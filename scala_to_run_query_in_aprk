@@ -1,0 +1,57 @@
+//include libraries
+import org.apache.spark.rdd.RDD
+import org.apache.log4j._
+import org.apache.spark.sql._
+import org.apache.spark.sql.{ DataFrame, Row, SQLContext }
+import org.apache.spark.sql.Dataset
+import org.apache.spark.sql.hive.HiveContext
+import org.apache.spark.{SparkConf, SparkContext}
+import org.joda.time.{DateTimeConstants, Days, LocalDate, DateTime}
+import org.joda.time.format.DateTimeFormat
+import org.apache.spark.sql.functions._
+import scala.io.Source
+import org.apache.spark.sql.functions.unix_timestamp
+import org.apache.log4j.Logger
+import org.apache.log4j.Level
+
+//sql context
+val spark = new org.apache.spark.sql.SQLContext(sc)
+
+//hive parameters for dynamic insert
+spark.setConf("hive.exec.dynamic.partition", "true")
+spark.setConf("hive.exec.dynamic.partition.mode", "nonstrict")
+spark.setConf("spark.sql.hive.convertMetastoreOrc", "false")
+import spark.implicits._ 
+
+//loggers
+val LOGGER = Logger.getLogger("DATA movement")
+Logger.getLogger("org").setLevel(Level.ERROR)
+Logger.getLogger("akka").setLevel(Level.ERROR)
+
+var query = ""
+
+//Get input arguments from triggering script
+val args = sc.getConf.get("spark.driver.args").split("^")
+if (args.size.equals(1)){
+
+query = args(0)
+
+LOGGER.info(" : Query passed in the parameter : " + query)
+
+} else {
+
+LOGGER.error(" : Please pass the required arguments to the job ")
+LOGGER.error(" : Insufficient arguments passed to the job " + args.size)
+LOGGER.error("spark-shell --master yarn --name 'Payee advise load' --num-executors ${num_executors} --executor-cores ${executor_cores} --executor-memory ${executor_memory} --driver-memory ${driver_mem} --driver-cores ${driver_crs} --queue ${queue}  -i <scala file> <query>")
+sys.exit(1)
+
+}
+
+LOGGER.info(s"Query_process_start")
+
+spark.sql(s"${query}")
+
+LOGGER.info(s"Query_process_end")
+
+sc.stop
+sys.exit
