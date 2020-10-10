@@ -1,0 +1,131 @@
+package com.scb.cib
+
+import scala.io.Source
+import org.apache.log4j._
+import org.apache.spark.rdd.RDD
+import org.apache.spark.sql.DataFrame
+import org.apache.spark.sql.hive.HiveContext
+import org.apache.spark.{SparkConf, SparkContext}
+import org.joda.time.{DateTimeConstants, Days, LocalDate, DateTime}
+import org.joda.time.format.DateTimeFormat
+import org.apache.spark.sql.functions._
+import java.io.{FileNotFoundException, IOException}
+import org.apache.hadoop.fs.{FileSystem, Path}
+import org.apache.hadoop.conf.Configuration
+
+
+object dataLoad {
+  
+  val LOGGER = Logger.getLogger("DATA LOADING")
+  Logger.getLogger("org").setLevel(Level.OFF);
+  Logger.getLogger("akka").setLevel(Level.OFF);
+  
+  def main(args: Array[String]) {
+    
+    //spark context and hive context
+    val conf = new SparkConf().setAppName("StgTableLoad")
+    val sc = new SparkContext(conf)
+    val hc = new HiveContext(sc)
+    
+    //properties for dynamic hive partitions
+    hc.setConf("hive.exec.dynamic.partition.mode", "nonstrict")
+    hc.setConf("hive.exec.dynamic.partition", "true")
+    hc.setConf("spark.sql.sources.partitionOverwriteMode","dynamic")
+    
+    LOGGER.info(" : starting the JOB to load stagging table : ")
+    LOGGER.info(" : Feching the input parameters : ")
+    
+    var inputFile = ""
+    var copyDate = ""
+    var hdfsPath = ""
+    var system = ""
+    var unformattedDate = ""
+    
+    //check for parameters passed 
+    if (args.size.equals(5)){
+      
+      inputFile = args(0)
+      copyDate  = args(1)
+      hdfsPath = args(2)
+      system = args(3)
+      unformattedDate= args(4)
+      
+      LOGGER.info(" : Source file for the details : " + inputFile)
+      LOGGER.info(" : Data copy date : " + copyDate)
+      LOGGER.info(" : HDFS path for the  : " + hdfsPath)
+      LOGGER.info(" : data copy system  : " + system)
+      LOGGER.info(" : unformatted Date  : " + unformattedDate)
+      
+      } else {
+        
+        LOGGER.error(" : Please pass the required arguments to the job ")
+        LOGGER.error(" : Insufficient arguments passed to the job " + args.size)
+        LOGGER.error("spark-submit --class ${COOL_SPARK_JOB_CLASS_NAME} --master yarn --driver-memory ${SPARK_DRIVER_MEMORY} --executor-cores ${SPARK_NUM_CORES} --executor-memory ${SPARK_EXEC_MEMORY} --num-executors ${SPARK_NUM_EXECUTORS} --conf spark.port.maxRetries=50 --conf spark.sql.shuffle.partitions=${SPARK_SHUFFLE_PARTITIONS} --conf spark.default.parallelism=${SPARK_DEFAULT_PARALLELISM}  --jars ${HIVE_JARS_PATH} $jar_path/${SL_JAR_NAME} ${odate} ${country_file} ${startDate} ${endDate}")
+        sys.exit(1)
+        
+      }
+    
+    //Date formatting
+    val inputFormatter = DateTimeFormat.forPattern("yyyyMMdd")
+    val date = inputFormatter.parseDateTime(unformattedDate)
+    val dateHyphen = date.toString("yyyy-MM-dd")
+    val dateUnderScore = date.toString("yyyy_MM_dd")
+    var partitioDate = copyDate
+    
+    //preparation of input file path
+    val InputTableFile = hdfsPath + "/" + inputFile
+    var lines = List[String]()
+    
+    LOGGER.info(" : Reading table list from  : " + InputTableFile)
+    
+    try {
+      lines = sc.textFile(InputTableFile).collect.toList
+    } catch {
+      case e: FileNotFoundException => {LOGGER.error(" : could not find the file : " + InputTableFile); null} 
+      case e: IOException => {LOGGER.error(" : Got an IOException in file : " + InputTableFile); null}
+      }
+
+    //execute hive query
+    def executeQuery(hc: HiveContext, query: String): DataFrame = {
+    try {
+      hc.sql(query)
+    } catch {
+      case e: Exception => LOGGER.error(" : Got an exception while running query : " + query + "exception : " + e);null}
+    }
+  
+    //starting the data movement
+    for (line <- lines) {
+      
+      val sourceDatabase = line.split('.')(0)
+      val sourceTable = line.split('.')(1)
+      val targetDatabase = line.split('.')(2)
+      val targetTable = line.split('.')(3)
+      val partitionColumn = line.split('.')(4)
+      val tableType = line.split('.')(5)
+      
+      LOGGER.info(" : Starting the process to load data in table : " + targetDatabase + "." + targetTable + " for date " + partitioDate )
+      LOGGER.info(" : Sourse table for the process : " + sourceDatabase + "." + sourceTable + " partition column " + partitionColumn )
+      
+      if ( system == "ebbs" && tableType == "M" ) {
+        val partitionQuery= s"show partitions ${sourceDatabase}.${sourceTable}"
+        LOGGER.info(" : Fetching max partitions for date : " + partitioDate + " from table : " + sourceDatabase +"."+ sourceTable)
+        val partitions = executeQuery(hc: HiveContext, partitionQuery).select("partition").filter(col("partition").contains(s"${dateUnderScore}")).agg(max(col("partition"))).collect().map{x => if (x(0) == null) null else x.toString()}
+        if (partitions(0) == null) {
+          LOGGER.info(" There are no partitions for date in the table " + dateUnderScore)
+          } else {
+            partitioDate=partitions.mkString("").split('=')(1)}
+      }
+      
+      val query = s"select * from ${sourceDatabase}.${sourceTable} where ${partitionColumn} = '${partitioDate}'"
+      val dataFrame = executeQuery(hc: HiveContext, query: String)
+      
+      //load data to the table
+      dataFrame.write.mode("overwrite").insertInto(s"${targetDatabase}.${targetTable}")
+      LOGGER.info(" : Loaded data to the table : " + targetTable + " for date " + partitioDate)
+      partitioDate = copyDate
+      
+    }
+    
+  }
+  
+}
