@@ -1,0 +1,19 @@
+##===========================================================================================
+##    hive properties for fast execution and vertex error
+##===========================================================================================
+set hive.execution.engine=tez;
+set hive.exec.parallel=true;
+set hive.cbo.enable=true;
+set hive.compute.query.using.stats=true;
+set hive.stats.fetch.column.stats=true;
+set hive.stats.fetch.partition.stats=true;
+set hive.tez.container.size=10240;
+set hive.tez.java.opts=-Xmx8192m;
+set tez.runtime.io.sort.mb=4096;
+set tez.runtime.unordered.output.buffer.size-mb=1024;
+set hive.auto.convert.join.noconditionaltask.size=100000000; 
+set hive.auto.convert.join=false;
+set hive.vectorized.execution.enabled=false;
+set hive.vectorized.execution.reduce.enabled=false;
+SET hive.optimize.ppd=true;
+SET mapred.reduce.tasks=-1;
