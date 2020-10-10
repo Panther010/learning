@@ -1,0 +1,15 @@
+sed -i '/ROW FORMAT SERDE/d' file
+sed -i '/WITH SERDEPROPERTIES/d' file
+sed -i '/serialization.format/d' file
+sed -i '/INPUTFORMAT/d' file
+sed -i '/TBLPROPERTIES/d' file
+sed -i '/ROW FORMAT SERDE/d' file
+sed -i '/OUTPUTFORMAT/d' file
+sed -i '/transient_lastDdlTime/d' file
+sed -i '/^)$/d' file
+sed -i 's/STORED AS/STORED AS ORC/g' file
+sed -i 's/hdfs:\/\/masternode\/path1\/path2\/path3\/path4\/path5/\/sit\/path1\/path2/g' file
+sed -i 's/.*CREATE EXTERNAL TABLE/;&/' file
+sed -i 's/;/;\n/' file
+sed -i '1d' file
+echo ";" >> file
