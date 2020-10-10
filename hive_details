@@ -17,3 +17,76 @@ set hive.vectorized.execution.enabled=false;
 set hive.vectorized.execution.reduce.enabled=false;
 SET hive.optimize.ppd=true;
 SET mapred.reduce.tasks=-1;
+
+
+
+##===========================================================================================
+##    merging small files 
+##===========================================================================================
+After the 1st MapReduce job finishes, Hive will decide if it needs to start another MapReduce job to merge the intermediate files. If small file merge is disabled, the number of target table files is the same as the number of mappers from 1st MapReduce job. Below 4 parameters determine if and how Hive does small file merge.
+hive.merge.mapfiles -- Merge small files at the end of a map-only job.
+hive.merge.mapredfiles -- Merge small files at the end of a map-reduce job.
+hive.merge.size.per.task -- Size of merged files at the end of the job.
+hive.merge.smallfiles.avgsize -- When the average output file size of a job is less than this number, Hive will start an additional map-reduce job to merge the output files into bigger files. This is only done for map-only jobs if hive.merge.mapfiles is true, and for map-reduce jobs if hive.merge.mapredfiles is true.
+By default hive.merge.smallfiles.avgsize=16000000 and hive.merge.size.per.task=256000000, so if the average file size is about 17MB, the merge job will not be triggered. Sometimes if we really want only 1 file being generated in the end, we need to increase hive.merge.smallfiles.avgsize to large enough to trigger the merge; and also you need to increase hive.merge.size.per.task to the get the needed number of files in the end.
+
+set hive.merge.mapfiles=true;
+set hive.merge.mapredfiles=true;
+set hive.merge.smallfiles.avgsize=104857600;
+set hive.merge.size.per.task=209715200;
+set mapred.max.split.size=68157440;
+set mapred.min.split.size=68157440;
+
+
+
+##===========================================================================================
+##    spark orc file issue
+##===========================================================================================
+spark.setConf("spark.sql.hive.convertMetastoreOrc", "false")
+
+
+##===========================================================================================
+##    dynamic partition
+##===========================================================================================
+set hive.exec.dynamic.partition=true;
+set hive.exec.dynamic.partition.mode=nonstrict;
+
+
+
+##===========================================================================================
+##    msck repair error issue
+##===========================================================================================
+set hive.msck.path.validation=ignore;
+
+
+
+##===========================================================================================
+##    load hive partition table from filestatic loading only
+##===========================================================================================
+load data local inpath '<path>' OVERWRITE INTO TABLE <table_name> PARTITION (ods='2019_06_30');
+
+
+
+##===========================================================================================
+##    alter table location in hive 
+##===========================================================================================
+ALTER TABLE <table> SET LOCATION "/path/to/new/location";
+
+
+##===========================================================================================
+##    load data to partitioned table 
+##===========================================================================================
+ALTER TABLE test ADD PARTITION (dt='2014-03-05') location 's3://test.com/2014-03-05'
+
+SET hive.exec.dynamic.partition = true;
+SET hive.exec.dynamic.partition.mode = nonstrict;
+INSERT OVERWRITE TABLE table_name PARTITION(Date) select date from table_name; 
+
+
+
+
+##===========================================================================================
+##    write data to file 
+##===========================================================================================
+hive -e "set hive.cli.print.header=true; select * from table where report_mth = '2019-09-30'" > file.txt
+
