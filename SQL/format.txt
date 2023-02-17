@@ -1,0 +1,12 @@
+-- create table statement
+
+-- Insert data
+
+-- Input data
+
+-- Required Output
+
+--Solution steps
+
+--SQL solution1
+
