@@ -32,6 +32,13 @@ select * from icc_world_cup;
 --SA,1,0,1
 --SL,2,0,2
 
+--Solution steps 
+-- 1. bring team_1 an team_2 in same column by union_all
+-- 2. get win_count column by check if team_1 is winning or team_2 is winning
+-- 3. COUNT all the row by team will give match played by teams
+-- 4. SUM of all the win_count will give no_of_win by team
+-- 5. Diferrence of win and played will give loss 
+
 --SQL solution1
 select team, count(1) as match_played, sum(winner_count) as no_of_wins, 
 (count(1) - sum(winner_count)) as no_of_losses from (
