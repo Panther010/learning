@@ -47,3 +47,12 @@ select team_2 as team, case when team_2 = winner then 1 else 0 end as winner_cou
 group by team
 order by no_of_wins desc
 
+-- Additional check with draw case (Common table expression)
+with win_draw_flag as(
+select team_1 as team, case when team_1 = winner then 1 else 0 end as win_flag,
+case when Winner = 'Draw' then 1 else 0 end as draw_flag from icc_world_cup1 union all
+select team_2 as team, case when team_2 = winner then 1 else 0 end as win_flag,
+case when Winner = 'Draw' then 1 else 0 end as draw_flag from icc_world_cup1)
+select team, count(1) as match_played, sum(win_flag) as no_of_wins, 
+(count(1)- sum(win_flag) -sum(draw_flag)) as no_of_losses,
+sum(draw_flag) as no_of_draw from win_draw_flag group by team order by no_of_wins desc

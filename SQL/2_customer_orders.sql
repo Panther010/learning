@@ -44,7 +44,7 @@ select * from customer_orders
 -- get customer ID, order date and first visit flag by above queries
 -- group by date and add the first visit flag to get date wise 1st visit and total minus first visit will be the repeated customers
 
---SQL solution1
+--SQL solution1 (with rank window function)
 select order_date, sum(new_old_flag) as new_vistiors, (count(1) - sum(new_old_flag)) as repeated_visitors
 from (
 select order_date, coming_date, 
@@ -54,7 +54,7 @@ rank() over(partition by customer_id order by order_date) as coming_date from cu
 group by order_date
 order by order_date
 
---SQL solution2
+--SQL solution2 (with rank window function and case statement with rank)
 select order_date, sum(new_old_flag) as new_vistiors, (count(1) - sum(new_old_flag)) as repeated_visitors
 from (
 select customer_id, order_date,
@@ -62,7 +62,7 @@ case when rank() over(partition by customer_id order by order_date) = 1 then 1 e
 group by order_date
 order by order_date
 
---SQL solution3
+--SQL solution3 (with self join and common table expression)
 with first_visit as (
 select customer_id, min(order_date) as min_order_date from customer_orders group by customer_id),
 visit_flag as 
@@ -89,3 +89,17 @@ sum(case when repeated_visit_flag = 1 then order_amount else 0 end) as repeated_
 from first_visit_order
 group by order_date
 order by order_date
+
+-- Additional check without join and min window function
+with first_visit as (
+select order_amount, order_date,
+case when min(order_date) over(partition by customer_id) = order_date then 1 else 0 end as new_visit_flag,
+case when min(order_date) over(partition by customer_id) != order_date then 1 else 0 end as repeat_visit_flag
+from customer_orders co order by order_id)
+
+select order_date, 
+sum(new_visit_flag) as new_visit_count,
+sum(case when new_visit_flag = 1 then order_amount else 0 end) as new_order_amount, 
+sum(repeat_visit_flag) as repeat_visit_count,
+sum(case when repeat_visit_flag = 1 then order_amount else 0 end) as repeat_order_amount 
+from first_visit group by order_date order by order_date;   
