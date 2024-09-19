@@ -1,3 +1,5 @@
+-- question statement
+
 -- create table statement
 
 -- Insert data
@@ -10,5 +12,5 @@
 
 --SQL solution1
 
---Aditional logics
+--Additional logics
 
