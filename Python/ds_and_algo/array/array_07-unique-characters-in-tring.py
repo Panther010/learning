@@ -1,4 +1,7 @@
 def unique_char(s):
+    """
+    check if all the character in the string are unique or not
+    """
     seen = set()
     
     for char in s:
