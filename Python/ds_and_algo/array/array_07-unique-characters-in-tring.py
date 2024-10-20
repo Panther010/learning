@@ -13,6 +13,16 @@ def unique_char(s):
     return True
 
 
-print(unique_char(''))
-print(unique_char('goo'))
-print(unique_char('abcdefg'))
+def unique_char1(s):
+    """
+    check if all the character in the string are unique or not
+    """
+    if len(s) == len(set(s)):
+        return True
+
+    return False
+
+
+print(unique_char1(''))
+print(unique_char1('goo'))
+print(unique_char1('abcdefg'))
