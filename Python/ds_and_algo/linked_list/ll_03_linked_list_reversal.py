@@ -83,6 +83,7 @@ class SinglyLinkedList:
         print("None")
 
     def list_reversal(self):
+        """Function to reverse the linked list"""
         previous_node = None
         current = self.head
 
