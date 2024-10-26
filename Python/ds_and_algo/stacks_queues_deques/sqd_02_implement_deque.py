@@ -1,4 +1,4 @@
-class Deque(object):
+class Deque:
 
     def __init__(self):
         self.deque = []

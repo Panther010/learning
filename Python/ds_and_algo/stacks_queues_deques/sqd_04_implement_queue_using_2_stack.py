@@ -6,7 +6,7 @@ def is_empty(a):
     return size(a) == 0
 
 
-class QueueUsingTwoStack(object):
+class QueueUsingTwoStack:
 
     def __init__(self):
         self.in_stack = []
