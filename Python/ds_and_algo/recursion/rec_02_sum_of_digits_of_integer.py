@@ -1,5 +1,6 @@
 def digit_sum(num1):
 
+    # base case
     if num1 < 10:
         return num1
     else:
