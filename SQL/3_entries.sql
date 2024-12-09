@@ -25,7 +25,11 @@ B,Bangalore,B1@gmail.com,2,DESKTOP
 B,Bangalore,B2@gmail.com,1,MONITOR
 
 -- Required Output
-name, total_visit, most_visited_floor, resources_used
+--calculate for each user
+    --which is the most visited floor
+    --how many total visits are there
+    --which all resources they have used
+name, most_visited_floor, total_visit, resources_used
 'A',1,3,"'CPU','DESKTOP'"
 'B',2,3,"'DESKTOP', 'MONITOR'"
 
@@ -58,4 +62,22 @@ select total_visits.name, total_visit, most_visit.floor as most_visited_floor, r
 from total_visits inner join res_used on total_visits.name = res_used.name 
 inner join most_visit on total_visits.name = most_visit.name
 where rn = 1
+
+--SQL solution3
+with
+	visit_count as (select name, count(1) as total_visit from entries group by name),
+	resource_used as (select name, string_agg(resources, ',') as resources_used from (
+						select distinct name, resources from entries) a
+							group by name),
+	floor_ranking as (select name, floor, count(1),
+						rank() over(partition by name order by count(1) desc) as most_visited_floor_rank from entries
+						group by name, floor)
+	select a.name, floor, total_visit, resources_used
+		from visit_count a inner join resource_used b
+			on a.name = b.name
+			inner join floor_ranking c
+			on a.name = c.name
+			and most_visited_floor_rank = 1
+		order by name
+
 
