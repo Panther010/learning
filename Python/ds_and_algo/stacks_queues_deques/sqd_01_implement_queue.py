@@ -10,19 +10,22 @@ class Queue:
         return self.size() == 0
 
     def enqueue(self, element):
+        """adding value to the top of the queue"""
         self.queue.append(element)
 
     def dequeue(self):
+        """removing first value from the queue"""
         if self.is_empty():
-            print(f"Queue is empty")
-            return None
+            return f"Queue is empty"
         return self.queue.pop(0)
 
     def peek(self):
         if self.is_empty():
-            print('Queue is empty')
-            return None
+            return f"Queue is empty"
         return self.queue[0]
+
+    def __str__(self):
+        return str(self.queue)
 
 
 # Testing the Queue class

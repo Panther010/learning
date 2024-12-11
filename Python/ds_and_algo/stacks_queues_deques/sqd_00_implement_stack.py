@@ -10,9 +10,11 @@ class Stack:
         return self.size() == 0
 
     def push(self, element):
+        """adding value at the top of the stack"""
         self.stack.append(element)
 
     def pop(self):
+        """removing value from the top of the stack"""
         if self.is_empty():
             print("Stack is empty!")
             return None
@@ -23,6 +25,9 @@ class Stack:
             print("Stack is empty!")
             return None
         return self.stack[-1]
+
+    def __str__(self):
+        return str(self.stack)
 
 
 # Test the Stack class

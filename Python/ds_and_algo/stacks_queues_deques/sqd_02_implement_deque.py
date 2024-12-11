@@ -10,22 +10,39 @@ class Deque:
         return self.size() == 0
 
     def add_front(self, element):
+        """Adding value to the top of the deque"""
         self.deque.append(element)
 
     def add_rear(self, element):
+        """Adding value to the bottom of the deque"""
         self.deque.insert(0, element)
 
     def remove_front(self):
+        """Removing value from the top of the deque"""
         if self.is_empty():
-            print('Deque is empty')
-            return None
+            return 'Deque is empty'
         return self.deque.pop()
 
     def remove_back(self):
+        """Removing value from the bottom of the deque"""
         if self.is_empty():
-            print('Deque is empty')
-            return None
+            return "Deque is empty"
         return self.deque.pop(0)
+
+    def peak_front(self):
+        """Returning value from the top of the deque"""
+        if self.is_empty():
+            return "deque is empty"
+        return self.deque[-1]
+
+    def peak_rear(self):
+        """Returning value from the bottom of the deque"""
+        if self.is_empty():
+            return "deque is empty"
+        return self.deque[0]
+
+    def __str__(self):
+        return str(self.deque)
 
 
 # Test the Deque class

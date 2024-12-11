@@ -1,5 +1,4 @@
 def balance_check(s):
-
     opening = {'(', '{', '['}  # All the opening parentheses
     matches = {('(', ')'), ('{', '}'), ('[', ']')}  # Pair of match cases
 
@@ -31,6 +30,6 @@ def balance_check(s):
 print(balance_check('[](){([[[]]])}'))
 # Testing the function
 print(balance_check('[](){([[[]]])}'))  # Should return True
-print(balance_check('[(])'))            # Should return False
-print(balance_check(''))                # Should return True (empty string is balanced)
-print(balance_check('['))               # Should return False (unmatched opening bracket)
+print(balance_check('[(])'))  # Should return False
+print(balance_check(''))  # Should return True (empty string is balanced)
+print(balance_check('['))  # Should return False (unmatched opening bracket)
