@@ -1,99 +1,153 @@
 class Node:
-    def __init__(self, value):
-        self.value = value
+
+    def __init__(self, val):
+
+        self.value = val
         self.next = None
 
 
 class SinglyLinkedList:
+
     def __init__(self):
         self.head = None
 
     def is_empty(self):
         return self.head is None
 
-    def append(self, value):
-        """Append the node/value at the end of the linked list"""
-        new_node = Node(value)
+    def append(self, val):
+        new_node = Node(val)
 
         if self.is_empty():
+            print("list is empty")
             self.head = new_node
             return
 
         current = self.head
-        while current.next:  # Traverse till the end of the list
+        while current.next:
             current = current.next
 
-        current.next = new_node  # Attach the new node at the end
+        current.next = new_node
 
-    def prepend(self, value):
-        """ Add a node with the given value at the beginning of the list """
-        new_node = Node(value)
+    def prepend(self, val):
+        new_node = Node(val)
         new_node.next = self.head
         self.head = new_node
 
-    def delete(self, value):
-        """ Delete the first occurrence of a node with the given value """
-        if self.is_empty():  # empty check
-            print("List is empty")
+    def delete(self, val):
+        if self.is_empty():
+            print("list is empty")
             return
 
-        if self.head.value == value:  # If the node to be deleted is the head node
-            self.head = self.head.next
-            return
-
-        # Traverse till the end of the list or just before finding the value
         current = self.head
-        while current.next and current.next.value != value:
+
+        if current.value == val:
+            self.head = current.next
+
+        while current.next and current.next.value != val:
             current = current.next
 
         if current.next is None:
-            print(f"Value {value} is not present in the List")
+            print(f"value {val} is not present in the list")
         else:
             current.next = current.next.next
 
-    def search(self, value):
-        """ Search for a node with a given value, return True if found, False otherwise """
+    def search(self, val):
         if self.is_empty():
-            return False
+            print("list is empty")
+            return
 
         current = self.head
+
         while current:
-            if current.value == value:
+            if current.value == val:
                 return True
             current = current.next
 
         return False
 
-    def print_list(self):
-        """ Print the linked list elements """
+    def __str__(self):
         if self.is_empty():
-            print("List is empty")
+            print("list is empty")
             return
 
         current = self.head
-        count = 1
+        count = 0
+
         while current:
-            if count > 100:
-                print('stopping after 100 elements')
-                return
-            print(current.value, end=" --> ")
+            print(current.value, end='-->')
             current = current.next
+            if count > 100:
+                return "Seems like there is a cycle in the list"
             count += 1
 
-        print("None")
+        return ""
+
+    def add_cyclic(self, position):
+        if self.is_empty():
+            print("list is empty")
+            return
+
+        pos = last = self.head
+
+        while last.next:
+            last = last.next
+
+        count = 1
+
+        while pos.next and count < position:
+            pos = pos.next
+            count += 1
+
+        if pos.next is None:
+            print("Position is not present in the list")
+
+        last.next = pos
+
+    def cyclic_check(self):
+        if self.is_empty():
+            print("list is empty")
+            return False
+
+        slow = fast = self.head
+
+        while fast and fast.next:
+
+            slow = slow.next
+            fast = fast.next.next
+
+            if fast:
+                print(f"Slow: {slow.value}, Fast: {fast.value}")
+            if slow == fast:
+                return True
+
+        return False
+
+    def reversal(self):
+        if self.is_empty():
+            print("list is empty")
+            return
+
+        current = self.head
+        previous = None
+
+        while current:
+            next_node = current.next
+            current.next = previous
+            previous = current
+            current = next_node
+
+        self.head = previous
 
     def nth_to_last_node(self, n):
-        left = self.head
-        right = self.head
-
         if self.is_empty():
-            print(" List is empty")
+            print("list is empty")
+            return
+
+        left = right = self.head
 
         for i in range(1, n):
-
             if not right.next:
-                raise LookupError(f" given value of n {n} is larger than the list length")
-
+                raise ValueError(f"position {n} is bigger than the total length of list")
             right = right.next
 
         while right.next:
@@ -111,6 +165,7 @@ if __name__ == "__main__":
     sll.prepend(3)
     sll.prepend(2)
     sll.prepend(1)
+    print(sll)
 
     # Append elements to the linked list
     sll.append(4)
@@ -119,7 +174,9 @@ if __name__ == "__main__":
     sll.append(7)
     sll.append(8)
     sll.append(9)
+    print(sll.search(10))  # False
     sll.append(10)
+    print(sll)
     sll.append(11)
     sll.append(12)
     sll.append(13)
@@ -132,7 +189,7 @@ if __name__ == "__main__":
     sll.append(20)
 
     # Print the list
-    sll.print_list()  # Expected: 1 -> 2 -> 3 -> 4 -> 5 -> None
+    print(sll)  # Expected: 1 -> 2 -> 3 -> 4 -> 5 ---> 20 ->
 
     # Search for an element
     print(sll.search(3))  # True
@@ -140,13 +197,21 @@ if __name__ == "__main__":
 
     # Delete an element
     sll.delete(3)
-    sll.print_list()  # Expected: 1 -> 2 -> 4 -> 5 -> None
+    print(sll)  # Expected: 1 -> 2 -> 4 -> 5 ---> 20 -> None
 
     # Try deleting an element not in the list
-    sll.delete(10)  # Should print that value 10 is not found
-    sll.print_list()
+    sll.delete(10)
+    sll.delete(25)  # Should print that value 25 is not found
+    print(sll)
+
+    sll.nth_to_last_node(8)
+    print(sll)
 
     print("checking after reversal")
-    sll.nth_to_last_node(8)
-    sll.print_list()
+    sll.reversal()
+    print(sll)
 
+    print(sll.cyclic_check())
+    sll.add_cyclic(5)
+    print(sll)
+    print(sll.cyclic_check())

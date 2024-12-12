@@ -1,5 +1,9 @@
+-- question statement
+--Write a query to provide the date for nth Occurrence in future for given date
+
 -- create table statement
     --Loaded data from the file "Superstore_orders.csv" present in data section
+
 -- Insert data
     --Loaded data from the file "Superstore_orders.csv" present in data section
 

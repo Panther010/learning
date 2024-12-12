@@ -1,3 +1,9 @@
+-- question statement
+--calculate for each user
+    --which is the most visited floor
+    --how many total visits are there
+    --which all resources they have used
+
 -- create table statement
 create table entries ( 
 name varchar(20),

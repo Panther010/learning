@@ -1,3 +1,6 @@
+-- question statement
+--Get the new and repeated customers daily from customer_orders table
+
 -- create table statement
 create table customer_orders (
 order_id integer,

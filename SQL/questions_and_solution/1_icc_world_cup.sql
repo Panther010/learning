@@ -1,3 +1,6 @@
+-- question statement
+--Calculate Total match played, win and lose for a team
+
 -- create table statement
 create table icc_world_cup
 (
