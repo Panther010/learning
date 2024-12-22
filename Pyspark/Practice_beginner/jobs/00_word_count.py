@@ -1,3 +1,8 @@
+"""
+This PySpark program performs a word count analysis on a text file, filtering out common stop words,
+and outputs the results sorted by frequency using both DataFrame API and SQL.
+"""
+
 from pyspark.sql import SparkSession
 from pyspark.sql import functions as f
 
@@ -44,5 +49,5 @@ query = f""" with words_tb as (
 result = spark.sql(query)
 
 result.coalesce(1).write.csv(output_path, mode="overwrite", header=True)
-
+# result.show()
 spark.stop()
