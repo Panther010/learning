@@ -35,4 +35,7 @@ result = heroes.alias('heroes').join(names.alias('names'), f.col('heroes.hero_id
 result.printSchema()
 result.show()
 
-query = """with """
+query = """with heroes_and_connections as (
+            select * from graphs
+            )
+            select * from heroes_and_connections"""
