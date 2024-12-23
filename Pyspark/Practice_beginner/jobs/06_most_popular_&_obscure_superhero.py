@@ -18,7 +18,7 @@ graphs.printSchema()
 graphs.show()
 
 heroes = graphs.select(f.split(f.col('value'), ' ')[0].alias('hero_id'),
-                       (f.size(f.split(f.col('value'), ' ')) - 1 ).alias('connection')) \
+                       (f.size(f.split(f.col('value'), ' ')) - 1).alias('connection')) \
           .groupby(f.col('hero_id')).agg(f.sum(f.col('connection')).alias('total_connections'))
 
 
@@ -35,7 +35,23 @@ result = heroes.alias('heroes').join(names.alias('names'), f.col('heroes.hero_id
 result.printSchema()
 result.show()
 
+graphs.createOrReplaceTempView('graphs')
+names.createOrReplaceTempView('names')
+
 query = """with heroes_and_connections as (
-            select * from graphs
+            select 
+                split(value, ' ')[0] as hero_id, 
+                (size(split(value, ' ')) - 1) as connections 
+            from graphs
             )
-            select * from heroes_and_connections"""
+            select a.hero_id,
+                b.hero_name,
+                sum(a.connections) as total_connection 
+            from heroes_and_connections a inner join names b on a.hero_id = b.hero_id
+            group by a.hero_id, b.hero_name
+            order by sum(a.connections)
+            """
+
+sql_results = spark.sql(query)
+sql_results.printSchema()
+sql_results.show()
