@@ -3,14 +3,15 @@ from pyspark.sql import functions as f
 
 class BatchWordCount:
 
-    def __init__(self):
-        self.input_path = '../data/'
-        self.out_path = '../output/counter'
+    def __init__(self, input_path, output_path, spark=None):
+        self.input_path = input_path
+        self.out_path = output_path
 
-        self.spark = SparkSession.builder \
-            .appName('batch word count') \
-            .master('local') \
-            .getOrCreate()
+        # Use the provided SparkSession or create a new one if not provided
+        if spark is None:
+            self.spark = SparkSession.builder.appName('Word Count').master('local').getOrCreate()
+        else:
+            self.spark = spark
 
     def read_raw_data(self):
         lines = self.spark.read.text(self.input_path, lineSep='.')
@@ -21,12 +22,12 @@ class BatchWordCount:
                 .filter((f.col('word').rlike('[a-z]')) & (f.col('word').isNotNull()))
 
     def word_counter(self, clean_df: DataFrame):
-        return clean_df.groupby(f.col('word')).agg(f.count())
+        return clean_df.groupby(f.col('word')).agg(f.count(f.col('word')).alias('count'))
 
     def writer(self, word_count_df: DataFrame):
         word_count_df.write.parquet(self.out_path, mode='overwrite')
 
-    def counter(self):
+    def run(self):
         print("Starting to run the code")
         raw = self.read_raw_data()
         clean_df = self.clean_data(raw)
@@ -36,5 +37,7 @@ class BatchWordCount:
 
 
 if __name__ == '__main__':
-    word_count = BatchWordCount()
-    word_count.counter()
+    input_dir = "../data/"
+    output_dir = "../output/counter/"
+    word_count = BatchWordCount(input_dir, output_dir)
+    word_count.run()
