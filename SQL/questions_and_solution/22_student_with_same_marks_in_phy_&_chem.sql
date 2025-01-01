@@ -32,8 +32,10 @@ insert into exams values
 
 
 --Solution steps
-    -- Try making list of all the possible combination  of stores and quarters
-    -- Once the table is reasy anti left join or left join with filter on null
+    -- group by student_id
+    -- have having filter on subject count > 1
+    -- second filter can be on distinct count of marks.
+    -- It will ensure getting the records which are having same marks in both the subjects
 
 --SQL solution 1 using special having clause
 select student_id
