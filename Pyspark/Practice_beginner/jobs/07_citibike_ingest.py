@@ -3,7 +3,7 @@ from pyspark.sql import functions as f
 
 spark = SparkSession.builder.appName("citi bike ingest").master('local').getOrCreate()
 
-input_file = '../input_data/citibike.csv'
+input_file = '../../input_data/citibike.csv'
 output_path = '../output/citibike_ingest'
 
 citibike_raw = spark.read.csv(input_file, header=True, inferSchema=True)

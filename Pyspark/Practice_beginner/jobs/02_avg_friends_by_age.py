@@ -4,7 +4,7 @@ from pyspark.sql.types import *
 
 spark = SparkSession.builder.appName("avg friends by age").master("local").getOrCreate()
 
-input_path = '../input_data/fakefriends.csv'
+input_path = '../../input_data/fakefriends.csv'
 
 schema = StructType([StructField('id', IntegerType(), True),
                      StructField('name', StringType(), True),

@@ -4,8 +4,8 @@ from pyspark.sql.types import *
 
 spark = SparkSession.builder.appName('most popular movie').master('local').getOrCreate()
 
-movie_rating_file = '../input_data/u.data'
-movie_name_file = '../input_data/u.item'
+movie_rating_file = '../../input_data/u.data'
+movie_name_file = '../../input_data/u.item'
 
 name_schema = StructType([StructField('movie_id', IntegerType(), True),
                           StructField('movie_name', StringType(), True)])

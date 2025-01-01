@@ -3,7 +3,7 @@ from pyspark.sql import functions as f
 
 spark = SparkSession.builder.appName("min temp").master('local').getOrCreate()
 
-input_file = '../input_data/1800.csv'
+input_file = '../../input_data/1800.csv'
 
 temperature_data = spark.read.csv(input_file, header=False, inferSchema=True)
 

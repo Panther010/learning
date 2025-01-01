@@ -4,7 +4,7 @@ from pyspark.sql.types import *
 
 spark = SparkSession.builder.appName("total order by customer").master("local").getOrCreate()
 
-input_file = '../input_data/customer-orders.csv'
+input_file = '../../input_data/customer-orders.csv'
 
 schema = StructType([StructField('cust_id', IntegerType(), True),
                       StructField('order_id', IntegerType(), True),

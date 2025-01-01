@@ -14,7 +14,7 @@ class WordsCount:
         self.spark = SparkSession.builder.appName('wc').master('local').getOrCreate()
 
         # file paths
-        self.input_path = "../input_data/words.txt"
+        self.input_path = "../../input_data/words.txt"
         self.output_path = "../output/words_count"
 
         # 2. Define File Paths for Input and Output

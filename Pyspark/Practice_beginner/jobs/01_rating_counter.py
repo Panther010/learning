@@ -7,7 +7,7 @@ class RatingCounter:
 
     def __init__(self):
         self.spark = SparkSession.builder.appName("movie ratings counter").master("local").getOrCreate()
-        self.input_path = "../input_data/u.data"
+        self.input_path = "../../input_data/u.data"
         self.output_path = '../output/ratings_count/'
 
         self.col_names = ['user_id', 'movie_id', 'rating', 'date_time']
