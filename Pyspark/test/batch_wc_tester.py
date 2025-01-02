@@ -11,7 +11,7 @@ class BatchWCTester:
         self.base_data_dir = '../Streaming/data'
         self.output_dir = '../Streaming/output/counter/'
 
-        self.test_data_dir = '../datasets/'
+        self.test_data_dir = '../input_data/datasets/'
 
         self.spark = SparkSession.builder.appName('Word Count tester').master('local').getOrCreate()
 

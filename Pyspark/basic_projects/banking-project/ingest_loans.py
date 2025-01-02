@@ -14,14 +14,14 @@ class LoanIngest:
     3. Write the processed data into a Parquet format at the specified output path.
     """
 
-    def __init__(self):
+    def __init__(self, input_file, output_path):
         """
         Initialize the LoanIngest class by setting up Spark session, input and output paths, and logger.
         """
         self.spark = SparkSession.builder.appName('loan ingest').master('local').getOrCreate()
 
-        self.input_path = '../../../input_data/raw/loan.csv'
-        self.output_path = '../../../input_data/bronze/loans'
+        self.input_path = input_file
+        self.output_path = output_path
 
         formatter = '%(levelname)s : %(filename)s : %(lineno)d : %(message)s'
         logging.basicConfig(level=logging.INFO, format=formatter)
@@ -77,7 +77,12 @@ class LoanIngest:
 
         self.spark.stop()
 
+
 # Entry point for the script
 if __name__ == '__main__':
-    ingest = LoanIngest()
+    # input_path = '../../input_data/raw/loan.csv'
+    # output_path = '../../../input_data/bronze/loans'
+    in_path = ''
+    out_path = ''
+    ingest = LoanIngest(in_path, out_path)
     ingest.main()
