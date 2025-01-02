@@ -1,5 +1,5 @@
 -- question statement
-    -- ind student with same marks in Physics and Chemistry
+    -- Find student with same marks in Physics and Chemistry
 
 -- create table statement
 create table exams (student_id int, subject varchar(20), marks int);
