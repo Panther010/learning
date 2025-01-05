@@ -13,14 +13,31 @@ class APIWordBank:
         logging.basicConfig(level=logging.INFO, format=formatter)
         self.log = logging.getLogger('logger')
 
+    def api_calls(self, parameters):
+        self.log.info(f"API : {self.url}, Parameters : {parameters}")
+        response = requests.get(f"{self.url}", params=parameters) if parameters else requests.get(f"{self.url}")
+        if response.status_code == 200:
+            self.log.info("successfully fetched the data with parameters provided")
+            print(response.json())
+        else:
+            self.log.warning(f"Hello person, there's a {response.status_code} error with your request")
+            self.log.warning(f"Response content: {response.text}")
+        return response
+
     def fetch_data(self):
         self.log.info(f'Fetching data from World Bank API...')
         try:
-            response = requests.get(self.url)
-            print(response)
-            response.raise_for_status()
-            if response.status_code == 200:
-                return response.json()
+            full_data = []
+            param = {}
+            resp = self.api_calls(param).json()
+            if resp[0]['pages'] > 0:
+                for i in range(1, resp[0]['pages'] + 1):
+                    param['page'] = str(i)
+                    resp1 = self.api_calls(param).json()
+                    full_data.extend(resp1[1])
+
+            return full_data
+
         except requests.exceptions.RequestException as e:
             self.log.error(f'Error fetching data from API as {e}')
             return None
@@ -30,7 +47,9 @@ class APIWordBank:
         try:
             os.makedirs(os.path.dirname(output_path), exist_ok=True)
             with open(self.output_path, "w") as f:
-                json.dump(data, f, indent=4)  # type: ignore
+                for record in data:
+                    json.dump(record, f) # type: ignore
+                    f.write("\n")
 
         except Exception as e:
             self.log.error(f'Error while writing data to path {self.output_path} error details: {e}')
