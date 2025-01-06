@@ -32,14 +32,13 @@ class WordsCount:
         return line_df.select(
             f.explode(
                 f.split(
-                    f.lower(f.col('value'))
+                    f.regexp_replace(f.lower(f.col('value'), r"[^a-z']", ''))
                 , ' ')).alias('words')
             )
 
     # Clean the words by removing Null, unwanted characters and filter unwanted words
     def words_cleaner(self, words_df):
-        return words_df.withColumn('words', f.regexp_replace(f.col('words'), r'[^a-z]', '')) \
-            .filter(~f.col('words').isin(self.stop_words) & f.col('words').isNotNull())
+        return words_df.filter(~f.col('words').isin(self.stop_words) & f.col('words').isNotNull())
 
     # Count Words and Order by Frequency
     def words_counter(self, words_df):
