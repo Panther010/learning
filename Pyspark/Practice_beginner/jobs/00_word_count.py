@@ -32,7 +32,7 @@ class WordsCount:
         return line_df.select(
             f.explode(
                 f.split(
-                    f.regexp_replace(f.lower(f.col('value'), r"[^a-z']", ''))
+                    f.regexp_replace(f.lower(f.col('value')), r"[^a-z']", ' ')
                 , ' ')).alias('words')
             )
 
@@ -55,13 +55,12 @@ class WordsCount:
         lines_df.createOrReplaceTempView("lines")
         return self.spark.sql(f"""
         with words_tb as (
-                select explode(split(lower(value), " ")) as words from lines),
-            clean_words_tb as (
-                select regexp_replace(words, '[^a-z]', '') as words from words_tb)
+                select explode(split(regexp_replace(lower(value), "[^a-z']", ' '), " ")) as words from lines)
+            
             select 
                 words, 
                 count(1) as words_count 
-            from clean_words_tb
+            from words_tb
             where words not in ({self.stop_words_str}) 
             group by words 
             order by count(1) desc
