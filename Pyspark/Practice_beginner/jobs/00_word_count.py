@@ -63,7 +63,7 @@ class WordsCount:
             from words_tb
             where words not in ({self.stop_words_str}) 
             group by words 
-            order by count(1) desc
+            order by words_count desc
         """)
 
     # diver program
