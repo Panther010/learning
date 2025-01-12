@@ -7,8 +7,7 @@ from pyspark.sql.types import *
 spark = SparkSession.builder.appName("distance calculator").master("local").getOrCreate()
 
 input_file = "../output/citibike_ingest"
-output_path = '../output/citibike_distance'
-
+output_path = "../output/citibike_distance"
 citi_bike = spark.read.parquet(input_file)
 
 print(citi_bike.count())
