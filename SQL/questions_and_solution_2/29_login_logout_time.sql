@@ -48,6 +48,8 @@ insert into event_status values
 -- 6. count() group key - 1 to get count group by group key
 
 --SQL solution1
+-- LAG function is used to get the previous row's status to identify transitions
+
 with prev_status_col as (
 	select
 		*,
@@ -68,6 +70,7 @@ group by group_key
 
 
 --SQL solution2 using rank get the rank and subtract from id to get group id
+-- SUM with CASE is used to identify new groups where status changes from 'off' to 'on'
 with cte as(
 	select
 		event_time,
