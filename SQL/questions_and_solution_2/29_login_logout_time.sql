@@ -67,7 +67,7 @@ from group_key_tbl
 group by group_key
 
 
---SQL solution2
+--SQL solution2 using rank get the rank and subtract from id to get group id
 with cte as(
 	select
 		event_time,
