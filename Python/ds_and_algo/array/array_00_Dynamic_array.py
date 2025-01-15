@@ -90,6 +90,9 @@ class DynamicArray:
 
         self.n -= 1
 
+    def __str__(self):
+        return str([self.A[i] for i in range(self.n)])
+
 
 # append the new elements
 arr = DynamicArray()
@@ -100,6 +103,7 @@ arr.append(4)
 arr.append(5)
 arr.append(6)
 arr.append(7)
+print(arr)
 arr.append(8)
 arr.append(9)
 arr.append(10)

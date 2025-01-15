@@ -29,13 +29,13 @@ class Deque:
             return "Deque is empty"
         return self.deque.pop(0)
 
-    def peak_front(self):
+    def peek_front(self):
         """Returning value from the top of the deque"""
         if self.is_empty():
             return "deque is empty"
         return self.deque[-1]
 
-    def peak_rear(self):
+    def peek_rear(self):
         """Returning value from the bottom of the deque"""
         if self.is_empty():
             return "deque is empty"
@@ -47,13 +47,23 @@ class Deque:
 
 # Test the Deque class
 if __name__ == "__main__":
+    # Initialize a deque instance
     d = Deque()
+
+    # Add elements
     d.add_front(10)
     d.add_rear(20)
     d.add_front(30)
 
-    print("Deque size:", d.size())  # Should print 3
+    # Assertions for testing
+    assert d.size() == 3, "Size should be 3 after adding three elements"
+    assert d.remove_front() == 30, "Front element should be 30"
+    assert d.remove_back() == 20, "Rear element should be 20"
+    assert d.size() == 1, "Size should be 1 after removing two elements"
 
-    print("Remove front:", d.remove_front())  # Should print 10
-    print("Remove back:", d.remove_back())  # Should print 30
-    print("Deque size:", d.size())  # Should print 1
+    # Add more elements and test peeks
+    d.add_front(40)
+    assert d.peek_front() == 40, "Front element should be 40"
+    assert d.peek_rear() == 10, "Rear element should be 10"
+
+    print("All tests passed successfully!")
