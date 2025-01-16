@@ -46,3 +46,19 @@ max(case when city = 'Mumbai' then name else null end) as mumbai,
 max(case when city = 'Delhi' then name else null end) as delhi
 from cte
 group by rn
+
+--SQL solution2
+with cte as (
+    select
+        name,
+        city,
+        row_number() over (partition by city order by name) as rn
+    from players_location
+)
+select
+    coalesce(max(case when city = 'Bangalore' then name end), null) as bangalore,
+    coalesce(max(case when city = 'Mumbai' then name end), null) as mumbai,
+    coalesce(max(case when city = 'Delhi' then name end), null) as delhi
+from cte
+group by rn
+order by rn;
