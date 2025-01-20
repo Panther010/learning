@@ -111,7 +111,7 @@ arr.append(10)
 # length of the given append in array
 
 print(len(arr))
-print(*[arr[i] for i in range(len(arr))])
+print(arr)
 
 # access the given append in array
 arr.append(12)
