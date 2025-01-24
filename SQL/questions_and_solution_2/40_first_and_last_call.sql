@@ -21,7 +21,8 @@ values(1, 2, '2019-01-01 09:00:00.000'),
        (2, 4, '2019-08-02 09:00:00.000'),
        (2, 5, '2019-08-02 10:00:00.000'),
        (2, 5, '2019-08-02 10:45:00.000'),
-       (2, 4, '2019-08-02 11:00:00.000');
+       (2, 4, '2019-08-02 11:00:00.000'),
+       (2, 3, '2019-08-03 09:00:00.000');
 
 -- Input data
 "caller_id","recipient_id","date_called"
@@ -39,45 +40,39 @@ values(1, 2, '2019-01-01 09:00:00.000'),
 2,5,2019-08-02 10:00:00.000
 2,5,2019-08-02 10:45:00.000
 2,4,2019-08-02 11:00:00.000
+2,3,2019-08-03 09:00:00.000
 
 -- Required Output
-"student_id","student_name"
-2,Jade
+"caller_id","recipient_id","call_date","min","max"
+2,4,2019-08-02,2019-08-02 09:00:00.000,2019-08-02 11:00:00.000
+2,5,2019-07-05,2019-07-05 09:00:00.000,2019-07-05 23:00:00.000
 
 --Solution steps
--- 1. Find out the rows which are having highest and lowest marks in an subject
--- 2. Using case statement flag 1 can be set for the student who has get highest or lowest mark in subject
--- 3. rest will get 0 in flag. Save this data temp table
--- 4. Group by student_id get the records having sum of flag == 0
--- 5. These are the quite student.
--- 6. To get name join with students table
+-- 1. calculate the date from the date_called column
+-- 2. using first_value rank function get the first and last recipient_id
+-- 3. save this data to temp table
+-- 4. Apply filter to get records where first recipient_id = last recipient_id and recipient_id = first recipient_id
+-- 5. now group by all the column get the min and max date_called
+-- 6. In case want t avoid single call records use having clause min(date_called) != max(date_called)
 
 
 --SQL solution1
 with cte as (
 	select
-	*,
-	case when rank() over(partition by exam_id order by score) = 1 then 1
-		when rank() over(partition by exam_id order by score desc) = 1 then 1
-		else 0 end as rank_flag
-	from exams)
+		*,
+		date(date_called) as call_date,
+		first_value(recipient_id) over(partition by caller_id, date(date_called) order by date_called) as first_call,
+		first_value(recipient_id) over(partition by caller_id, date(date_called) order by date_called desc) as last_call
+	from phonelog)
 select
-a.student_id, b.student_name
-from cte a inner join students b
-on a.student_id = b.student_id
-group by a.student_id, b.student_name
-having sum(rank_flag) = 0
-
---SQL solution2
-with cte as (
-select
-	student_id, exam_id,
-	rank() over(partition by exam_id order by score) low_marks_rank,
-	rank() over(partition by exam_id order by score desc) high_marks_rank
-	from exams),
-cte2 as (
-	select distinct student_id from exams where student_id not in (
-	select distinct student_id from cte
-	where low_marks_rank = 1 or high_marks_rank = 1))
-select a.* from students a
-inner join cte2 b on a.student_id = b.student_id
+	caller_id,
+	recipient_id,
+	call_date,
+	min(date_called),
+	max(date_called)
+from cte
+where first_call = last_call and first_call = recipient_id
+group by caller_id,
+	recipient_id,
+	call_date
+having min(date_called) != max(date_called)
