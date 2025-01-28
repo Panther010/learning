@@ -2,6 +2,7 @@ from pyspark.sql import SparkSession, DataFrame
 from pyspark.sql import functions as f
 from pyspark.sql.window import Window
 import logging
+import time
 
 
 class IngestFlightData:
@@ -14,7 +15,7 @@ class IngestFlightData:
         self.passengers_data = passenger_data
 
         # Logging setup
-        formatter = '%(levelname)s : %(filename)s : %(lineno)d : %(message)s'
+        formatter = '%(asctime)s : %(levelname)s : %(filename)s : %(lineno)d : %(message)s'
         logging.basicConfig(level=logging.INFO, format=formatter)
         self.log = logging.getLogger('FlightAnalysis')
 
@@ -41,7 +42,7 @@ class IngestFlightData:
         return flight.alias('flight') \
             .select(f.col('passengerId'), f.col('flightId')) \
             .groupby(f.col('passengerId')).agg(f.count(f.col('flightId')).alias('flight_count')) \
-            .join(passengers.alias('passengers'), f.col('flight.passengerId') == f.col('passengers.passengerId')) \
+            .join(f.broadcast(passengers).alias('passengers'), f.col('flight.passengerId') == f.col('passengers.passengerId')) \
             .orderBy(f.col('flight_count').desc(), f.col('flight.passengerId')) \
             .drop(f.col('passengers.passengerId')).limit(100)
 
@@ -56,9 +57,9 @@ class IngestFlightData:
             f.col('date').alias('travel_date'))
 
         # Last country where passenger is present
-        last_country = flight.withColumn('',
+        last_country = flight.withColumn('rn',
                                          f.rank().over(Window.partitionBy(f.col('passengerId'))
-                                                       .orderBy(f.col('date').desc())).alias('rn')) \
+                                                       .orderBy(f.col('date').desc()))) \
             .filter(f.col('rn') == f.lit(1)) \
             .select(f.col('passengerId'),
                     f.col('to').alias('country'), f.dateadd(f.col('date'), 1).alias('travel_date'))
@@ -115,7 +116,8 @@ class IngestFlightData:
         self.log.info(f'Starting flight analysis .\n')
 
         # Read data
-        flights_df = self.read_data(self.flight_data)
+        start_time = time.time()
+        flights_df = self.read_data(self.flight_data).cache()
         passengers_df = self.read_data(self.passengers_data)
 
         # Q1: Total flights per month
@@ -134,13 +136,15 @@ class IngestFlightData:
         country_visit_non_uk_df.show(100)
 
         # Q4: Passengers flying together on more than 3 flights
-        flight_together_df = self.passengers_flying_together(flights_df)
+        flight_together_df = self.passengers_flying_together(flights_df).cache()
         more_than_3_df = self.more_than_three(flight_together_df)
         more_than_3_df.show(100)
 
         # Q5: Passengers flying together more than `min_flights` times in a given date range.
         more_than_n_df = self.flights_together_in_date_range(7, '2017-01-01', '2017-08-08', flight_together_df)
         more_than_n_df.show(100)
+        end_time = time.time()
+        print(f"Job started as {start_time} job completed at {end_time} total run time {end_time- start_time}")
 
 
 if __name__ == '__main__':
