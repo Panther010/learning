@@ -4,10 +4,10 @@
         -- Do not return the student who have not given any exam.
 
 -- create table statement
-create table phonelog(caller_id int, recipient_id int, date_called timestamp);
+create table phone_log(caller_id int, recipient_id int, date_called timestamp);
 
 -- Insert data
-insert into phonelog(caller_id, recipient_id, date_called)
+insert into phone_log(caller_id, recipient_id, date_called)
 values(1, 2, '2019-01-01 09:00:00.000'),
        (1, 3, '2019-01-01 17:00:00.000'),
        (1, 4, '2019-01-01 23:00:00.000'),
