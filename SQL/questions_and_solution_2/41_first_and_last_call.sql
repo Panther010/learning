@@ -3,7 +3,7 @@
         -- Who tok at least one exam and did not score high score nor the low score in any on the exam.
         -- Do not return the student who have not given any exam.
 
--- create table statement
+-- create table statement update
 create table phone_log(caller_id int, recipient_id int, date_called timestamp);
 
 -- Insert data
