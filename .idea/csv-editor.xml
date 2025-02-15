@@ -10,10 +10,24 @@
             </Attribute>
           </value>
         </entry>
+        <entry key="\Pyspark\input_data\raw\flightData.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
         <entry key="\Pyspark\input_data\raw\keystrokes-for-tech-test.csv">
           <value>
             <Attribute>
               <option name="separator" value=":" />
+            </Attribute>
+          </value>
+        </entry>
+        <entry key="\Pyspark\input_data\raw\passengers.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
             </Attribute>
           </value>
         </entry>
