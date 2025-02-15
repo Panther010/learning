@@ -1,19 +1,19 @@
 from pyspark.sql import SparkSession, DataFrame
 from pyspark.sql import functions as f
-import logger
-
+from src.logger import setup_logger
+from src.spark_manager import stop_spark_session, get_spark_session
 
 class FlightIngest:
 
-    def __init__(self) -> None:
-        self.spark = SparkSession.builder.appName('flight Ingest').master('local').getOrCreate()
+    def __init__(self, spark: SparkSession) -> None:
+        self.spark = spark
 
         self.flight_raw_file = '../../../input_data/raw/flightData.csv'
         self.passenger_raw_file = '../../../input_data/raw/passengers.csv'
 
         self.output_path = '../../../input_data/silver/'
 
-        self.log = logger.setup_logger()
+        self.log = setup_logger()
 
     def _read_csv_data(self, file_path: str) -> DataFrame:
         self.log.info(f'reading data from {file_path}')
@@ -24,7 +24,7 @@ class FlightIngest:
         new_col = ''.join([f'_{char.lower()}' if char.isupper() else char for char in col]).lstrip('_')
         return new_col
 
-    def _write_parquet_to_bronze(self, df:DataFrame, file_path: str) -> None:
+    def _write_parquet_to_silver(self, df:DataFrame, file_path: str) -> None:
         self.log.info(f'writing data to {file_path}')
         columns = [self.camel_to_snake_case(col) for col in df.columns]
         df = df.toDF(*columns)
@@ -44,19 +44,18 @@ class FlightIngest:
 
             passenger_df = self._read_csv_data(self.passenger_raw_file)
 
-            self._write_parquet_to_bronze(flight_df, f'{self.output_path}flights_data')
-            self._write_parquet_to_bronze(passenger_df, f'{self.output_path}passenger_details')
-            self._write_parquet_to_bronze(passenger_flight_df, f'{self.output_path}passenger_flight')
-            self._write_parquet_to_bronze(flight_details_df, f'{self.output_path}flight_details')
+            self._write_parquet_to_silver(flight_df, f'{self.output_path}flights_data')
+            self._write_parquet_to_silver(passenger_df, f'{self.output_path}passenger_details')
+            self._write_parquet_to_silver(passenger_flight_df, f'{self.output_path}passenger_flight')
+            self._write_parquet_to_silver(flight_details_df, f'{self.output_path}flight_details')
 
         except Exception as e:
             self.log.error(f'An error occurred: {e}')
             raise
-        finally:
-            if self.spark is not None:
-                self.spark.stop()
 
 
 if __name__ == '__main__':
-    fi = FlightIngest()
+    session = get_spark_session()
+    fi = FlightIngest(session)
     fi.main()
+    stop_spark_session()
