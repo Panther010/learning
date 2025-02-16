@@ -10,13 +10,6 @@
             </Attribute>
           </value>
         </entry>
-        <entry key="\Pyspark\input_data\gold\q4_more_than_3_flights_together\part-00000-d7b4e3af-4c6b-4c60-b043-c6c2c8d1587a-c000.csv">
-          <value>
-            <Attribute>
-              <option name="separator" value="," />
-            </Attribute>
-          </value>
-        </entry>
         <entry key="\Pyspark\input_data\raw\flightData.csv">
           <value>
             <Attribute>
