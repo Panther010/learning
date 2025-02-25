@@ -2,7 +2,7 @@
     -- Write a query to find the winner in each group
 
     --Winner is a player who scored the maximum total points within the group.
-    --In case of tie the lowest player_id wins
+    --In case of tie, the lowest player_id wins
 
 -- create table statement
 create table players (player_id int, group_id int);
@@ -89,3 +89,22 @@ player_ranking as (
 select * from player_ranking where ranking = 1
 
 --Additional logics
+with player_score as (
+	select
+		first_player as player,
+		first_score as score
+	from matches
+	union all
+	select
+		second_player as player,
+		second_score as score
+	from matches),
+player_ranking as (
+	select
+		b.group_id,
+		player,
+		sum(score) total_score,
+		rank() over(partition by b.group_id order by sum(score) desc, player)
+	from player_score a join players b on a.player = b.player_id
+	group by player, b.group_id)
+select * from player_ranking where rank = 1

@@ -89,3 +89,15 @@ create table items (item_id int, item_brand varchar(50));
         on m.user_id = d.seller_id and sell_number = 2
 
 --Additional logics
+with market_analysis as (
+	select
+		a.seller_id,
+		b.item_brand,
+		row_number() over(partition by seller_id order by order_date) as rn
+	from orders a join items b on a.item_id = b.item_id)
+select
+	coalesce(seller_id, user_id) as seller_id,
+	case when item_brand = favorite_brand then 'YES' else 'NO' end as item_fav_brand
+from market_analysis right join market_users
+	on seller_id = user_id and rn = 2
+order by seller_id

@@ -1,5 +1,5 @@
 -- question statement
-    -- Write a SQL query to find the cancellation rate of requests with unbanned users
+    -- Write a SQL query to find the cancellation rate of requests with unbanned users daily
     --(both client and driver must not be banned) each day between "2013-10-01" and "2013-10-03"
     --Round cancellation rate to two decimal points.
 
@@ -99,5 +99,15 @@ select
 from trips_with_user_driver_banned_flag
 group by request_at
 order by request_at
---Additional logics
 
+--Additional logics
+select
+	request_at,
+	count(1) as total_trip_cunt,
+	sum(case when status = 'completed' then 0 else 1 end) as cancelled_trip,
+	round((sum(case when status = 'completed' then 0 else 1 end) * 1.0 / count(1)), 2) as cancellation_rate
+from trips a join users b
+	on a.client_id = b.users_id and b.banned = 'No'
+join users c on a.driver_id = c.users_id and c.banned = 'No'
+group by request_at
+order by request_at

@@ -3,10 +3,20 @@
 --of a person who have friends with total score greater than 100
 
 -- create table statement
-    --Loaded data from the file "Superstore_orders.csv" present in data section
+create table person (person_id int, name varchar(100), email varchar(100), score int);
+
+create table friend (person_id int, friend_id int);
 
 -- Insert data
-    --Loaded data from the file "Superstore_orders.csv" present in data section
+INSERT INTO person (person_id, name, email, score) VALUES
+(1,'Alice','alice2018@hotmail.com',88),
+(2,'Bob','bob2018@hotmail.com',11),
+(3,'Davis','davis2018@hotmail.com',27),
+(4,'Tara','tara2018@hotmail.com',45),
+(5,'John','john2018@hotmail.com',63);
+
+INSERT INTO friend (person_id, friend_id) VALUES
+(1,2), (1,3), (2,1), (2,3), (3,5), (4,2), (4,3), (4,5);
 
 -- Input data
 --table 1 person
@@ -64,4 +74,23 @@ select * from friend_make_sum
 where sum_of_marks > 100
 
 --Additional logics
+with friend_mark_details as (
+	select
+		a.person_id,
+		a.name,
+		b.friend_id,
+		c.name as friend_name,
+		c.score as friend_score
+	from person a join friend b
+		on a.person_id = b.person_id
+	join person c on b.friend_id = c.person_id),
+marks_total as (
+	select
+		person_id,
+		name,
+		count(1) as friend_count,
+		sum(friend_score) sum_of_marks
+	from friend_mark_details
+	group by person_id, name)
+select * from marks_total where sum_of_marks > 100
 

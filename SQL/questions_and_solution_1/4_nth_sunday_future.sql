@@ -8,7 +8,7 @@
 -- Input data
 
 -- Required Output
-Write a query to provide the date for nth Occurrence in future for given date
+--Write a query to provide the date for nth Occurrence in future for given date
 
 --Solution steps
 -- declare variable for current date or given date
@@ -31,3 +31,9 @@ Write a query to provide the date for nth Occurrence in future for given date
     date_today + cast(7 - date_part('dow', date_today) as integer) + ((n-1) * 7) as nth_sunday,
     n
     from my_data
+-- sql solution 3
+with my_records (my_date, n) as (values(current_date, 5))
+select
+	my_date + cast(7 - date_part('dow', my_date) as integer) as next_sunday,
+	my_date + cast(7 - date_part('dow', my_date) as integer) + (7 * (n -1)) as nth_sunday
+from my_records

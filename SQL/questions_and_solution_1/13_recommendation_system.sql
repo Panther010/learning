@@ -51,7 +51,7 @@ B D,1
 
 
 --Solution steps
-    --Self join the orders table to get all the possible pair sold
+    --Self join the orders table on ordr_id to get all the possible pair sold
     --To remove duplicate and same to product apply filter a.product_id < b.product_id
     --join the results with product table to get the product name save this in temp table
     --group by name1 and name2 get the frequency of products bought together
