@@ -86,3 +86,20 @@ select
 	count(1) as total_user
 from update_platform
 group by spend_date, platform, total_amount
+
+--Additional logic:
+with spend_agg as (
+	select
+		user_id, spend_date,
+		string_agg(distinct platform, '|') platform,
+		sum(amount) total_amount,
+		count(1) total_users
+		from spending
+	group by user_id, spend_date)
+select
+	spend_date,
+	case when platform like '%|%' then 'both' else platform end as platform,
+	total_amount,
+	total_users
+from spend_agg
+order by spend_date

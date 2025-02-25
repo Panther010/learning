@@ -29,7 +29,7 @@ def auto_commit_and_push(repo_path: str, branch_name: str, commit_message: str =
     # Step 1.1 Create new branch
     run_git_command(f"git checkout -b {branch_name}", cwd=repo_path)
     # Step 2: Add all changes
-    run_git_command("git add .", cwd=repo_path)
+    # run_git_command("git add .", cwd=repo_path)
     print("All changes staged.")
     # Step 3: Commit changes
     run_git_command(f'git commit -m "{commit_message}"', cwd=repo_path)
