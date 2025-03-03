@@ -11,8 +11,19 @@ def run_git_command(command: str, cwd: str) -> str:
     :return: Output of the Git command.
     """
     result = subprocess.run(command, shell=True, cwd=cwd, capture_output=True, text=True)
+    # Log command execution details
+    print(f"Running: {command} in {cwd}")
+    print(f"Exit Code: {result.returncode}")
+
+    if result.stdout:
+        print(f"STDOUT: {result.stdout.strip()}")
+
+    if result.stderr:
+        print(f"STDERR: {result.stderr.strip()}")
+
     if result.returncode != 0:
-        raise Exception(f"Git command failed: {command}\n{result.stderr}")
+        raise Exception(f"Git command failed: {command}\nError: {result.stderr.strip()}")
+
     return result.stdout.strip()
 
 
@@ -29,7 +40,7 @@ def auto_commit_and_push(repo_path: str, branch_name: str, commit_message: str =
     # Step 1.1 Create new branch
     run_git_command(f"git checkout -b {branch_name}", cwd=repo_path)
     # Step 2: Add all changes
-    # run_git_command("git add .", cwd=repo_path)
+    run_git_command("git add .", cwd=repo_path)
     print("All changes staged.")
     # Step 3: Commit changes
     run_git_command(f'git commit -m "{commit_message}"', cwd=repo_path)
