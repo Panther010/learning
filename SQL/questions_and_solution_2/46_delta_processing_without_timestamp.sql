@@ -46,7 +46,7 @@ insert into emp values
 --Solution steps
 -- 1. perform 2 self join join manager id with emp id to get manager of an emp.
 -- 2. select the required columns
--- 3. start again
+
 --SQL solution1
 select
 	e1.emp_id,
