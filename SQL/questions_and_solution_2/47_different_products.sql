@@ -1,50 +1,70 @@
 -- question statement
-    -- write a query to print total rides and profit rides for each driver
-    -- profit ride is when the end location of current ride is same as start location on next ride
+    -- write a query to users who bought different products on different dates
+    -- products purchased on any given date are not repeated on any other day by same user
 
 -- create table statement update
-create table drivers(id varchar(10), start_time time, end_time time, start_loc varchar(10), end_loc varchar(10));
+create table purchase_history (userid int, productid int, purchasedate date);
 
 -- Insert data
-insert into drivers values
-('dri_1', '09:00', '09:30', 'a','b'),
-('dri_1', '09:30', '10:30', 'b','c'),
-('dri_1', '11:00', '11:30', 'd','e'),
-('dri_1', '12:00', '12:30', 'f','g'),
-('dri_1', '13:30', '14:30', 'c','h'),
-('dri_2', '12:15', '12:30', 'f','g'),
-('dri_2', '13:30', '14:30', 'c','h');
+insert into purchase_history values
+(1,1,'2012-01-23')
+,(1,2,'2012-01-23')
+,(1,3,'2012-01-25')
+,(2,1,'2012-01-23')
+,(2,2,'2012-01-23')
+,(2,2,'2012-01-25')
+,(2,4,'2012-01-25')
+,(3,4,'2012-01-23')
+,(3,1,'2012-01-23')
+,(4,1,'2012-01-23')
+,(4,2,'2012-01-25');
 
 -- Input data
-"id","start_time","end_time","start_loc","end_loc"
-dri_1,09:00:00,09:30:00,a,b
-dri_1,09:30:00,10:30:00,b,c
-dri_1,11:00:00,11:30:00,d,e
-dri_1,12:00:00,12:30:00,f,g
-dri_1,13:30:00,14:30:00,c,h
-dri_2,12:15:00,12:30:00,f,g
-dri_2,13:30:00,14:30:00,c,h
+"userid","productid","purchasedate"
+1,1,2012-01-23
+1,2,2012-01-23
+1,3,2012-01-25
+2,1,2012-01-23
+2,2,2012-01-23
+2,2,2012-01-25
+2,4,2012-01-25
+3,4,2012-01-23
+3,1,2012-01-23
+4,1,2012-01-23
+4,2,2012-01-25
 
 -- Required Output
-"id","total_rides","profit_rides"
-dri_1,5,1
-dri_2,2,0
+"userid"
+1
+4
 
 --Solution steps
--- 1. using lead calculate the next start location for each ride
--- 2. Save table as CTE and in next step
--- 3. calculate total ride and conditional sum of rides where current end location is same as next start location
-
+-- 1. self join the table on user id on same userid and differentdate not same
+-- 2. productid same or greater than the first to avoid duplicate
+-- 3. this join wil give us products pair bought by same user on different date save this data in temp table
+-- 4. group by user id conditional sum 1 when product id is same else 0
+-- 5. select only records having sum 0 to get the user not bought same product on different date
 
 --SQL solution1
-with drive_cte as (
+with cte as (
 	select
-		*,
-		lead(start_loc) over(partition by id order by start_time) as next_start_loc
-	from drivers)
+		a.*,
+		b.productid as b_productid,
+		b.purchasedate
+	from purchase_history a join purchase_history b on
+		a.userid = b.userid and
+		a.purchasedate != b.purchasedate and
+		a.productid <= b.productid)
 select
-	id,
-	count(start_loc) as total_rides,
-	sum(case when end_loc = next_start_loc then 1 else 0 end) as profit_rides
-from drive_cte
-group by id
+	userid
+from cte
+group by userid
+having sum(case when productid = b_productid then 1 else 0 end) = 0
+
+-- SQL solution to by checking if there are different purchase date and
+-- distinct product count and total product count is same
+select
+	userid
+from purchase_history
+group by userid
+having count(distinct purchasedate) > 1 and count(productid) = count(distinct productid)
