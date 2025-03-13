@@ -153,4 +153,3 @@ group by userid
 having sum(case when productid = b_productid then 1 else 0 end) = 0
 
 -- SQL solution to by checking if there are different purchase date and
--- distinct product count and total product count is same
