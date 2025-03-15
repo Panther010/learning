@@ -137,19 +137,20 @@ insert into marketing_campaign values
 -- 5. select only records having sum 0 to get the user not bought same product on different date
 
 --SQL solution1
-with cte as (
-	select
-		a.*,
-		b.productid as b_productid,
-		b.purchasedate
-	from purchase_history a join purchase_history b on
-		a.userid = b.userid and
-		a.purchasedate != b.purchasedate and
-		a.productid <= b.productid)
-select
-	userid
-from cte
-group by userid
-having sum(case when productid = b_productid then 1 else 0 end) = 0
 
--- SQL solution to by checking if there are different purchase date and
+with cte as(
+	select
+		*,
+		rank() over(partition by user_id order by created_at) as rn
+	from marketing_campaign),
+first_day as (
+	select * from cte where rn = 1),
+other_day as (
+	select * from cte where rn != 1)
+
+select
+distinct a.user_id
+from other_day	a left join first_day b
+on a.user_id = b.user_id and a.product_id = b.product_id
+where b.user_id is null
+order by user_id
