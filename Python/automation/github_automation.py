@@ -58,8 +58,10 @@ def auto_commit_and_push(repo_path: str, branch_name: str, commit_message: str =
 
 def main():
     # Path to your Git repository (PyCharm project directory)
-    repo_path = os.path.abspath(os.path.dirname(__file__))  # Dynamically detects current script's directory
-    git_path = '\\'.join(repo_path.split('\\')[:-2])
+    repo_path = os.path.abspath(os.path.dirname(__file__))
+    print(f'repo_path: {repo_path}')
+    # Dynamically detects current script's directory
+    git_path = os.path.abspath(os.path.join(repo_path, "..", ".."))
     print(f'git_path : {git_path}')
     changes_today = input("Hi Good day what all changes you have made today? \n")
     branch = changes_today.replace(' ', '_')
