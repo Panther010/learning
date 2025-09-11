@@ -14,6 +14,8 @@ Create a list to store these monthly expenses and using that find out,
 4. June month just finished and your expense is 1980 dollar. Add this item to our monthly expense list
 5. You returned an item that you bought in a month of April and got a refund of 200$. Make a correction to your monthly expense list based on this
 """
+from operator import index
+
 """
 You have a list of your favourite marvel super heros.
 heros=['spider man','thor','hulk','iron man','captain america']
@@ -130,14 +132,17 @@ Exercise: Python for loop
 After flipping a coin 10 times you got this result,
 result = ["heads","tails","tails","heads","tails","heads","heads","tails","tails","tails"]
 Using for loop figure out how many times you got heads
-
+"""
+"""
 Print square of all numbers between 1 to 10 except even numbers
 Your monthly expense list (from Jan to May) looks like this,
 expense_list = [2340, 2500, 2100, 3100, 2980]
 Write a program that asks you to enter an expense amount and program should tell you in which month that expense occurred. If expense is not found then it should print that as well.
-
+"""
+"""
 Lets say you are running a 5 km race. Write a program that,
-
+"""
+"""
 Upon completing each 1 km asks you "are you tired?"
 If you reply "yes" then it should break and print "you didn't finish the race"
 If you reply "no" then it should continue and ask "are you tired" on every km
@@ -151,3 +156,43 @@ Write a program that prints following shape
 *****
 
 """
+
+# 1.
+def for1() -> None:
+    result = ["heads","tails","tails","heads","tails","heads","heads","tails","tails","tails"]
+    counter = 0
+    for i in result:
+        if i == 'heads':
+            counter += 1
+
+    print(f"{counter} times we got heads")
+
+    for n in range(1, 11):
+        print(n**2)
+
+def for2() -> None:
+    expense_list = [2340, 2500, 2100, 3100, 2980]
+    user_expense = int(input("Please enter expense: "))
+    months = ['Jan', 'Feb', 'Mar', 'Apr', 'May']
+    if user_expense in expense_list:
+        print(f"you spent {user_expense} in {months[expense_list.index(user_expense)]} month")
+    else:
+        print(f"You have not spent {user_expense} in any month")
+
+def for3() -> None:
+
+    for i in range(1,6):
+        if i == 5:
+            print(f"Congratulations you have completed the race")
+        else:
+            tired = input(f"Are you tired after {i} KMs: ")
+            if tired == 'yes':
+                print(f"You didn't finish 5 km race but hey congrats anyways! you completed {i} kms")
+                break
+
+
+def for4() -> None:
+    for i in range(1,6):
+        print('*' * i)
+
+for4()
