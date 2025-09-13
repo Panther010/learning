@@ -155,7 +155,7 @@ def stock_calculator():
 
 Write circle_calc() function that takes radius of a circle as an input from user and then it calculates and returns area, circumference and diameter. You should get these values in your main program by calling circle_calc function and then print them
 """
-def circle_calc() -> tuple[float, float, int]:
+def circle_calc():
     radius = int(input("Please enter the radius of circle : "))
     area = math.pi * (radius ** 2)
     circumference = 2 * math.pi * radius
@@ -163,5 +163,6 @@ def circle_calc() -> tuple[float, float, int]:
 
     return area, circumference, diameter
 
-received_data = circle_calc()
-print(f"Area of teh circle => {received_data[0]} Circumference of area => {received_data[1]} diameter of area = {received_data[2]}")
+
+a, c, d = circle_calc()
+print(f"Area of teh circle => {a} Circumference of area => {c} diameter of area = {d}")
