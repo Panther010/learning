@@ -1,67 +1,149 @@
 -- question statement
-    --We have a table which stores multiple sections, every section has 3 numbers. We have to find 4 numbers from any 2 sections
-    --(2 numbers each) whose addition should be max
-    --In case there us same total for 2 sections section with high individual number will get preference.
-    --current scenario out of C and D D will get preference since D is having one number with 10
+    --we have data of bookings and another table for segment
+    -- solve following question
+    -- 1. calculate total user count for each segment and for each segment user who booked flight in apr 2022
+    --
 
 -- create table statement update
-create table section_data
-(
-section varchar(5),
-number integer
+--Booking_table
+CREATE TABLE booking_table(
+   booking_id       VARCHAR(3) NOT NULL
+  ,booking_date     date NOT NULL
+  ,user_id          VARCHAR(2) NOT NULL
+  ,line_of_business VARCHAR(6) NOT NULL
+);
+-- user_table
+CREATE TABLE user_table(
+   user_id VARCHAR(3) NOT NULL
+  ,segment VARCHAR(2) NOT NULL
 );
 
 -- Insert data
-insert into section_data
-values ('A',5),('A',7),('A',10) ,('B',7),('B',9),('B',10) ,('C',9),('C',7),('C',9) ,('D',10),('D',3),('D',8);
+--Booking_table
+INSERT INTO booking_table values
+('b1','2022-03-23','u1','Flight'),
+('b2','2022-03-27','u2','Flight'),
+('b3','2022-03-28','u1','Hotel'),
+('b4','2022-03-31','u4','Flight'),
+('b5','2022-04-02','u1','Hotel'),
+('b6','2022-04-02','u2','Flight'),
+('b7','2022-04-06','u5','Flight'),
+('b8','2022-04-06','u6','Hotel'),
+('b9','2022-04-06','u2','Flight'),
+('b10','2022-04-10','u1','Flight'),
+('b11','2022-04-12','u4','Flight'),
+('b12','2022-04-16','u1','Flight'),
+('b13','2022-04-19','u2','Flight'),
+('b14','2022-04-20','u5','Hotel'),
+('b15','2022-04-22','u6','Flight'),
+('b16','2022-04-26','u4','Hotel'),
+('b17','2022-04-28','u2','Hotel'),
+('b18','2022-04-30','u1','Hotel'),
+('b19','2022-05-04','u4','Hotel'),
+('b20','2022-05-06','u1','Flight');
+
+-- user_table
+INSERT INTO user_table values('u1','s1'), ('u2','s1'), ('u3','s1'), ('u4','s2'), ('u5','s2'), ('u6','s3'), ('u7','s3'), ('u8','s3'), ('u9','s3'), ('u10','s3');
 
 -- Input data
-"section","number"
-A,5
-A,7
-A,10
-B,7
-B,9
-B,10
-C,9
-C,7
-C,9
-D,10
-D,3
-D,8
+--Booking_table
+"booking_id","booking_date","user_id","line_of_business"
+b1,2022-03-23,u1,Flight
+b2,2022-03-27,u2,Flight
+b3,2022-03-28,u1,Hotel
+b4,2022-03-31,u4,Flight
+b5,2022-04-02,u1,Hotel
+b6,2022-04-02,u2,Flight
+b7,2022-04-06,u5,Flight
+b8,2022-04-06,u6,Hotel
+b9,2022-04-06,u2,Flight
+b10,2022-04-10,u1,Flight
+b11,2022-04-12,u4,Flight
+b12,2022-04-16,u1,Flight
+b13,2022-04-19,u2,Flight
+b14,2022-04-20,u5,Hotel
+b15,2022-04-22,u6,Flight
+b16,2022-04-26,u4,Hotel
+b17,2022-04-28,u2,Hotel
+b18,2022-04-30,u1,Hotel
+b19,2022-05-04,u4,Hotel
+b20,2022-05-06,u1,Flight
+
+-- user_table
+"user_id","segment"
+u1,s1
+u2,s1
+u3,s1
+u4,s2
+u5,s2
+u6,s3
+u7,s3
+u8,s3
+u9,s3
+u10,s3
+
 
 -- Required Output
-"section","number"
-B,10
-B,9
-D,10
-D,8
+--Q1
+"segment","total_user_count","user_who_booked_flight_in_apr2022"
+s1,3,2
+s2,2,2
+s3,5,1
+
 
 --Solution steps
--- 1. Calculate row_number for each section having number as desc to select the highest 2 marks for each section
--- 2. apply filter section_number_rank < 3 to remove other data.
--- 3. Calculate the total for each section and the max marks from each section
--- 4. apply dense rank on the section total marks and max marks to get highest total with high mark ranking
--- 5. apply fiter to remove unfiltered data
+-- 1. left join user_table and booking table on user_id
+--2. count distinct user_id
+--3. with in case class apply condition to fetch user_id from apr 2022
 
 --SQL solution1
-
-with ranked_section as (
+with booking_and_segment as (
 	select
-		*,
-		row_number() over(partition by section order by number desc) as section_number_rank
-	from section_data
+		distinct b.user_id, segment
+	from booking_table a inner join user_table b
+	on a.user_id = b.user_id and a.line_of_business = 'Flight' and date_part('month', booking_date) = 4
 ),
-section_total as (
+apr_flight_booking_segment as (
 	select
-		*,
-		sum(number) over(partition by section) as section_marks,
-		max(number) over(partition by section) as mn
-	from ranked_section where section_number_rank < 3),
-section_total_ranking as (
+		segment,
+		count(user_id) as user_who_booked_flight_in_apr2022
+	from booking_and_segment
+	group by segment
+),
+segment_user_count as(
 	select
-		*, dense_rank() over(order by section_marks desc, mn desc) as sm
-	from section_total
+		segment,
+		count(user_id) as total_user_count
+	from user_table
+	group by segment
 )
-select section, number from section_total_ranking where sm < 3
+select
+	a1.segment,
+	a1.total_user_count,
+	b1.user_who_booked_flight_in_apr2022
+from segment_user_count a1 left join apr_flight_booking_segment b1
+	on a1.segment = b1.segment
+order by a1.segment
 
+--SQL solution2
+
+select
+	segment,
+	count(distinct a.user_id) as total_user_count,
+	count(distinct
+		case when line_of_business = 'Flight' and
+		booking_date between '2022-04-01' and '2022-04-30'
+	then a.user_id end) as user_who_booked_flight_in_apr2022
+from user_table a left join booking_table b on a.user_id = b.user_id
+group by segment;
+
+select
+	segment,
+	count(distinct a.user_id) as total_user_count,
+	count(distinct
+		case when line_of_business = 'Flight' and
+		date_part('month', booking_date) = 4 and
+		date_part('year', booking_date) = 2022
+	then a.user_id end) as user_who_booked_flight_in_apr2022
+from user_table a left join booking_table b on a.user_id = b.user_id
+group by segment
