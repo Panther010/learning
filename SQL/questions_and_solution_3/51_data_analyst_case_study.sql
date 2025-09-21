@@ -3,6 +3,8 @@
     -- solve following question
     -- 1. calculate total user count for each segment and for each segment user who booked flight in apr 2022
     -- 2. write a query to get the users whose first booking was a hotel booking
+    -- 3. write a query to find days between first and last booking of each days
+    -- 4. write a query to find number of hotel bookings for each of the user segment for the year 2022
 
 -- create table statement update
 --Booking_table
@@ -156,13 +158,82 @@ b8,2022-04-06,u6,Hotel,1
 --Solution steps
 --1. rank by user order by booking_date
 
---SQL solution2
+--SQL solution1
 with user_booking_rank as (
 	select
 		*,
 		rank() over(partition by user_id order by booking_date) as rn
 	from booking_table
 )
-
 select * from user_booking_rank
 where rn = 1 and line_of_business = 'Hotel'
+
+--SQL solution2
+with user_booking_rank as (
+	select
+		*,
+		first_value(line_of_business) over(partition by user_id order by booking_date) as rn
+	from booking_table
+)
+
+select * from user_booking_rank
+where rn = 'Hotel' and line_of_business = 'Hotel'
+
+
+--Q3
+"user_id","days_between"
+u4,34
+u5,14
+u1,44
+u2,32
+u6,16
+
+--Solution steps
+--1. get max date and min date and calculate the difference
+
+--SQL solution1
+select
+	user_id,
+	(max(booking_date) - min(booking_date)) as days_between
+from booking_table
+group by user_id
+
+--SQL solution2
+select distinct
+	user_id,
+	first_value(booking_date) over(partition by user_id order by booking_date),
+	last_value(booking_date) over(partition by user_id),
+	last_value(booking_date) over(partition by user_id) -
+	first_value(booking_date) over(partition by user_id order by booking_date) as days_between
+from booking_table
+order by user_id
+
+--Q4
+"segment","flight_bookings","hotel_bookings"
+s1,8,4
+s2,3,3
+s3,1,1
+
+--Solution steps
+--1. case condition with in some
+
+--SQL solution1
+select
+	segment,
+	sum(case when line_of_business = 'Flight' then 1 else 0 end) as flight_bookings,
+	sum(case when line_of_business = 'Hotel' then 1 else 0 end) as hotel_bookings
+from user_table a left join booking_table b on
+	a.user_id = b.user_id
+group by segment
+order by segment
+
+--SQL solution2
+select
+	segment,
+	line_of_business,
+	count(a.user_id) as booking_count
+from user_table a inner join booking_table b on
+	a.user_id = b.user_id and
+	date_part('year', booking_date) = '2022'
+group by segment, line_of_business
+order by segment
