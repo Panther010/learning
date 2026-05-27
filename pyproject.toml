@@ -1,0 +1,41 @@
+[project]
+name = "de-learning"
+version = "0.1.0"
+description = "Data Engineering learning repository - portfolio, practice, and interview prep"
+requires-python = ">=3.11"
+dependencies = [
+    "pyspark>=3.5.0",
+    "pydantic>=2.0",
+    "pyyaml>=6.0",
+    "requests>=2.31.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0",
+    "ruff>=0.4.0",
+    "mypy>=1.10",
+]
+
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+include = ["shared*", "projects*", "fundamentals*"]
+
+[tool.pytest.ini_options]
+testpaths = ["shared/tests", "projects", "fundamentals"]
+pythonpath = ["."]
+addopts = "-v --tb=short"
+
+[tool.ruff]
+line-length = 120
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "W"]
+
+[tool.mypy]
+python_version = "3.11"
+ignore_missing_imports = true
