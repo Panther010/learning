@@ -1,6 +1,7 @@
 from pyspark.sql import SparkSession
 from pyspark.sql.types import *
 from pyspark.sql import functions as f
+from pyspark.sql.window import Window
 
 spark = SparkSession.builder.appName("sol").master("local").getOrCreate()
 
@@ -33,13 +34,14 @@ df.show()
 
 # Task: Filter the dataframe to show only Electronics rows
 # Expected: 6 rows
-df.filter(f.lower(f.col("category")) == f.lit("electronics")).show()
+df = df.filter(f.lower(f.col("category")) == f.lit("electronics"))
+df.show()
 
 # Task: Add a new column "amount_with_tax"
 # Tax rate is 20% — amount_with_tax = amount * 1.20
 # Round to 2 decimal places
-df.withColumn("amount_with_tax", f.col("amount") * f.lit(1.20)).show()
-
+df = df.withColumn("amount_with_tax", f.col("amount") * f.lit(1.20))
+df.show()
 
 # Task: Group by salesperson, sum the amount, order by total descending
 # Expected output:
@@ -47,7 +49,8 @@ df.withColumn("amount_with_tax", f.col("amount") * f.lit(1.20)).show()
 # Charlie 2380.0
 # Bob 2865.0
 # Alice 2470.0
-df.groupBy(f.col("salesperson")).agg(f.sum("amount").alias("total_amount")).orderBy(f.col("total_amount").desc()).show()
+df1 = df.groupBy(f.col("salesperson")).agg(f.sum("amount").alias("total_amount")).orderBy(f.col("total_amount").desc())
+df1.show()
 
 
 # Task:
@@ -62,6 +65,10 @@ df.groupBy(f.col("salesperson")).agg(f.sum("amount").alias("total_amount")).orde
 # Clothing Jan 350.0
 # Electronics Feb 4025.0
 # ... etc
+df = df.withColumn("sale_date", f.to_date(f.col("sale_date"))) \
+      .withColumn("sale_month", f.month(f.col("sale_date")))
+df.show()
+df.printSchema()
 
 
 
@@ -77,7 +84,12 @@ df.groupBy(f.col("salesperson")).agg(f.sum("amount").alias("total_amount")).orde
 # Bob Electronics 1540.0
 # Charlie Electronics 2200.0
 # Diana Electronics 3100.0
-
+df = df.withColumn("sale_tier",
+              f.when(f.col("amount") >= f.lit(2000), f.lit("High"))
+              .when(f.col("amount") >= f.lit(1000), f.lit("Medium"))
+              .otherwise(f.lit("Low"))
+              )
+df.show()
 
 # Task: Add a column "running_total" showing cumulative sales
 # for each salesperson ordered by sale_date
@@ -85,7 +97,10 @@ df.groupBy(f.col("salesperson")).agg(f.sum("amount").alias("total_amount")).orde
 # 2026-01-15 1200.0 running_total: 1200.0
 # 2026-02-01 850.0 running_total: 2050.0
 # 2026-03-05 420.0 running_total: 2470.0
+window_spec = Window.orderBy(f.col("id"))
 
+df = df.withColumn("running_total", f.sum(f.col("amount")).over(window_spec))
+df.show()
 
 # Task: Pivot the data so each category becomes a column
 # showing total sales per salesperson per category
