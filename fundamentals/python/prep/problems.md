@@ -1,3 +1,25 @@
+  Python: fundamentals/python/prep/solutions/
+ 
+  solutions/
+  ├── arrays_and_hashing.py      # Problems 1-4, 8-10 (Two Sum, Anagram, Duplicates, etc.)
+  ├── two_pointers.py            # Problems 7, 13, 16, 18 (3Sum, Container, Rotate, etc.)
+  ├── sliding_window.py          # Problems 12, 25 (Longest Substring, Subarray Sum)
+  ├── stacks_and_linked_lists.py # Problems 5, 6, 28 (Valid Parentheses, Merge Lists)
+  ├── matrix.py                  # Problems 22-24 (Sudoku, Set Zeroes, Spiral)
+  ├── binary_search.py           # Problems 19, 27 (Peak Element, Median of Two)
+  ├── dynamic_programming.py     # Problems 4, 15, 26, 30 (Stock, Kadane, Trapping Rain)
+  └── graphs_and_bfs.py          # Problem 29 (Word Ladder)
+ 
+  PySpark: fundamentals/spark/prep/solutions/
+ 
+  solutions/
+  ├── basic_transformations.py   # Problems 1-4 (filter, withColumn, groupBy, dates)
+  ├── joins_and_lookups.py       # Problems 5-8 (joins, broadcast, self-join)
+  ├── window_functions.py        # Problems 9-14 (rank, lag, running totals)
+  ├── aggregations_advanced.py   # Problems 15-20 (pivot, rollup, complex agg)
+  ├── data_quality.py            # Problems 21-25 (nulls, dedup, schema validation)
+  └── optimization.py            # Problems 26-30 (partitioning, caching, explain)
+
 # Python Interview Problem Bank
 
 **Total Problems:** 30 (10 Easy, 15 Medium, 5 Hard)
