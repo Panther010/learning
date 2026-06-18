@@ -2,8 +2,6 @@
 # Problem 1: Two Sum (Easy)
 # Time: O(n) | Space: O(n)
 # ============================================================
-from numpy.core.numeric import infty
-
 
 def two_sum(nums: list, target:int) -> list:
     if len(nums) < 2:
@@ -84,7 +82,7 @@ print(duplicate_check2([1, 1, 1, 3, 3, 4, 3, 2, 4, 2]))
 # ============================================================
 
 def buy_sell_analysis(prices: list[int]) -> int:
-    min_price = float(infty)
+    min_price = float('inf')
     max_profit = 0
 
     for price in prices:
