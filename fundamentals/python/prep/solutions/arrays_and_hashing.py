@@ -15,9 +15,9 @@ def two_sum(nums: list, target:int) -> list:
             index_map[nums[i]] = i
     return []
 
-print(two_sum([2, 7, 11, 15], 9))
-print(two_sum([3, 2, 4], 6))
-print(two_sum([3, 3], 6))
+# print(two_sum([2, 7, 11, 15], 9))
+# print(two_sum([3, 2, 4], 6))
+# print(two_sum([3, 3], 6))
 
 
 
@@ -46,9 +46,9 @@ def valid_anagram(s: str, t: str) -> bool:
 
     return True
 
-print(valid_anagram("anagram", "nagaram")) # Output: True
-print(valid_anagram("rat", "car")) # Output: False
-print(valid_anagram("listen", "silent"))
+# print(valid_anagram("anagram", "nagaram")) # Output: True
+# print(valid_anagram("rat", "car")) # Output: False
+# print(valid_anagram("listen", "silent"))
 
 
 # ============================================================
@@ -71,9 +71,9 @@ def duplicate_check2(nums: list) -> bool:
 
     return False
 
-print(duplicate_check2([1, 2, 3, 1]))
-print(duplicate_check2([1, 2, 3, 4]))
-print(duplicate_check2([1, 1, 1, 3, 3, 4, 3, 2, 4, 2]))
+# print(duplicate_check2([1, 2, 3, 1]))
+# print(duplicate_check2([1, 2, 3, 4]))
+# print(duplicate_check2([1, 1, 1, 3, 3, 4, 3, 2, 4, 2]))
 
 
 # ============================================================
@@ -94,8 +94,8 @@ def buy_sell_analysis(prices: list[int]) -> int:
 
     return max_profit
 
-print(buy_sell_analysis([7, 1, 5, 3, 6, 4]))
-print(buy_sell_analysis([7, 6, 4, 3, 1]))
+# print(buy_sell_analysis([7, 1, 5, 3, 6, 4]))
+# print(buy_sell_analysis([7, 6, 4, 3, 1]))
 
 if __name__ == "__main__":
       assert two_sum([2, 7, 11, 15], 9) == [0, 1]
