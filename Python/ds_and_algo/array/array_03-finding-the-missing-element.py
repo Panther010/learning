@@ -26,7 +26,7 @@ def finder2(arr1, arr2):
         else:
             count[num1] -= 1
         print(count)
-
+    return None
 
 def finder3(arr1, arr2):
     return sum(arr1) - sum(arr2)
@@ -36,11 +36,11 @@ def finder(arr1, arr2):
     res = 0
     for num1 in arr1 + arr2:
         res ^= num1
-        print(res)
+        #print(res)
 
     return res
 
 
 a1 = [1, 2, 3, 4, 5, 6, 7]
 a2 = [3, 7, 2, 1, 4, 6]
-print(finder(a1, a2))
+print(finder2(a1, a2))
