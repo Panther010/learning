@@ -317,9 +317,9 @@ Amazon DynamoDB stored operational metadata including:
 - Completion time
 - Error messages
 - Retry count
-- High Water Mark (HWM)
+- High watermark (HWM)
 
-The High Water Mark ensured incremental processing.
+The High watermark ensured incremental processing.
 
 Only newly arrived or modified data was processed.
 
@@ -426,7 +426,7 @@ The platform was optimized using:
 - Predicate pushdown
 - Partition pruning
 - Incremental processing
-- High Water Mark processing
+- High watermark processing
 - Snappy compression
 - Parquet storage
 - Glue job bookmarks (where applicable)
