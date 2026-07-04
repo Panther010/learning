@@ -97,6 +97,27 @@ def buy_sell_analysis(prices: list[int]) -> int:
 # print(buy_sell_analysis([7, 1, 5, 3, 6, 4]))
 # print(buy_sell_analysis([7, 6, 4, 3, 1]))
 
+# ============================================================
+# Problem 8: Find All Duplicates in an Array
+# Time: O(n) | Space: O(n)
+# Can you do it without extra space (O(1)) and in O(n) time?
+# ============================================================
+
+def duplicate_in_array(arr: list[int]) -> list:
+    result_map = {}
+
+    if len(arr) <= 1:
+        return []
+
+    for num in arr:
+        result_map[num] = result_map.get(num, 0) + 1
+
+    return [key for key in result_map if result_map[key] > 1]
+
+print(duplicate_in_array([4, 3, 2, 7, 8, 2, 3, 1]))
+print(duplicate_in_array([1, 1, 2]))
+print(duplicate_in_array([1]))
+
 if __name__ == "__main__":
       assert two_sum([2, 7, 11, 15], 9) == [0, 1]
       assert two_sum([3, 2, 4], 6) == [1, 2]

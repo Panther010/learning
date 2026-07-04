@@ -92,7 +92,7 @@ flowchart LR
 
 Delta Lake brings the four ACID properties to data lake writes:
 
-- **Atomicity** — a write either fully commits or has no effect at all; no partial files are ever visible to readers.
+- **Atomicity** — write either fully commits or has no effect at all; no partial files are ever visible to readers.
 - **Consistency** — the table always reflects a schema-valid, structurally sound state after every commit.
 - **Isolation** — concurrent readers/writers don't see each other's uncommitted changes (snapshot isolation via the transaction log).
 - **Durability** — once committed, changes are permanently recorded in the transaction log and underlying files.
