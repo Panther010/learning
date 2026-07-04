@@ -169,3 +169,38 @@ df13 = spark.createDataFrame(data13, schema13)
 df13.show()
 window_spec13 = Window.partitionBy(f.col("department")).orderBy(f.col("salary").desc())
 df13.select(f.col("*"), f.rank().over(window_spec13).alias("max_salary")).filter(f.col("max_salary") == f.lit(1)).drop(f.col("max_salary")).show()
+
+
+# ============================================================
+# Problem 14: Pivot sales data so each product category becomes a column showing total sales per region.
+# Topic: pivot, groupBy
+# Task: Pivot to show:
+# region  Electronics  Clothing
+# North      8000        3000
+# South      7000        2000
+# East       6000        4000
+# ============================================================
+
+data14 = [
+    ("North", "Electronics", 5000),
+    ("North", "Clothing",    3000),
+    ("South", "Electronics", 7000),
+    ("South", "Clothing",    2000),
+    ("East",  "Electronics", 6000),
+    ("East",  "Clothing",    4000),
+    ("North", "Electronics", 3000),
+]
+
+schema14 = StructType([
+    StructField("region", StringType()),
+    StructField("category", StringType()),
+    StructField("sales", IntegerType()),
+])
+
+df14 = spark.createDataFrame(data14, schema14)
+
+df14.show()
+
+result_df14 = df14.groupBy(f.col("region")).pivot("category").agg(f.sum(f.col("sales")))
+result_df14.show()
+
