@@ -162,3 +162,36 @@ df1.show()
 df2.show()
 df1.union(df2).dropDuplicates().show()
 df1.union(df2).distinct().show()
+
+# ============================================================
+# Problem 20: Calculate month-over-month sales growth percentage for each product category.
+# Topic: Window, lag, date functions
+# Task: Calculate growth % = ((current - previous) / previous) * 100
+# Round to 1 decimal. Show null for first month.
+# Expected:
+# Electronics 2026-01  10000  null
+# Electronics 2026-02  12000  20.0%
+# Electronics 2026-03  11000  -8.3%
+# Clothing    2026-01   5000  null
+# Clothing    2026-02   6000  20.0%
+# Clothing    2026-03   7500  25.0%
+# ============================================================
+data20 = [
+    ("Electronics", "2026-01", 10000),
+    ("Electronics", "2026-02", 12000),
+    ("Electronics", "2026-03", 11000),
+    ("Clothing",    "2026-01",  5000),
+    ("Clothing",    "2026-02",  6000),
+    ("Clothing",    "2026-03",  7500),
+]
+
+schema20 = StructType([
+    StructField("category", StringType()),
+    StructField("month", StringType()),
+    StructField("sales", IntegerType()),
+])
+
+df20 = spark.createDataFrame(data20, schema20)
+
+df20.show()
+
