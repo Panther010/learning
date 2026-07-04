@@ -194,4 +194,10 @@ schema20 = StructType([
 df20 = spark.createDataFrame(data20, schema20)
 
 df20.show()
-
+window_spec20 = Window.partitionBy(f.col("category")).orderBy(f.col("month"))
+df20_temp = df20.select(
+    f.col("*"),
+    f.lag(f.col("sales")).over(window_spec20).alias("previous_sale"))
+df20_temp.select(
+    f.col("*"),
+    f.round(((f.col("sales") - f.col("previous_sale"))/f.col("previous_sale")) * f.lit(100), 1)).show()
