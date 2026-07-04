@@ -200,4 +200,4 @@ df20_temp = df20.select(
     f.lag(f.col("sales")).over(window_spec20).alias("previous_sale"))
 df20_temp.select(
     f.col("*"),
-    f.round(((f.col("sales") - f.col("previous_sale"))/f.col("previous_sale")) * f.lit(100), 1)).show()
+    f.round(((f.col("sales") - f.col("previous_sale"))/f.col("previous_sale")) * f.lit(100), 1).alias("monthly_sales_growth")).show()
