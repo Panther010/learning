@@ -4,6 +4,8 @@ from pyspark.sql import functions as f
 from pyspark.sql.window import Window
 from datetime import datetime
 
+from typing_inspection.typing_objects import alias
+
 spark = SparkSession.builder.appName("opt").master("local").getOrCreate()
 
 
@@ -63,3 +65,38 @@ df26_session = df26_boundary.select(f.col("*"),
 # final deliverable per task step 5
 df26_final = df26_session.select("user", "event_time", "session_id")
 df26_final.show()
+
+
+# ============================================================
+# Problem 27: Top N Per Group with Ties
+# Topic: Window, lag, session detection
+#
+# Find top 2 salaries in each department, but include ties (use dense_rank instead of rank).
+# Task: Show top 2 salaries per department (include ties)
+# Expected Engineering: Alice, Bob (both rank 1), Charlie (rank 2) = 3 rows
+# Expected Sales: Diana, Eve (both rank 1), Frank (rank 2) = 3 rows
+# ============================================================
+
+data27 = [
+    (1, "Alice",   "Engineering", 95000),
+    (2, "Bob",     "Engineering", 95000),  # tie for 1st
+    (3, "Charlie", "Engineering", 88000),
+    (4, "Diana",   "Sales",       82000),
+    (5, "Eve",     "Sales",       82000),  # tie for 1st
+    (6, "Frank",   "Sales",       78000),
+    (7, "Grace",   "Sales",       75000),
+]
+
+schema27 = StructType([
+    StructField("emp_id", IntegerType()),
+    StructField("name", StringType()),
+    StructField("department", StringType()),
+    StructField("salary", IntegerType()),
+])
+
+df27 = spark.createDataFrame(data27, schema27)
+
+df27.show()
+
+window_spec27 = Window.partitionBy(f.col("department")).orderBy(f.col("salary").desc())
+df27.select(f.col("*"), f.dense_rank().over(window_spec27).alias("salary_rank")).filter(f.col("salary_rank") <= f.lit(2)).show()
