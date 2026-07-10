@@ -81,3 +81,83 @@ def generate_rectangle(n: int, m: int) -> list[str]:
     return ["*" * m for _ in range(n)]
 
 print(generate_rectangle(4, 5))
+
+
+
+"""
+Problem Description:
+You are given an integer n. Your task is to return a right-angled triangle pattern of '*' where each side has n characters, represented as a list of strings. The triangle has '*' characters, starting with 1 star in the first row, 2 stars in the second row, and so on until the last row has n stars.
+
+Input Parameters:
+n (int): The height and base of the right-angled triangle.
+
+Output:
+A list of strings where each string is a row of '*' characters that increases in length from 1 to n.
+
+Example:
+Input: 3
+Output: ['*', '**', '***']
+ 
+Input: 5
+Output: ['*', '**', '***', '****', '*****']
+"""
+def generate_triangle(n: int):
+    return ["*" * (i + 1) for i in range(n)]
+
+print(generate_triangle(3))
+print(generate_triangle(5))
+
+
+"""
+Problem Description:
+You are given an integer n. Your task is to return an inverted right-angled triangle pattern of '*' where each side has n characters, represented as a list of strings. The first row should have n stars, the second row n-1 stars, and so on, until the last row has 1 star.
+
+Input Parameters:
+n (int): The height and base of the inverted right-angled triangle.
+
+Output:
+A list of strings where each string is a row of '*' characters that decreases in length from n to 1.
+
+Example:
+
+Input: 3
+Output: ['***', '**', '*']
+ Input: 5
+Output: ['*****', '****', '***', '**', '*']
+"""
+def generate_inverted_triangle(n):
+    return ["*" * i for i in range(n, 0, -1)]
+
+print(generate_inverted_triangle(3))
+print(generate_inverted_triangle(5))
+
+
+"""
+Problem Description:
+You are given an integer n. Your task is to return a pyramid pattern of '*' where each side has n rows, represented as a list of strings. The pyramid is centered, with 1 star in the first row, 3 stars in the second row, and so on, increasing by 2 stars per row until the base row has 2n - 1 stars.
+
+Input:
+A single integer n, where 1 <= n <= 100.
+
+Output:
+A list of strings where each string contains stars ('*') centered, forming a pyramid shape. Each row has an increasing number of stars, with appropriate spaces for centering.
+
+Example:
+
+Input: 3
+Output: ['  *  ', ' *** ', '*****']
+ 
+Input: 5
+Output: ['    *    ', '   ***   ', '  *****  ', ' ******* ', '*********']
+"""
+def generate_pyramid(n):
+    result = []
+    for i in range(n):
+        spaces = " " *  (n - i - 1)
+        stars = "*" * (2 * i + 1)
+        result.append(spaces + stars + spaces)
+
+    return result
+print(generate_pyramid(3))
+print(generate_pyramid(4))
+print(generate_pyramid(5))
