@@ -244,13 +244,15 @@ Output: ['1', '2 3', '4 5 6']
 def generate_floyds_triangle(n):
     result = []
     current_num = 1
-    row = ""
-    for i in range(n):
-        for j in range(i+1):
-            row = row + str(current_num) + " "
-            current_num += 1
+    for i in range(1, n + 1):
+        # Create a row by collecting the next i numbers
+        row = ' '.join(str(current_num + j) for j in range(i))
+        # Append the row to the list
         result.append(row)
-        row = ""
+        # Update the current number for the next row
+        current_num += i
+
+        # Return the list of rows
     return result
 print(generate_floyds_triangle(3))
 print(generate_floyds_triangle(5))
