@@ -63,3 +63,79 @@ df26_session = df26_boundary.select(f.col("*"),
 # final deliverable per task step 5
 df26_final = df26_session.select("user", "event_time", "session_id")
 df26_final.show()
+
+
+
+# ============================================================
+# Problem 27: Top N Per Group with Ties
+# Difficulty: Hard Topics: Window, dense_rank, filter
+# Find top 2 salaries in each department, but include ties (use dense_rank instead of rank).
+# Task: Show top 2 salaries per department (include ties)
+# Expected Engineering: Alice, Bob (both rank 1), Charlie (rank 2) = 3 rows
+# Expected Sales: Diana, Eve (both rank 1), Frank (rank 2) = 3 rows
+# ============================================================
+
+data27= [
+    (1, "Alice",   "Engineering", 95000),
+    (2, "Bob",     "Engineering", 95000),  # tie for 1st
+    (3, "Charlie", "Engineering", 88000),
+    (4, "Diana",   "Sales",       82000),
+    (5, "Eve",     "Sales",       82000),  # tie for 1st
+    (6, "Frank",   "Sales",       78000),
+    (7, "Grace",   "Sales",       75000),
+]
+
+schema27 = StructType([
+    StructField("emp_id", IntegerType()),
+    StructField("name", StringType()),
+    StructField("department", StringType()),
+    StructField("salary", IntegerType()),
+])
+
+df27 = spark.createDataFrame(data27, schema27)
+
+df27.show()
+
+window_spec27 = Window.partitionBy(f.col("department")).orderBy(f.col("salary").desc())
+
+df27.select(f.col("*"), f.dense_rank().over(window_spec27).alias("rn")).filter(f.col("rn") <= f.lit(2)).show()
+
+
+# ============================================================
+# Problem 228: Skewed Join Optimization
+# Difficulty: Hard Topics: salting, skew handling Time: 40 min
+# Handle a highly skewed join where one key has disproportionately many records.
+# Task: Implement salting to distribute product_id=101 across partitions
+# Steps:
+# 1. Add salt column (random 0-9) to large_df
+# 2. Replicate small_df 10 times with salt values 0-9
+# 3. Join on (product_id, salt)
+# 4. Remove salt column from result
+# ============================================================
+
+# Skewed large table (80% of records have product_id = 101)
+large_data = [(i, 101, 100.0) for i in range(1, 801)] + \
+             [(i, 102, 150.0) for i in range(801, 901)] + \
+             [(i, 103, 200.0) for i in range(901, 1001)]
+
+# Small dimension table
+small_data = [
+    (101, "Laptop"),
+    (102, "Mouse"),
+    (103, "Keyboard"),
+]
+
+large_schema = StructType([
+    StructField("txn_id", IntegerType()),
+    StructField("product_id", IntegerType()),
+    StructField("amount", DoubleType()),
+])
+
+small_schema = StructType([
+    StructField("product_id", IntegerType()),
+    StructField("product_name", StringType()),
+])
+
+large_df = spark.createDataFrame(large_data, large_schema)
+small_df = spark.createDataFrame(small_data, small_schema)
+
