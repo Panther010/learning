@@ -102,7 +102,7 @@ df27.select(f.col("*"), f.dense_rank().over(window_spec27).alias("rn")).filter(f
 
 
 # ============================================================
-# Problem 228: Skewed Join Optimization
+# Problem 28: Skewed Join Optimization
 # Difficulty: Hard Topics: salting, skew handling Time: 40 min
 # Handle a highly skewed join where one key has disproportionately many records.
 # Task: Implement salting to distribute product_id=101 across partitions
@@ -139,3 +139,14 @@ small_schema = StructType([
 large_df = spark.createDataFrame(large_data, large_schema)
 small_df = spark.createDataFrame(small_data, small_schema)
 
+large_df_salted = large_df.withColumn("salt", f.floor(f.rand() * 10))
+
+salt_df = spark.createDataFrame([(i,) for i in range(10)], ["salt"])
+
+small_df_salted = small_df.crossJoin(salt_df)
+
+joined_df = large_df_salted.join(small_df_salted, on=["product_id", "salt"], how="inner")
+
+final_df = joined_df.drop("salt")
+final_df.show(5)
+print(f"Total rows after salted join: {final_df.count()}")
