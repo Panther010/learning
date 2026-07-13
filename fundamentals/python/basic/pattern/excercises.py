@@ -161,3 +161,98 @@ def generate_pyramid(n):
 print(generate_pyramid(3))
 print(generate_pyramid(4))
 print(generate_pyramid(5))
+
+
+
+"""
+Problem Description
+You are given an integer n. Your task is to return an inverted pyramid pattern of '*', where each side has n rows, represented as a list of strings. The first row has 2n - 1 stars, the second row has 2n - 3 stars, and so on, until the last row has 1 star, with each row centered using spaces.
+
+Input Parameters:
+n (int): The number of rows in the inverted pyramid.
+
+Output:
+A list of strings where each string represents a row of the inverted pyramid.
+
+Example:
+Input: 3
+Output: ['*****', ' *** ', '  *  ']
+Input: 5
+Output: ['*********', ' ******* ', '  *****  ', '   ***   ', '    *    ']
+
+"""
+def generate_inverted_pyramid(n:int):
+    result = []
+    for i in range(n):
+        spaces = " " *  (i)
+        stars = "*" * (2 * n - 1 - (2*i))
+        result.append(spaces + stars + spaces)
+
+    return result
+
+print(generate_inverted_pyramid(3))
+print(generate_inverted_pyramid(5))
+
+
+"""
+Problem Description:
+You are given an integer n. Your task is to return a right-angled triangle pattern where each row contains repeated digits. The first row contains the number 1 repeated once, the second row contains the number 2 repeated twice, and so on until the nth row contains the number n repeated n times.
+
+Input:
+A single integer n, where 1 <= n <= 100.
+
+Output:
+A list of strings where each string represents a row in the triangle. The ith row contains the digit i repeated i times.
+
+Example:
+
+Input: 5
+Output: ['1', '22', '333', '4444', '55555']
+ 
+Input: 3
+Output: ['1', '22', '333']
+
+"""
+
+def generate_number_triangle(n):
+    result = []
+    for i in range(n):
+        result.append(str(i+1) * (i+1))
+
+    return result
+
+print(generate_number_triangle(5))
+
+
+"""
+Problem Description:
+You are given an integer n. Your task is to return the first n rows of Floyd’s Triangle, represented as a list of strings. Floyd's Triangle is a triangular array of natural numbers where the first row contains 1, the second row contains 2 and 3, the third row contains 4, 5, and 6, and so on.
+
+Input:
+A single integer n, where 1 <= n <= 100.
+
+Output:
+A list of strings where each string represents a row in Floyd's Triangle.
+
+Example:
+Input: 5
+Output: ['1', '2 3', '4 5 6', '7 8 9 10', '11 12 13 14 15']
+Input: 3
+Output: ['1', '2 3', '4 5 6']
+"""
+
+def generate_floyds_triangle(n):
+    result = []
+    current_num = 1
+    for i in range(1, n + 1):
+        # Create a row by collecting the next i numbers
+        row = ' '.join(str(current_num + j) for j in range(i))
+        # Append the row to the list
+        result.append(row)
+        # Update the current number for the next row
+        current_num += i
+
+        # Return the list of rows
+    return result
+print(generate_floyds_triangle(3))
+print(generate_floyds_triangle(5))
