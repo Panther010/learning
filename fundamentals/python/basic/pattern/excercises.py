@@ -256,3 +256,102 @@ def generate_floyds_triangle(n):
     return result
 print(generate_floyds_triangle(3))
 print(generate_floyds_triangle(5))
+
+"""
+Problem Description:
+You are given an integer n. Your task is to return a diamond pattern of '*' with n rows for the upper part (the widest row will have 2n - 1 stars), and the lower part is the mirrored version of the upper part. Each row should be centered with appropriate spaces.
+
+Input:
+A single integer n, where 1 <= n <= 100.
+
+Output:
+A list of strings where each string represents a row in the diamond pattern.
+
+Example:
+Input: 3
+Output: ['  *  ', ' *** ', '*****', ' *** ', '  *  ']
+Input: 5
+Output: ['    *    ', '   ***   ', '  *****  ', ' ******* ', '*********', ' ******* ', '  *****  ', '   ***   ', '    *    ']
+"""
+
+def generate_diamond(n):
+    result = []
+
+    for i in range(n):
+        stars = '*' * ((2 * i) + 1)
+        blank = ' ' * (n - i -1)
+        result.append(blank + stars + blank)
+
+    for j in range(n - 1):
+        blank = ' ' * (j + 1)
+        stars = '*' * ((2 * (n -j)) - 3)
+        result.append(blank + stars + blank)
+
+
+    return result
+
+print(generate_diamond(3))
+print(generate_diamond(5))
+
+
+"""
+Problem Description:
+You are given an integer n. Your task is to return a right-angled triangle pattern of '*', where each row contains stars aligned to the right. The first row has one star, the second row has two stars, and so on, until the nth row has n stars.
+
+Input:
+A single integer n, where 1 <= n <= 100.
+
+Output:
+A list of strings where each string represents a row in the right-angled triangle, right-aligned.
+
+Example:
+Input: 4
+Output: ['   *', '  **', ' ***', '****']
+Input: 3
+Output: ['  *', ' **', '***']
+"""
+def generate_right_angled_triangle(n):
+    result = []
+    for i in range(n):
+        star = '*' * (i+1)
+        blank = ' ' * (n-i-1)
+        result.append(blank + star)
+
+    return result
+
+print(generate_right_angled_triangle(4))
+
+
+
+"""
+Problem Description:
+You are given an integer n. Your task is to return a sandglass pattern of '*', where the first row contains 2n - 1 stars and each subsequent row decreases the number of stars by 2, until the last row contains a single star. After reaching the smallest width, the pattern then continues with the same number of stars increasing back to 2n - 1. The stars in each row should be centered.
+
+Input:
+A single integer n, where 1 <= n <= 100.
+
+Output:
+A list of strings where each string represents a row in the sandglass pattern.
+
+Example:
+Input: 3
+Output: ['*****', ' *** ', '  *  ', ' *** ', '*****']
+Input: 4
+Output: ['*******', ' ***** ', '  ***  ', '   *   ', '  ***  ', ' ***** ', '*******']"""
+def generate_sandglass(n):
+    result = []
+
+    for i in range(n):
+        star = '*' * (2 * (n - i) - 1)
+        blank = ' ' * i
+        result.append(blank + star + blank)
+
+    for j in range(1, n):
+        star = '*' * (2 * j + 1)
+        blank = ' ' * (n - j - 1)
+        result.append(blank + star + blank)
+
+    return result
+
+print(generate_sandglass(3))
+print(generate_sandglass(4))
