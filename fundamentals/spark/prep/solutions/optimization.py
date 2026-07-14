@@ -103,7 +103,7 @@ df27.select(f.col("*"), f.dense_rank().over(window_spec27).alias("rn")).filter(f
 
 # ============================================================
 # Problem 28: Skewed Join Optimization
-# Difficulty: Hard Topics: salting, skew handling Time: 40 min
+# Difficulty: Hard Topics: salting, skew handling
 # Handle a highly skewed join where one key has disproportionately many records.
 # Task: Implement salting to distribute product_id=101 across partitions
 # Steps:
@@ -150,3 +150,63 @@ joined_df = large_df_salted.join(small_df_salted, on=["product_id", "salt"], how
 final_df = joined_df.drop("salt")
 final_df.show(5)
 print(f"Total rows after salted join: {final_df.count()}")
+
+# ============================================================
+# Problem 29: Complex Multi-Level Aggregation
+# Difficulty: Hard Topics: groupBy, rollup, cube
+# Calculate sales totals at multiple levels: by region, by category, by region+category, and grand total.
+# Task: Use rollup or cube to show:
+# 1. Total by region and category
+# 2. Total by region (all categories)
+# 3. Total by category (all regions)
+# 4. Grand total (all regions, all categories)
+
+# Expected output includes rows like:
+# North  Electronics   5000   (detail)
+# North  null          8000   (region total)
+# null   Electronics  18000   (category total)
+# null   null         27000   (grand total)
+# Hint: Use rollup("region", "category") or cube("region", "category")
+# rollup(region, category) only produces hierarchical subtotals in the order given:
+#       (region, category) → (region, null) → (null, null).
+#       It will never produce (null, category) — a category-only subtotal skipping region —
+#       because rollup assumes region is the "outer" grouping level and category is nested inside it.
+# cube(region, category) produces every combination of grouping/ungrouping:
+#       (region,category), (region,null), (null,category), (null,null) — all 2² = 4 combinations.
+# ============================================================
+
+data29 = [
+    ("North", "Electronics", 5000),
+    ("North", "Clothing",    3000),
+    ("South", "Electronics", 7000),
+    ("South", "Clothing",    2000),
+    ("East",  "Electronics", 6000),
+    ("East",  "Clothing",    4000),
+]
+
+schema29 = StructType([
+    StructField("region", StringType()),
+    StructField("category", StringType()),
+    StructField("sales", IntegerType()),
+])
+
+df29 = spark.createDataFrame(data29, schema29)
+
+df29.cube(f.col("region"), f.col("category")).agg(
+    f.sum(f.col("sales")).alias("sales"),
+    f.grouping_id("region", "category").alias("grouping_level")
+).withColumn(
+    "level",
+    f.when(f.col("grouping_level") == f.lit(0), f.lit("Detail"))
+    .when(f.col("grouping_level") == f.lit(1), f.lit("Region Total"))
+    .when(f.col("grouping_level") == f.lit(2), f.lit("Category Total"))
+    .when(f.col("grouping_level") == f.lit(3), f.lit("Grand Total"))
+).orderBy(f.col("region").asc_nulls_last(), f.col("category").asc_nulls_last()).show()
+
+rollup_region = (
+    df29.rollup(f.col("region"), f.col("category"))
+    .agg(
+        f.sum("sales").alias("sales"),
+        f.grouping_id("region", "category").alias("grouping_level")
+    )
+).show()
