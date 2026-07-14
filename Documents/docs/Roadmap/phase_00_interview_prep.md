@@ -500,3 +500,28 @@ This is a living document. You can:
 - Adjust time allocations based on what's working
 
 Update `CLAUDE.md` "Current Progress" section to point here when you start Phase 0.
+
+
+- topics:
+- Partition Strategies -> Done
+Delta Lake -> Done
+Apache Iceberg -> Done
+Spark Shuffle -> Done
+Data Skew -> Done
+Broadcast Join -> Done
+Bucketing vs Partitioning -> Done
+Slowly Changing Dimensions -> Done
+Data Modeling
+Kafka Consumer Groups
+Redshift Distribution Keys
+DynamoDB Partition Keys
+EMR Internals
+Athena Query Execution
+Lakehouse Architecture
+CDC Patterns -> Done
+Medallion Architecture
+Schema Evolution
+Compaction
+Hudi vs Iceberg vs Delta -> Done
+Airflow Scheduling
+Exactly Once Processing
