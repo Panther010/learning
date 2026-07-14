@@ -19,28 +19,28 @@ This is a NEW phase inserted BEFORE Phase 1. It front-loads urgent interview pre
 
 ### Morning — Core Skills Sharpening (3 hours)
 
-| Hour | Focus | Repo Integration |
-|------|-------|------------------|
-| 1 | **SQL Practice** — 2 hard problems (window functions, CTEs, recursive, pivots) | Add to `fundamentals/sql/interview_prep/` with detailed comments explaining the approach |
-| 2 | **PySpark Coding** — 1 transformation from scratch (no lookup) | Add to `fundamentals/spark/interview_prep/` — test your muscle memory |
-| 3 | **Python DSA + Core** — 1 medium LeetCode + daily concept (decorators, generators, collections, etc.) | Add to `fundamentals/python/interview_prep/` with complexity analysis |
+| Hour | Focus                                                                                                 | Repo Integration                                                                         |
+|------|-------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------|
+| 1    | **SQL Practice** — 2 hard problems (window functions, CTEs, recursive, pivots)                        | Add to `fundamentals/sql/interview_prep/` with detailed comments explaining the approach |
+| 2    | **PySpark Coding** — 1 transformation from scratch (no lookup)                                        | Add to `fundamentals/spark/interview_prep/` — test your muscle memory                    |
+| 3    | **Python DSA + Core** — 1 medium LeetCode + daily concept (decorators, generators, collections, etc.) | Add to `fundamentals/python/interview_prep/` with complexity analysis                    |
 
 ### Afternoon — Concepts & System Design (2.5 hours)
 
-| Hour | Focus | Repo Integration |
-|------|-------|------------------|
-| 4 | **AWS Deep Revision** (W1-2) or **System Design Practice** (W3-4) | Create `docs/notes/aws_cheatsheet.md` and `docs/notes/system_design_patterns.md` |
-| 5 | **Concept of the Day** — Rotate: partitioning, Delta vs Parquet, Spark internals, data modelling, SCDs, exactly-once, backfill strategies | Add to `docs/notes/concepts/` — one markdown file per concept |
-| 5.5 | **AI Theory** (30 min) — See AI learning schedule below | Add to `docs/notes/ai/` — summarize in your own words |
+| Hour | Focus                                                                                                                                     | Repo Integration                                                                 |
+|------|-------------------------------------------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------|
+| 4    | **AWS Deep Revision** (W1-2) or **System Design Practice** (W3-4)                                                                         | Create `docs/notes/aws_cheatsheet.md` and `docs/notes/system_design_patterns.md` |
+| 5    | **Concept of the Day** — Rotate: partitioning, Delta vs Parquet, Spark internals, data modelling, SCDs, exactly-once, backfill strategies | Add to `docs/notes/concepts/` — one markdown file per concept                    |
+| 5.5  | **AI Theory** (30 min) — See AI learning schedule below                                                                                   | Add to `docs/notes/ai/` — summarize in your own words                            |
 
 ### Evening — Portfolio Projects (2.5 hours)
 
-| Week | Gap-Filling Project | AI Project | Where it goes in repo |
-|------|---------------------|------------|----------------------|
-| 1 | Docker + Airflow basics | Claude API basics | `projects/01_docker_airflow_starter/` |
-| 2 | Delta Lake + pytest | SQL Generator Tool | `projects/02_sql_generator_ai/` |
-| 3 | dbt basics | RAG Pipeline | `projects/03_dbt_fundamentals/` + `projects/04_rag_doc_search/` |
-| 4 | Spark Streaming | Data Quality AI Assistant | `projects/05_streaming_pipeline/` + `projects/06_dq_ai_assistant/` |
+| Week | Gap-Filling Project     | AI Project                | Where it goes in repo                                              |
+|------|-------------------------|---------------------------|--------------------------------------------------------------------|
+| 1    | Docker + Airflow basics | Claude API basics         | `projects/01_docker_airflow_starter/`                              |
+| 2    | Delta Lake + pytest     | SQL Generator Tool        | `projects/02_sql_generator_ai/`                                    |
+| 3    | dbt basics              | RAG Pipeline              | `projects/03_dbt_fundamentals/` + `projects/04_rag_doc_search/`    |
+| 4    | Spark Streaming         | Data Quality AI Assistant | `projects/05_streaming_pipeline/` + `projects/06_dq_ai_assistant/` |
 
 ### Daily Non-Negotiables (30 min)
 
