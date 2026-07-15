@@ -355,3 +355,102 @@ def generate_sandglass(n):
 
 print(generate_sandglass(3))
 print(generate_sandglass(4))
+
+
+"""
+Problem Description:
+You are given an integer n. Your task is to return a hollow right-angled triangle pattern of '*', where the first and last rows contain stars, while the inner rows contain a star at the beginning and end, with spaces in between. The triangle should be right-aligned.
+
+Input:
+A single integer n, where 1 <= n <= 100.
+
+Output:
+A list of strings where each string represents a row in the hollow right-angled triangle.
+
+Example:
+Input: 4
+Output: ['*', '**', '* *', '****']
+ 
+Input: 5
+Output: ['*', '**', '* *', '*  *', '*****']
+"""
+def generate_hollow_right_angled_triangle(n):
+    result = []
+    for i in range(1, n+1):
+        if (i >= 2) & (i < n):
+            blanks = " " * (i -2)
+            row = "*" + blanks + "*"
+        else:
+            row = "*" * i
+        result.append(row)
+
+    return result
+
+print(generate_hollow_right_angled_triangle(4))
+print(generate_hollow_right_angled_triangle(5))
+
+
+"""
+Problem Description:
+You are given an integer n. Your task is to return a hollow inverted right-angled triangle pattern of '*', where the first row contains n stars, while the inner rows contain a star at the beginning and end, with spaces in between. The triangle should be left-aligned.
+
+Input:
+A single integer n, where 1 <= n <= 100.
+
+Output:
+A list of strings where each string represents a row in the hollow inverted right-angled triangle.
+
+Example:
+
+Input: 4
+Output: ['****', '* *', '**', '*']
+ 
+Input: 5
+Output: ['*****', '*  *', '* *', '**', '*']
+"""
+def generate_hollow_inverted_right_angled_triangle(n):
+    result = []
+    for i in range(n, 0, -1):
+        if (i >= 2) & (i < n):
+            blanks = " " * (i -2)
+            row = "*" + blanks + "*"
+        else:
+            row = "*" * i
+        result.append(row)
+
+    return result
+
+print(generate_hollow_inverted_right_angled_triangle(4))
+print(generate_hollow_inverted_right_angled_triangle(5))
+
+
+"""
+Problem Description:
+You are given an integer n. Your task is to return a pyramid pattern of numbers, where each row contains increasing numbers starting from 1 up to the row number, and the pyramid is centered with leading spaces.
+
+Input:
+A single integer n, where 1 <= n <= 100.
+
+Output:
+A list of strings where each string represents a row in the pyramid pattern.
+
+Example:
+
+Input: 4
+Output: ['   1   ', '  1 2  ', ' 1 2 3 ', '1 2 3 4']
+ 
+Input: 3
+Output: ['  1  ', ' 1 2 ', '1 2 3']
+"""
+def generate_number_pyramid(n):
+    result = []
+    for i in range(1, n+1):
+        numbers = " ".join(str(x+1) for x in range(i))
+        blank = " " * (n - i)
+        row = blank + numbers + blank
+        result.append(row)
+    return result
+
+print(generate_number_pyramid(4))
+print(generate_number_pyramid(3))
+print(generate_number_pyramid(2))
