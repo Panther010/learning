@@ -504,24 +504,47 @@ Update `CLAUDE.md` "Current Progress" section to point here when you start Phase
 
 - topics:
 - Partition Strategies -> Done
-Delta Lake -> Done
-Apache Iceberg -> Done
-Spark Shuffle -> Done
-Data Skew -> Done
-Broadcast Join -> Done
-Bucketing vs Partitioning -> Done
-Slowly Changing Dimensions -> Done
-Data Modeling
-Kafka Consumer Groups
-Redshift Distribution Keys
-DynamoDB Partition Keys
-EMR Internals
-Athena Query Execution
-Lakehouse Architecture
-CDC Patterns -> Done
-Medallion Architecture
-Schema Evolution
-Compaction
-Hudi vs Iceberg vs Delta -> Done
-Airflow Scheduling
-Exactly Once Processing
+- Delta Lake -> Done
+- Apache Iceberg -> Done
+- Spark Shuffle -> Done
+- Data Skew -> Done
+- Broadcast Join -> Done
+- Bucketing vs Partitioning -> Done
+- Slowly Changing Dimensions -> Done
+- Data Modeling
+- Kafka Consumer Groups
+- Redshift Distribution Keys
+- DynamoDB Partition Keys
+- EMR Internals
+- Athena Query Execution
+- Lakehouse Architecture
+- CDC Patterns -> Done
+- Medallion Architecture
+- Schema Evolution
+- Compaction
+- Hudi vs Iceberg vs Delta -> Done
+- Airflow Scheduling
+- Exactly Once Processing
+
+| #  | Hook                                                    | Main Lesson             |
+| -- | ------------------------------------------------------- | ----------------------- |
+| 1  | Spark is slow. Is it really Spark?                      | Partition Strategy      |
+| 2  | Why did our Athena bill double overnight?               | Partition Pruning       |
+| 3  | The million tiny files nobody wanted                    | Small File Problem      |
+| 4  | Repartition vs Coalesce: One shuffle cost me 45 minutes | Spark Partitions        |
+| 5  | Why partitioning by customer_id is usually a mistake    | Choosing Partition Keys |
+| 6  | Hash vs Range Partitioning                              | Real-world trade-offs   |
+| 7  | Partitioning vs Bucketing                               | When to use each        |
+| 8  | Iceberg solved a problem Hive couldn't                  | Partition Evolution     |
+| 9  | Kafka partitions aren't just for scaling                | Ordering & Consumers    |
+| 10 | The hidden cost of bad data skew                        | Skew & Salting          |
+| 11 | Why adding more executors didn't help                   | Parallelism myths       |
+| 12 | Broadcast Join vs Shuffle Join                          | Join optimization       |
+| 13 | Why Delta/Iceberg OPTIMIZE exists                       | File compaction         |
+| 14 | Why Parquet beats CSV in production                     | Columnar storage        |
+| 15 | Designing a Data Lake for 100+ teams                    | Architecture decisions  |
+| 16 | Why schema evolution is harder than it looks            | Data governance         |
+| 17 | The ETL mistake every new engineer makes                | Pipeline design         |
+| 18 | What happens after your Spark job finishes?             | Write path internals    |
+| 19 | The first metric I check when a pipeline fails          | Production debugging    |
+| 20 | Five decisions that saved us the most cloud cost        | Lessons learned         |
