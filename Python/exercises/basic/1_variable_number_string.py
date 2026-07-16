@@ -6,7 +6,7 @@ Exercise: Python Variables
 4. Answer which of these are invalid variable names: _nation 1record record1 record_one record-one record^one continue
 """
 
-print("Shri Ganesha Namh")
+print("Shri Ganeshay Namh")
 
 # 1.
 # break = 5 ==> invalid syntax
