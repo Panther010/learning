@@ -271,8 +271,111 @@ def rotate_list_new(lst, k):
 
     return result
 
+def rotate_list_new1(lst, k):
+    length = len(lst)
+
+    if not lst:
+        return []
+
+    k = k % length
+
+    for i in range(k):
+        last_element = lst.pop()
+        lst.insert(0, last_element)
+
+    return lst
+
+print(rotate_list_new1([1, 2, 3, 4, 5], 3))
+print(rotate_list_new1([1, 2, 3, 4, 5], 2))
+print(rotate_list_new1([], 2))
 
 
-print(rotate_list_new([1, 2, 3, 4, 5], 3))
-print(rotate_list_new([1, 2, 3, 4, 5], 2))
-print(rotate_list_new([], 2))
+"""
+Merge Lists to Dictionary
+Design a Python function named merge_lists_to_dictionary to merge two lists into a dictionary where elements from the first list act as keys and elements from the second list act as values.
+
+Parameters:
+keys (List): A list of keys.
+values (List): A list of values.
+
+Returns:
+A dictionary containing merged key-value pairs.
+
+Example:
+
+Input: keys = ['a', 'b', 'c'], values = [1, 2, 3]
+Output: {'a': 1, 'b': 2, 'c': 3}
+Input: keys = ['x', 'y', 'z'], values = [10, 20, 30]
+Output: {'x': 10, 'y': 20, 'z': 30}
+
+"""
+def merge_lists_to_dictionary(keys, values):
+    if len(keys) != len(values):
+        return False
+
+    result = {}
+    for key, val in zip(keys, values):
+        result[key] = val
+    return result
+
+print(merge_lists_to_dictionary(['a', 'b', 'c'], [1, 2, 3]))
+print(merge_lists_to_dictionary(['x', 'y', 'z'], [10, 20, 30]))
+print(merge_lists_to_dictionary(['key1', 'key2'], [100]))
+
+
+
+"""
+Merge Three Dictionaries
+Design a Python function named merge_three_dictionaries to merge exactly three dictionaries into one.
+
+Parameters:
+dict1 (Dictionary): The first dictionary to be merged.
+dict2 (Dictionary): The second dictionary to be merged.
+dict3 (Dictionary): The third dictionary to be merged.
+
+Returns:
+A single dictionary containing all key-value pairs from the three input dictionaries.
+Example:
+Input: ({'a': 1, 'b': 2}, {'c': 3, 'd': 4}, {'e': 5, 'f': 6})
+Output: {'a': 1, 'b': 2, 'c': 3, 'd': 4, 'e': 5, 'f': 6}
+Input: ({'x': 10, 'y': 20}, {'z': 30}, {'a': 40, 'b': 50})
+Output: {'x': 10, 'y': 20, 'z': 30, 'a': 40, 'b': 50}
+"""
+def merge_three_dictionaries(dict1, dict2, dict3):
+    result = {}
+
+    for d in (dict1, dict2, dict3):
+        for key, value in d.items():
+            result[key] =value
+    return result
+
+
+print(merge_three_dictionaries({'a': 1, 'b': 2}, {'c': 3, 'd': 4}, {'e': 5, 'f': 6}))
+
+
+"""
+Count Word Frequency
+Design a Python function named count_word_frequency to count the frequency of words in a sentence and store the counts in a dictionary.
+
+Parameters:
+sentence (str): The input sentence where you need to count the frequency of each word.
+
+Returns:
+A dictionary where the keys are words from the sentence and the values are their corresponding frequencies.
+
+Example:
+Input: "hello world hello"
+Output: {'hello': 2, 'world': 1}
+Input: "the quick brown fox jumps over the lazy dog"
+Output: {'the': 2, 'quick': 1, 'brown': 1, 'fox': 1, 'jumps': 1, 'over': 1, 'lazy': 1, 'dog': 1}"""
+
+
+def count_word_frequency(sentence):
+    result = {}
+
+    for word in sentence.split():
+        result[word] = result.get(word, 0) +1
+    return result
+
+print(count_word_frequency("hello world hello"))
+print(count_word_frequency("the quick brown fox jumps over the lazy dog"))
