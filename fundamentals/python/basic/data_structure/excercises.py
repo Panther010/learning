@@ -215,42 +215,64 @@ Output: [1, 2, 3, 4, 5, 7, 8]
 def merge_two_sorted_lists(list1, list2):
     i = j = 0
     result = []
-    while i < len(list1) and j < len(list2):
-        if list1[i] <= list2[j]:
-            result.append(list1[i])
-            i +=1
-        else:
-            result.append(list2[j])
-            j += 1
 
-    while i < len(list1):
+    while i<len(list1) and j<len(list2):
+         if list1[i] <= list2[j]:
+             result.append(list1[i])
+             i += 1
+         else:
+             result.append(list2[j])
+             j += 1
+
+    while i<len(list1):
         result.append(list1[i])
         i += 1
 
-    while j < len(list2):
+    while j<len(list2):
         result.append(list2[j])
         j += 1
 
     return result
 
+print(merge_two_sorted_lists([1, 3, 5], [2, 4, 6]))
 print(merge_two_sorted_lists([1, 4, 7], [2, 3, 5, 8]))
 
 
+"""
+Rotate a List (Without Slicing)
+You are given a list of integers and an integer k. Write a Python function to rotate the list to the right by k positions without using slicing. A rotation shifts elements from the end of the list to the front.
+
+Parameters:
+lst (List of integers): The list to be rotated.
+
+k (Integer): The number of positions to rotate the list.
+Returns:
+
+A list of integers rotated by k positions.
+Example:
+
+Input: lst = [1, 2, 3, 4, 5], k = 2
+Output: [4, 5, 1, 2, 3]
+Input: lst = [10, 20, 30, 40, 50], k = 3
+Output: [30, 40, 50, 10, 20]
+"""
 def rotate_list_new(lst, k):
-    n = len(lst)
-    if n <= 1:
-        return lst
+    length = len(lst)
 
-    k = k % n
-    # Pre-allocate a new list of the same size
-    rotated = [0] * n
+    if length == 0:
+        return []
 
-    for i in range(n):
-        print(i, lst[i])
-        new_index = (i + k) % n
-        print(i, lst[i], new_index)
-        rotated[new_index] = lst[i]
+    k = k % length
+    result = [0] * length
 
-    return rotated
+    for i in range(length):
+        new_index = (i+length+k) % length
+        result[new_index] = lst[i]
 
-print(rotate_list_new([1, 2, 3, 4, 5],2))
+    return result
+
+
+
+print(rotate_list_new([1, 2, 3, 4, 5], 3))
+print(rotate_list_new([1, 2, 3, 4, 5], 2))
+print(rotate_list_new([], 2))
