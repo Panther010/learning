@@ -1,0 +1,9 @@
+- AI agent: AI system that can do work for you independently where LLM control the workflow. LLM with tool in a loop to achieve a goal.
+- Agentic System: System where LLMs direcy their own process and tool usage maintaning cntrol teir accomplish task
+- Prompt chaining: Seriedd of LLM call
+- Routing: Direct an input into a specialized sub-task ensuring sparation of concern
+- Parallelization Breaking down tasks and running multiple task concurrently
+- Orchestrator-worker: Complex tasks are broken down dynamically and combined
+- Evaluator optimiser. LLM output iw validated by another LLM
+- 
+- tool give llm abilities 
