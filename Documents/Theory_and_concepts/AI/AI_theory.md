@@ -97,3 +97,7 @@ CrewAI
 - Hierarchical process
 - memory
 - Traces 3 steps 
+
+
+
+LangChain/ Lang Graph
