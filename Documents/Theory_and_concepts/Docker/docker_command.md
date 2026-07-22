@@ -4,19 +4,19 @@
 
 Think of an **image** as a *recipe/blueprint*, and a **container** as the *actual running dish* made from that recipe.
 
-| Command | Meaning |
-|---|---|
-| `docker run <image>` | Create + start a new container from an image. |
-| `docker run -d nginx` | Run container in **background** (detached mode) — you get your terminal back immediately. |
-| `docker ps` | List **currently running** containers. |
-| `docker ps -a` | List **all** containers — running *and* stopped. |
-| `docker stop <name/id>` | Stop a running container (gracefully). |
-| `docker rm <name/id>` | Remove a stopped container permanently. |
-| `docker images` | List all **downloaded/local images**. |
-| `docker rmi <name>` | Delete a downloaded image — the image must **not** be running or even stopped as a container first. |
-| `docker pull <name>` | Download an image from a registry (like Docker Hub) without running it. |
-| `docker exec <id> <command>` | Run a command **inside** an already-running container. |
-| `docker system prune` | Clean up unused containers, images, networks in one shot — frees up disk space. |
+| Command                      | Meaning                                                                                             |
+|------------------------------|-----------------------------------------------------------------------------------------------------|
+| `docker run <image>`         | Create + start a new container from an image.                                                       |
+| `docker run -d nginx`        | Run container in **background** (detached mode) — you get your terminal back immediately.           |
+| `docker ps`                  | List **currently running** containers.                                                              |
+| `docker ps -a`               | List **all** containers — running *and* stopped.                                                    |
+| `docker stop <name/id>`      | Stop a running container (gracefully).                                                              |
+| `docker rm <name/id>`        | Remove a stopped container permanently.                                                             |
+| `docker images`              | List all **downloaded/local images**.                                                               |
+| `docker rmi <name>`          | Delete a downloaded image — the image must **not** be running or even stopped as a container first. |
+| `docker pull <name>`         | Download an image from a registry (like Docker Hub) without running it.                             |
+| `docker exec <id> <command>` | Run a command **inside** an already-running container.                                              |
+| `docker system prune`        | Clean up unused containers, images, networks in one shot — frees up disk space.                     |
 
 > Example: `docker exec 538d cat /etc/hosts` → runs `cat /etc/hosts` inside the already-running container with ID starting `538d`, without needing to log into it.
 
@@ -164,18 +164,22 @@ When your app needs **multiple containers** working together (e.g., a web app + 
 
 ### Quick Recap Table
 
-| Term | One-liner |
-|---|---|
-| `docker run` | Create & start a container from an image |
-| `docker ps -a` | Show all containers, running or stopped |
-| `docker rmi` | Delete a downloaded image (must not be in use) |
-| `-p host:container` | Map a host port to a container port |
-| `-v` / `--mount` | Persist data outside the container |
-| Dockerfile | Recipe to build a custom image |
-| Layered Architecture | Each Dockerfile step = a cached layer |
-| BuildKit | Modern, faster, smarter Docker build engine |
-| Cache/Secret Mounts | Reuse cache & safely use secrets during build |
-| `docker init` | Auto-generate starter Docker project files |
-| ENTRYPOINT vs CMD | Fixed main command vs overridable default args |
-| Docker Compose | Manage multi-container apps with one YAML file |
+| Term                 | One-liner                                      |
+|----------------------|------------------------------------------------|
+| `docker run`         | Create & start a container from an image       |
+| `docker ps -a`       | Show all containers, running or stopped        |
+| `docker rmi`         | Delete a downloaded image (must not be in use) |
+| `-p host:container`  | Map a host port to a container port            |
+| `-v` / `--mount`     | Persist data outside the container             |
+| Dockerfile           | Recipe to build a custom image                 |
+| Layered Architecture | Each Dockerfile step = a cached layer          |
+| BuildKit             | Modern, faster, smarter Docker build engine    |
+| Cache/Secret Mounts  | Reuse cache & safely use secrets during build  |
+| `docker init`        | Auto-generate starter Docker project files     |
+| ENTRYPOINT vs CMD    | Fixed main command vs overridable default args |
+| Docker Compose       | Manage multi-container apps with one YAML file |
 
+Docker engine, storage and networking
+- Name space PID
+- Cgroups
+- Docker Storage
