@@ -101,3 +101,66 @@ CrewAI
 
 
 LangChain/ Lang Graph
+- Lang chain open source framework
+  - Lang chain core -> Agent framework, create agent model tools etc
+  - Lang graph -> Low level orchestration: Graph, state, persistence
+  - Lang smith --> Observability evals and monitoring
+  - LangSmith Deployment
+- The abstraction layers
+  - langchain-core (Layer1) building blocks
+  - Lang graph (Layer2) Orchestration
+  - Langchain (Layer3) Agent
+  - Deepagents (Layer4) Agent harness
+- LangChain Core
+  - Models ChatOpenAi as one interface to every LLM
+  - Messages
+  - Tools
+- LangGraph
+  - low-level orchestration framework and runtime for stateful long-running agents. 
+  - Dependency graph
+  - Durable 
+  - State is immutable (Python Object)
+  - Nodes -> Do the work. It is a python function. Note take old state and return new state object.
+  - Edges -> Chose what to do next (Conditional, non-conditional)
+  - 5 Steps
+    - Define the State class
+    - Start the Graph Builder
+    - Create a Node
+    - Create the Edges
+    - Compile the Graph 
+  - Reducer --> take a new state and existing state and combine them
+  - The Super-Step -> can be considered a single iteration over the graph nodes
+  - checkpointer
+  - memory saver, sqlilite saver as memory, checkpoints, time travel
+- Lang chain agent
+  - create_agent is a function
+  - custom middleware
+- Microsoft playwright mcp server
+- Deep agents
+  - create_deep_agent wraps create_agent in an opinionated harness
+  - Built in planning todo list
+  - Agent Skills: SKILL.md
+    - Frontmatter name and description
+    - Progressive disclosure
+    - Skills vs Tools
+      - Skills are the feature for end user who are using agents
+      - Tools are for developer making agents
+      - Skills are high level construct
+      - Tools are better option where you are developing agent
+
+Google ADK
+- Code first toolkit
+- Type a function it becomes a tool
+- adk web
+- flexible but heavier to learn
+
+Agent to agent framework
+- A Linux Foundation way for agents to find and cll each other
+
+Strands and Pydantic AI
+- product from AWS
+- open source offering
+- super lightweight framework
+- any provider lightest loop
+MS agent Framework and Agno
+Mastra

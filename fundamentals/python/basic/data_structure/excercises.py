@@ -379,3 +379,120 @@ def count_word_frequency(sentence):
 
 print(count_word_frequency("hello world hello"))
 print(count_word_frequency("the quick brown fox jumps over the lazy dog"))
+
+
+"""
+Check if Tuple is Palindromic
+Design a Python function named is_palindromic_tuple to check if a tuple is palindromic, meaning it reads the same forwards and backwards.
+
+Parameters:
+tup (tuple): The input tuple that you need to check for palindromic property.
+
+Returns:
+True if the tuple is palindromic, False otherwise.
+
+Example:
+
+Input: (1, 2, 3, 2, 1)
+Output: True
+Input: ('a', 'b', 'c', 'b', 'a')
+Output: True
+Input: (1, 2, 3, 4, 5)
+Output: False
+Input: ('x', 'y', 'z', 'x')
+Output: False
+Input: ('a',)
+Output: True"""
+
+def is_palindromic_tuple(tup):
+    i = 0
+    j = len(tup)-1
+    while i <= j:
+        if tup[i] != tup[j]:
+            return False
+        else:
+            i +=1
+            j -= 1
+    return True
+
+print(is_palindromic_tuple((1, 2, 3, 2, 1)))
+print(is_palindromic_tuple(('a', 'b', 'c', 'b', 'a')))
+print(is_palindromic_tuple((1, 2, 3, 4, 5)))
+print(is_palindromic_tuple(('x', 'y', 'z', 'x')))
+print(is_palindromic_tuple(('a',)))
+
+
+"""
+Merge Dictionaries with Overlapping Keys
+Design a Python function named merge_dicts_with_overlapping_keys that merges multiple dictionaries into a single dictionary. If a key appears in more than one dictionary, sum up their values.
+
+Parameters:
+dicts (list): A list of dictionaries where keys might overlap.
+
+Returns:
+A single dictionary where values for overlapping keys are summed.
+
+Example:
+Input: [{'a': 1, 'b': 2}, {'b': 3, 'c': 4}, {'c': 5, 'd': 6}]
+Output: {'a': 1, 'b': 5, 'c': 9, 'd': 6}
+Input: [{'x': 10, 'y': 20}, {'y': 30, 'z': 40}, {'z': 50, 'x': 60}]
+Output: {'x': 70, 'y': 50, 'z': 90}
+"""
+
+def merge_dicts_with_overlapping_keys(dicts):
+    result = {}
+    for d in dicts:
+        for key, value in d.items():
+            result[key] = result.get(key, 0) + value
+    return result
+
+print(merge_dicts_with_overlapping_keys([{'a': 1, 'b': 2}, {'b': 3, 'c': 4}, {'c': 5, 'd': 6}]))
+print(merge_dicts_with_overlapping_keys([{'x': 10, 'y': 20}, {'y': 30, 'z': 40}, {'z': 50, 'x': 60}]))
+
+
+"""
+Check if a List is a Subset of Another List (Brute Force Approach)
+You are given two lists of integers. Write a Python program that checks whether the first list is a subset of the second list using a brute-force approach, without using the in keyword. A list is considered a subset if all elements of the first list are present in the second list.
+
+Parameters:
+lst1 (List of integers): The first list, which is being checked as a subset.
+lst2 (List of integers): The second list, which is the list to compare against.
+
+Returns:
+A boolean value True if lst1 is a subset of lst2, otherwise False.
+
+Example:
+Input: lst1 = [1, 2, 3], lst2 = [1, 2, 3, 4, 5]
+Output: True
+All elements in lst1 are present in lst2.
+Input: lst1 = [1, 6], lst2 = [1, 2, 3, 4, 5]
+Output: False
+The element 6 is not present in lst2.
+"""
+
+def is_subset(lst1, lst2):
+    for j in lst1:
+        if j not in lst2:
+            return False
+
+    return True
+def counter(arr: list) -> dict:
+    result = {}
+    for i in arr:
+        result[i] = result.get(i, 0) + 1
+    return result
+
+
+def is_subset1(lst1, lst2):
+    counter1 = counter(lst1)
+    counter2 = counter(lst2)
+
+    for key, value in counter1.items():
+        if counter2.get(key,0) < value:
+            return False
+
+    return True
+
+
+print(is_subset1(lst1 = [1, 2, 3], lst2 = [1, 2, 3, 4, 5]))
+print(is_subset1(lst1 = [1, 6], lst2 = [1, 2, 3, 4, 5]))
