@@ -179,7 +179,39 @@ When your app needs **multiple containers** working together (e.g., a web app + 
 | ENTRYPOINT vs CMD    | Fixed main command vs overridable default args |
 | Docker Compose       | Manage multi-container apps with one YAML file |
 
-Docker engine, storage and networking
-- Name space PID
-- Cgroups
-- Docker Storage
+
+Docker Engine on Linux
+- Docker Demon --> Image containers volumes networks
+- Rest API --> Programs tools integrations
+- Docker CLI --> Docker run, docker stop docker rmi
+  - CLI need not be on demon it can communicate from different machine as well 
+- docker cli -> dockerd demon --> containered runtime -> runc OCI
+  - docker do not use dockerd
+- Namespaces
+  - PID Network IPC MOunt UTS User
+  - PID --> 
+  - cgroups --> restrict amount of the resources from host 
+  - Storage and file system --> /var/lib/<>
+    - Volume mount
+    - bind mount
+    - Storage driver
+      - overlay2
+      - zfs
+      - vfs
+      - btrfs
+- Networking
+  - Bridge
+    - private internal network created by docker in host with
+  - none
+    - isolated network no connection with outer world or other networks
+  - host
+    - to connect externally use 
+  - docker inspect
+  - docker network ls
+  - embedded DNS--> how to resolve each other 
+- Docker Registry
+  - central repo for all the docker images
+  - Private Registries
+- Container orchestration
+- Docker swarm
+- 
