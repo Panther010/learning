@@ -210,3 +210,43 @@ rollup_region = (
         f.grouping_id("region", "category").alias("grouping_level")
     )
 ).show()
+
+
+"""
+# ============================================================
+# Problem 30: Incremental Processing Pattern
+# Difficulty: Window, checkpoint, watermark concepts Time: 40-45 min
+# Process only new records since last run (simulate incremental batch processing).
+# Task:
+# 1. Filter records with date > last_processed_date
+# 2. Calculate daily totals for these new records
+# 3. Join with historical aggregates to get cumulative totals
+# 4. Update checkpoint to new max date
+
+# This simulates an incremental ETL pattern where you only process
+# new data and merge with existing aggregates
+# ============================================================"""
+
+# Full dataset
+full_data30 = [
+    (1, "Alice",  "2026-06-01", 100.0),
+    (2, "Bob",    "2026-06-02", 150.0),
+    (3, "Charlie","2026-06-03", 200.0),
+    (4, "Diana",  "2026-06-04", 120.0),
+    (5, "Eve",    "2026-06-05", 180.0),
+    (6, "Frank",  "2026-06-06", 210.0),
+]
+
+schema30 = StructType([
+    StructField("txn_id", IntegerType()),
+    StructField("customer", StringType()),
+    StructField("date", StringType()),
+    StructField("amount", DoubleType()),
+])
+
+df30 = spark.createDataFrame(full_data30, schema30)
+
+# Simulate: last processed date was 2026-06-03
+last_processed_date = "2026-06-03"
+
+df30.show()
