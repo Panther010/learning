@@ -527,7 +527,7 @@ Update `CLAUDE.md` "Current Progress" section to point here when you start Phase
 - Exactly Once Processing
 
 | #  | Hook                                                    | Main Lesson             |
-| -- | ------------------------------------------------------- | ----------------------- |
+|----|---------------------------------------------------------|-------------------------|
 | 1  | Spark is slow. Is it really Spark?                      | Partition Strategy      |
 | 2  | Why did our Athena bill double overnight?               | Partition Pruning       |
 | 3  | The million tiny files nobody wanted                    | Small File Problem      |
