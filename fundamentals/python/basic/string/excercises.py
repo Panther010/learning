@@ -133,3 +133,169 @@ def remove_duplicates(s: str) -> str:
 
 print(remove_duplicates("programming"))
 print(remove_duplicates("Hello, World!"))
+
+
+"""
+Problem Description:
+You are given a string s. Your task is to count the number of consonants in the string and return the total count. A consonant is any alphabetic character that is not a vowel (a, e, i, o, u).
+
+Input:
+A single string s, where the length of s is between 1 and 1000.
+
+Output:
+An integer representing the total count of consonants in the input string.
+
+Example:
+Input: "Hello, World!"
+Output: 7
+Input: "Python Programming"
+Output: 13
+"""
+
+def count_consonants(s):
+    vowels = {"a", "e", "i", "o", "u"}
+    return sum(1 for c in s.lower() if c not in vowels and c.isalpha())
+
+print(count_consonants("Hello, World!"))
+print(count_consonants("Python Programming"))
+
+
+"""Problem Description:
+You are given two strings s and t. Your task is to determine if string t is an anagram of string s. An anagram is a word or phrase formed by rearranging the characters of a different word or phrase, using all the original characters exactly once.
+
+Input:
+Two strings s and t where both lengths are between 1 and 1000.
+
+Output:
+Return True if t is an anagram of s, and False otherwise.
+
+Example:
+Input: s = "anagram", t = "nagaram"
+Output: True
+Input: s = "rat", t = "car"
+Output: False
+"""
+def is_anagram(s: str, t:str) -> bool:
+    s = s.replace(" ", "").lower()
+    t = t.replace(" ", "").lower()
+
+    if len(s) != len(t):
+        return False
+
+    counter = {}
+    for i in s:
+        counter[i] = counter.get(i, 0) + 1
+
+    for j in t:
+        if j not in counter or counter[j] == 0:
+            return False
+        counter[j] -= 1
+
+    return True
+
+print(is_anagram(s="anagram", t="nagaram"))
+print(is_anagram(s="rat", t="car"))
+
+
+"""
+Problem Description:
+You are given two strings s and t. Your task is to determine if string t is a subsequence of string s. A subsequence of a string is a new string that is formed from the original string by deleting some (or no) characters without changing the order of the remaining characters.
+
+Input:
+Two strings s and t where the length of s is between 1 and 1000, and the length of t is between 1 and 1000.
+
+Output:
+Return True if t is a subsequence of s, and False otherwise.
+
+Example:
+Input: s = "abcde", t = "ace"
+Output: True
+Input: s = "abcde", t = "aec"
+Output: False
+"""
+
+def is_subsequence(s, t):
+    if not t:
+        return True
+
+    s_pointer = t_pointer = 0
+
+    while s_pointer < len(s) and t_pointer < len(t):
+        if s[s_pointer] == t[t_pointer]:
+            t_pointer += 1
+
+        s_pointer += 1
+
+    return t_pointer == len(t)
+
+print(is_subsequence(s = "abcde", t = "ace"))
+print(is_subsequence(s = "abcde", t = "aec"))
+
+
+"""
+Problem Description:
+You are given two strings, s and t. Your task is to determine if the string t is a substring of the string s. A substring is a contiguous sequence of characters within a string. Do not use any built-in functions for string operations and do not use recursion.
+
+Input:
+Two strings s and t, where 1 <= len(s), len(t) <= 1000.
+
+Output:
+A boolean value (True or False) indicating whether t is a substring of s.
+
+
+Example:
+Input: s = "hello world", t = "world"
+Output: True
+Input: s = "hello world", t = "worlds"
+Output: False
+"""
+def is_substring(s, t):
+    s_length, t_length = len(s), len(t)
+
+    for i in range(s_length - t_length + 1):
+        if s[i: i+t_length] == t:
+            return True
+    return False
+
+print(is_substring(s = "hello world", t = "world"))
+print(is_substring(s = "hello world", t = "worlds"))
+
+
+"""
+Problem Description:
+You are given a string s. Your task is to find the length of the longest word in the string. A word is defined as a sequence of characters separated by spaces. Do not use any built-in functions for string manipulation.
+
+Input:
+A string s, where the length of s is between 1 and 1000 characters.
+
+Output:
+An integer representing the length of the longest word in the string.
+
+Example:
+Input: s = "The quick brown fox jumps over the lazy dog"
+Output: 5
+Input: s = "Hello World"
+Output: 5
+"""
+
+def longest_word_length(s):
+    result = 0
+    word_length = 0
+    for char in s:
+        if char == " ":
+            result = max(result, word_length)
+            word_length = 0
+        else:
+            word_length += 1
+
+    return max(result, word_length)
+
+def longest_word_length1(s):
+    result = 0
+    for word in s.split():
+        result = max(result, len(word))
+
+    return result
+
+print(longest_word_length(s = "The quick brown fox jumps over the lazy dog"))
+print(longest_word_length(s = "Hello World"))
