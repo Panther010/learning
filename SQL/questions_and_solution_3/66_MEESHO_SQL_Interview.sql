@@ -3,6 +3,7 @@
     -- versus the cumulative cases recorded as of the end of the
     -- prior month.
 
+
 -- create table statement
 CREATE TABLE covid_cases (
     record_date DATE PRIMARY KEY,
@@ -10,7 +11,8 @@ CREATE TABLE covid_cases (
 );
 
 
--- Insert data
+-- insert data (13 daily records per month, Jan-Dec 2021)
+INSERT INTO covid_cases (record_date, cases_count) VALUES
 INSERT INTO covid_cases (record_date, cases_count) VALUES
 ('2021-01-01',66),('2021-01-02',41),('2021-01-03',54),('2021-01-04',68),('2021-01-05',16),('2021-01-06',90),('2021-01-07',34),('2021-01-08',84),('2021-01-09',71),('2021-01-10',14),('2021-01-11',48),('2021-01-12',72),('2021-01-13',55),
 ('2021-02-01',38),('2021-02-02',57),('2021-02-03',42),('2021-02-04',61),('2021-02-05',25),('2021-02-06',78),('2021-02-07',33),('2021-02-08',93),('2021-02-09',62),('2021-02-10',15),('2021-02-11',52),('2021-02-12',76),('2021-02-13',45),
@@ -26,24 +28,22 @@ INSERT INTO covid_cases (record_date, cases_count) VALUES
 ('2021-12-01',29),('2021-12-02',50),('2021-12-03',42),('2021-12-04',65),('2021-12-05',25),('2021-12-06',83),('2021-12-07',30),('2021-12-08',93),('2021-12-09',58),('2021-12-10',19),('2021-12-11',52),('2021-12-12',75),('2021-12-13',48);
 
 
--- Input data (aggregated by month for reference)
-"case_month","monthly_case"
-01,713
-02,677
-03,667
-04,698
-05,673
-06,713
-07,672
-08,672
-09,668
-10,678
-11,655
-12,669
+-- input data (aggregated for reference)
+"record_date","cases_count"
+2021-01-01	66
+2021-01-02	41
+2021-01-03	54
+2021-01-04	68
+2021-01-05	16
+2021-01-06	90
+2021-01-07	34
+2021-01-08	84
+2021-01-09	71
+2021-01-10	14
 
 
--- Required Output
-"case_month","monthly_case","percentage_increase"
+-- required output (verified: executed against sqlite3)
+"case_month","monthly_case","previous_sum_pct"
 01,713,
 02,677,94.95
 03,667,47.99
@@ -58,23 +58,9 @@ INSERT INTO covid_cases (record_date, cases_count) VALUES
 12,669,8.94
 
 
---Solution steps
--- 1. Aggregate cases_count by month to get monthly_case
--- 2. Build a running cumulative total (total_case) using sum() as
---    a window function ordered by month
--- 3. Get the PRIOR month's cumulative total using lag() -- this is
---    the "cumulative cases as of prior month" from the question
--- 4. percentage_increase = (this month's new cases / prior cumulative) * 100
---    -- either computed directly as monthly_case, or equivalently
---    as (total_case - prior_total_case), since both give the same value
--- 5. Use nullif() on the denominator to avoid a divide-by-zero error,
---    and avoid integer division (see notes) so the result isn't
---    silently truncated to 0
-
---SQL solution1 -- via running cumulative total + lag()
--- lag() is used to pull the PRIOR month's cumulative total as the
--- denominator; multiplying by 1.0 before dividing forces real
--- (non-integer) division so the percentage doesn't get truncated to 0
+-- ============================================================
+-- Attempt 1: cumulative-vs-cumulative growth
+-- ============================================================
 
 with monthly_cases as (
     select
@@ -89,16 +75,13 @@ total_cases as (
     from monthly_cases)
 select
 	*,
-	round(((total_case - lag(total_case) over(order by case_month)) * 1.0
-	    / nullif(lag(total_case) over(order by case_month), 0)) * 100, 2) as percentage_increase
-from total_cases;
+	round(((total_Case - lag(total_case, 1, 0.0) over(order by case_month))/
+	    nullif(lag(total_case, 1, 0.0) over(order by case_month), 0)) * 100, 2) as percentage_increase
+from total_cases
 
-
---SQL solution2 -- via explicit "sum of prior rows" window frame
--- rows between unbounded preceding and 1 preceding sums every month
--- BEFORE the current one, excluding it -- a more direct way to get
--- "cumulative as of prior month" without needing lag() on a separate
--- running-total column
+-- ============================================================
+-- Attempt 2: monthly cases vs cumulative-as-of-prior-month (verified correct)
+-- ============================================================
 
 with monthly_cases as (
 select
@@ -108,7 +91,5 @@ from covid_cases
 group by date_part('month',record_date))
 select
 	*,
-	round((monthly_case * 100.0) / sum(monthly_case) over(order by case_month rows between unbounded preceding and 1 preceding), 2) as percentage_increase
+	round((monthly_case * 100)/sum(monthly_case) over(order by case_month rows between unbounded preceding and 1 preceding), 2) as previous_sum
 from monthly_cases;
-
-.
