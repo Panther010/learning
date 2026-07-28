@@ -118,14 +118,14 @@ sequenceDiagram
 
 *(Not present in the original notes — added since it's frequently confused with partitioning.)*
 
-| Aspect | Partitioning | Bucketing (a.k.a. Clustering) |
-|---|---|---|
-| Mechanism | Splits data into **separate directories** by column value | Splits data into a **fixed number of files** within a partition/table using a **hash of a column**, modulo bucket count |
-| Cardinality fit | Best for **low-to-medium cardinality** columns | Best for **high cardinality** columns (e.g., `user_id`) |
-| Directory structure | Creates new folders per value | No new folders — bucket = a physical file |
-| Number of units | Grows dynamically with distinct values | **Fixed** at table creation (e.g., 256 buckets) |
-| Primary benefit | Partition pruning (skip whole directories) | Efficient joins/aggregations (avoids shuffle when both tables bucketed the same way) & avoids small-file explosion from over-partitioning |
-| Small file risk | High, if key has high cardinality | Low — bucket count is fixed and controlled |
+| Aspect              | Partitioning                                              | Bucketing (a.k.a. Clustering)                                                                                                             |
+|---------------------|-----------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------|
+| Mechanism           | Splits data into **separate directories** by column value | Splits data into a **fixed number of files** within a partition/table using a **hash of a column**, modulo bucket count                   |
+| Cardinality fit     | Best for **low-to-medium cardinality** columns            | Best for **high cardinality** columns (e.g., `user_id`)                                                                                   |
+| Directory structure | Creates new folders per value                             | No new folders — bucket = a physical file                                                                                                 |
+| Number of units     | Grows dynamically with distinct values                    | **Fixed** at table creation (e.g., 256 buckets)                                                                                           |
+| Primary benefit     | Partition pruning (skip whole directories)                | Efficient joins/aggregations (avoids shuffle when both tables bucketed the same way) & avoids small-file explosion from over-partitioning |
+| Small file risk     | High, if key has high cardinality                         | Low — bucket count is fixed and controlled                                                                                                |
 
 **Rule of thumb:** Partition on low-cardinality columns used in filters (e.g., `date`, `region`, `country`). Bucket on high-cardinality columns used in joins/lookups (e.g., `user_id`, `customer_id`).
 
@@ -158,12 +158,12 @@ Choosing the right partition key is one of the most important design decisions i
 
 **Consequences of a bad choice:**
 
-| Problem | Cause | Symptom |
-|---|---|---|
-| Small file problem / metadata overhead | Key has **too high** cardinality | Millions of tiny partitions/files; slow metadata listing; NameNode/Hive Metastore/S3 listing pressure |
-| Oversized partitions / data skew | Key has **too low** cardinality | A few partitions become huge; parallelism suffers; those tasks become stragglers |
-| Data skew | Values not evenly distributed (even with reasonable cardinality) | Some tasks take far longer than others (e.g., "Black Friday" partition 100x larger than a normal day) |
-| No benefit | Key not used in filters | Extra write complexity, no pruning gain |
+| Problem                                | Cause                                                            | Symptom                                                                                               |
+|----------------------------------------|------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------|
+| Small file problem / metadata overhead | Key has **too high** cardinality                                 | Millions of tiny partitions/files; slow metadata listing; NameNode/Hive Metastore/S3 listing pressure |
+| Oversized partitions / data skew       | Key has **too low** cardinality                                  | A few partitions become huge; parallelism suffers; those tasks become stragglers                      |
+| Data skew                              | Values not evenly distributed (even with reasonable cardinality) | Some tasks take far longer than others (e.g., "Black Friday" partition 100x larger than a normal day) |
+| No benefit                             | Key not used in filters                                          | Extra write complexity, no pruning gain                                                               |
 
 **Common good choices:** `date` / `event_date` (time-series data, naturally bounded cardinality, almost always filtered on), `region`/`country` (bounded, often filtered on), or a **coarser bucket** derived from a high-cardinality key (e.g., `customer_id % 100` as a secondary partition, combined with bucketing for the fine-grained key — see [Section 13, Q1](#13-qa--scenario--system-design)).
 
@@ -223,14 +223,14 @@ timeline
 
 While *storage-side* partitioning is about how data is laid out on disk, **compute-side partitioning** is about how data is split into in-memory partitions during Spark processing — this determines task parallelism.
 
-| | `repartition(n)` | `coalesce(n)` |
-|---|---|---|
-| Shuffle? | **Full shuffle** across the cluster | **No full shuffle** — merges adjacent existing partitions |
-| Can increase partitions? | Yes | **No** (only decreases; increasing with coalesce is a no-op / not supported properly) |
-| Can decrease partitions? | Yes | Yes (its main use case) |
-| Data distribution after | Even (random/hash-based redistribution) | Uneven — can leave few partitions doing most of the work |
-| Cost | Expensive (network + disk I/O for shuffle) | Cheap (minimizes data movement) |
-| Typical use | Fix data skew, increase parallelism, prep for wide operations, control output file *count* upward | Reduce output file count cheaply after a job, especially before writing (e.g., avoid small files) *when data isn't skewed* |
+|                          | `repartition(n)`                                                                                  | `coalesce(n)`                                                                                                              |
+|--------------------------|---------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------|
+| Shuffle?                 | **Full shuffle** across the cluster                                                               | **No full shuffle** — merges adjacent existing partitions                                                                  |
+| Can increase partitions? | Yes                                                                                               | **No** (only decreases; increasing with coalesce is a no-op / not supported properly)                                      |
+| Can decrease partitions? | Yes                                                                                               | Yes (its main use case)                                                                                                    |
+| Data distribution after  | Even (random/hash-based redistribution)                                                           | Uneven — can leave few partitions doing most of the work                                                                   |
+| Cost                     | Expensive (network + disk I/O for shuffle)                                                        | Cheap (minimizes data movement)                                                                                            |
+| Typical use              | Fix data skew, increase parallelism, prep for wide operations, control output file *count* upward | Reduce output file count cheaply after a job, especially before writing (e.g., avoid small files) *when data isn't skewed* |
 
 **Example:**
 ```python

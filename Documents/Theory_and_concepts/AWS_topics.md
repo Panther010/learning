@@ -119,12 +119,12 @@ When **versioning** is enabled on a bucket, every write to the same key creates 
 
 ### 1.5 Encryption Options
 
-| Method | Who manages the key | Notes |
-|---|---|---|
-| **SSE-S3** | AWS manages the key entirely | Simplest; AES-256, no extra configuration |
-| **SSE-KMS** | AWS KMS-managed key (customer can control via KMS key policy) | Adds audit trail (CloudTrail logs key usage), supports key rotation, access control at the key level — most common choice when compliance/audit matters |
-| **SSE-C** | Customer provides their own encryption key with each request | AWS never stores the key — customer fully responsible for key management |
-| **Client-Side Encryption** | Customer encrypts data **before** uploading, using their own key management | AWS never sees plaintext data at all |
+| Method                     | Who manages the key                                                         | Notes                                                                                                                                                   |
+|----------------------------|-----------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **SSE-S3**                 | AWS manages the key entirely                                                | Simplest; AES-256, no extra configuration                                                                                                               |
+| **SSE-KMS**                | AWS KMS-managed key (customer can control via KMS key policy)               | Adds audit trail (CloudTrail logs key usage), supports key rotation, access control at the key level — most common choice when compliance/audit matters |
+| **SSE-C**                  | Customer provides their own encryption key with each request                | AWS never stores the key — customer fully responsible for key management                                                                                |
+| **Client-Side Encryption** | Customer encrypts data **before** uploading, using their own key management | AWS never sees plaintext data at all                                                                                                                    |
 
 > Correction: the original notes wrote "SSE-S£" — this should be **SSE-S3**.
 
@@ -132,11 +132,11 @@ When **versioning** is enabled on a bucket, every write to the same key creates 
 
 Both are JSON-based access control, but attached differently and used for different purposes:
 
-| | Bucket Policy | IAM Policy |
-|---|---|---|
-| Attached to | The **bucket** itself (resource-based policy) | A **user/role/group** (identity-based policy) |
-| Controls | Who (including **cross-account** principals) can access this specific bucket, and how | What actions this specific identity can perform, across whichever resources the policy allows |
-| Typical use | Granting **cross-account** access, making a bucket public (rare/careful use), enforcing bucket-wide conditions (e.g., require encryption on upload) | Controlling what a given application/user/role within *your* account can do generally |
+|             | Bucket Policy                                                                                                                                       | IAM Policy                                                                                    |
+|-------------|-----------------------------------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------|
+| Attached to | The **bucket** itself (resource-based policy)                                                                                                       | A **user/role/group** (identity-based policy)                                                 |
+| Controls    | Who (including **cross-account** principals) can access this specific bucket, and how                                                               | What actions this specific identity can perform, across whichever resources the policy allows |
+| Typical use | Granting **cross-account** access, making a bucket public (rare/careful use), enforcing bucket-wide conditions (e.g., require encryption on upload) | Controlling what a given application/user/role within *your* account can do generally         |
 
 Both are evaluated together — an action is only allowed if **no explicit deny** exists in either, and **at least one** applicable policy explicitly allows it.
 
@@ -242,12 +242,12 @@ glueContext.write_dynamic_frame.from_options(
 
 ### 2.5 Glue Job Types
 
-| Type | Use Case |
-|---|---|
-| **Spark** | Large-scale, distributed batch transformations (the default/most common Glue job type) |
-| **Spark Streaming** | Near-real-time/continuous processing (e.g., reading from Kinesis/Kafka) |
-| **Python Shell** | Lightweight scripts that don't need distributed Spark (e.g., simple API calls, small file manipulations, orchestration glue-code) — cheaper and faster to start than a Spark job |
-| **Ray** | Python-native distributed compute, geared toward ML/data-science workloads that benefit from Ray's task-parallel model rather than Spark's DataFrame model |
+| Type                | Use Case                                                                                                                                                                         |
+|---------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **Spark**           | Large-scale, distributed batch transformations (the default/most common Glue job type)                                                                                           |
+| **Spark Streaming** | Near-real-time/continuous processing (e.g., reading from Kinesis/Kafka)                                                                                                          |
+| **Python Shell**    | Lightweight scripts that don't need distributed Spark (e.g., simple API calls, small file manipulations, orchestration glue-code) — cheaper and faster to start than a Spark job |
+| **Ray**             | Python-native distributed compute, geared toward ML/data-science workloads that benefit from Ray's task-parallel model rather than Spark's DataFrame model                       |
 
 ### 2.6 Glue Job Bookmarks
 
@@ -255,10 +255,10 @@ glueContext.write_dynamic_frame.from_options(
 
 ### 2.7 Worker Types
 
-| Worker Type | vCPUs | Memory |
-|---|---|---|
-| **G.1X** | 4 | 16 GB |
-| **G.2X** | 8 | 32 GB |
+| Worker Type     | vCPUs   | Memory      |
+|-----------------|---------|-------------|
+| **G.1X**        | 4       | 16 GB       |
+| **G.2X**        | 8       | 32 GB       |
 | **G.4X / G.8X** | 16 / 32 | 64 / 128 GB |
 
 > Correction: the original notes wrote these as `g1.x`, `g2.x`, `g4.x` — the correct naming is **G.1X / G.2X / G.4X / G.8X**. Larger worker types suit memory-intensive transformations (large joins/shuffles, wide aggregations); more (smaller) workers suit highly parallel, less memory-hungry jobs.
@@ -283,11 +283,11 @@ Glue supports **triggers** to chain jobs/crawlers together (on a schedule, on jo
 
 ### 3.2 Node Types
 
-| Node Type | Role |
-|---|---|
-| **Master Node** | Manages the cluster — runs the Spark **driver**, YARN ResourceManager, and cluster coordination processes. |
-| **Core Nodes** | Run both **HDFS DataNodes** (storage) **and** compute (Spark/YARN executors) — losing a core node risks losing HDFS data blocks stored on it. |
-| **Task Nodes** | **Compute only** — no HDFS storage role, so they're safe to run on **Spot Instances** (interruption just loses in-progress compute work, not stored data) for significant cost savings. |
+| Node Type       | Role                                                                                                                                                                                    |
+|-----------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **Master Node** | Manages the cluster — runs the Spark **driver**, YARN ResourceManager, and cluster coordination processes.                                                                              |
+| **Core Nodes**  | Run both **HDFS DataNodes** (storage) **and** compute (Spark/YARN executors) — losing a core node risks losing HDFS data blocks stored on it.                                           |
+| **Task Nodes**  | **Compute only** — no HDFS storage role, so they're safe to run on **Spot Instances** (interruption just loses in-progress compute work, not stored data) for significant cost savings. |
 
 ```mermaid
 flowchart TB
@@ -308,12 +308,12 @@ EMR clusters can run on:
 
 A recurring interview topic because it drives cost and architecture decisions:
 
-| | Transient Cluster | Long-Running (Persistent) Cluster |
-|---|---|---|
-| Lifecycle | Spun up for a **specific job/workflow**, then **terminated** automatically on completion | Stays running continuously, serving many jobs over time |
-| Cost model | Pay only for the duration of the actual job | Pay continuously, even during idle periods (unless separately scaled down) |
-| Best for | Scheduled batch ETL (e.g., nightly jobs), unpredictable/bursty workloads | Interactive workloads (ad hoc Hive/Presto queries), shared multi-tenant clusters, workloads needing a "warm" cluster to avoid startup latency |
-| HDFS data | Typically **not** relied upon for durable storage (data lives in S3 via EMRFS) since the cluster (and its HDFS) is destroyed after the job | Can rely more on local HDFS for intermediate/frequently accessed data, though S3/EMRFS is still generally preferred for durability |
+|            | Transient Cluster                                                                                                                          | Long-Running (Persistent) Cluster                                                                                                             |
+|------------|--------------------------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------|
+| Lifecycle  | Spun up for a **specific job/workflow**, then **terminated** automatically on completion                                                   | Stays running continuously, serving many jobs over time                                                                                       |
+| Cost model | Pay only for the duration of the actual job                                                                                                | Pay continuously, even during idle periods (unless separately scaled down)                                                                    |
+| Best for   | Scheduled batch ETL (e.g., nightly jobs), unpredictable/bursty workloads                                                                   | Interactive workloads (ad hoc Hive/Presto queries), shared multi-tenant clusters, workloads needing a "warm" cluster to avoid startup latency |
+| HDFS data  | Typically **not** relied upon for durable storage (data lives in S3 via EMRFS) since the cluster (and its HDFS) is destroyed after the job | Can rely more on local HDFS for intermediate/frequently accessed data, though S3/EMRFS is still generally preferred for durability            |
 
 ### 3.5 Managed Scaling vs Auto Scaling
 
@@ -367,11 +367,11 @@ Redshift stores data **column-by-column** rather than row-by-row — each column
 
 Distribution style determines **how table rows are physically distributed across compute nodes/slices** — a critical performance lever, especially for joins.
 
-| Style | Behavior | Best for |
-|---|---|---|
-| **EVEN** | Rows distributed round-robin across all slices, regardless of value | Tables with no natural join key, or where even load distribution matters more than co-location |
-| **KEY** | Rows distributed based on the hash of a specified column (like hash partitioning) — rows with the same key value always land on the same slice | Large tables frequently **joined** on that key — co-locating matching keys avoids expensive network shuffle during the join |
-| **ALL** | The **entire table** is replicated in full to every node | Small, frequently-joined dimension tables — avoids any shuffle at join time since every node already has a full local copy, at the cost of storing N copies of the table |
+| Style    | Behavior                                                                                                                                       | Best for                                                                                                                                                                 |
+|----------|------------------------------------------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **EVEN** | Rows distributed round-robin across all slices, regardless of value                                                                            | Tables with no natural join key, or where even load distribution matters more than co-location                                                                           |
+| **KEY**  | Rows distributed based on the hash of a specified column (like hash partitioning) — rows with the same key value always land on the same slice | Large tables frequently **joined** on that key — co-locating matching keys avoids expensive network shuffle during the join                                              |
+| **ALL**  | The **entire table** is replicated in full to every node                                                                                       | Small, frequently-joined dimension tables — avoids any shuffle at join time since every node already has a full local copy, at the cost of storing N copies of the table |
 
 ```mermaid
 flowchart TB

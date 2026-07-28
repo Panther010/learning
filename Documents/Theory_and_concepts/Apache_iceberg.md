@@ -81,12 +81,12 @@ flowchart TB
     M2 --> D3[data-file-003.parquet]
 ```
 
-| Layer | What it stores |
-|---|---|
-| **Catalog** | A pointer to the **current metadata file** for each table — this is the single source of truth for "what's the latest version of this table" (implemented via Glue Catalog, Hive Metastore, a REST catalog, Nessie, JDBC, etc.) |
-| **Metadata file** (JSON) | Table **schema** (with full history of schema versions), **partition spec** (with history, enabling partition evolution), and the **list of all snapshots** with their IDs/timestamps |
-| **Manifest list** (Avro, one per snapshot) | Tracks the set of **manifest files** that make up a given snapshot, along with summary stats per manifest (e.g., partition value ranges) used for pruning at the manifest level |
-| **Manifest file** (Avro) | Tracks individual **data files**: their paths, partition values, and column-level stats (min/max, null counts) used for **file-level pruning** |
+| Layer                                      | What it stores                                                                                                                                                                                                                  |
+|--------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **Catalog**                                | A pointer to the **current metadata file** for each table — this is the single source of truth for "what's the latest version of this table" (implemented via Glue Catalog, Hive Metastore, a REST catalog, Nessie, JDBC, etc.) |
+| **Metadata file** (JSON)                   | Table **schema** (with full history of schema versions), **partition spec** (with history, enabling partition evolution), and the **list of all snapshots** with their IDs/timestamps                                           |
+| **Manifest list** (Avro, one per snapshot) | Tracks the set of **manifest files** that make up a given snapshot, along with summary stats per manifest (e.g., partition value ranges) used for pruning at the manifest level                                                 |
+| **Manifest file** (Avro)                   | Tracks individual **data files**: their paths, partition values, and column-level stats (min/max, null counts) used for **file-level pruning**                                                                                  |
 
 Because pruning happens by reading small metadata files (manifest lists → manifests → matching data files) rather than listing directories, query planning is fast and **independent of the number of partitions/files** in the way that directory listing is not.
 
@@ -167,12 +167,12 @@ A **partition transform** is metadata-level rule defining how a column's value i
 
 Built-in transforms:
 
-| Transform | Description | Example |
-|---|---|---|
-| **Identity** | Partition directly by the column's raw value | `PARTITIONED BY (region)` |
-| **Bucketing** | Hash the column into a fixed number of buckets | `PARTITIONED BY (bucket(16, customer_id))` — good for high-cardinality columns |
-| **Truncate** | Truncate a value (string prefix, or numeric rounding) to a coarser granularity | `PARTITIONED BY (truncate(4, zip_code))` |
-| **Temporal transforms** | Derive a time-based partition value directly from a timestamp column | `PARTITIONED BY (day(event_timestamp))`, also `year()`, `month()`, `hour()` |
+| Transform               | Description                                                                    | Example                                                                        |
+|-------------------------|--------------------------------------------------------------------------------|--------------------------------------------------------------------------------|
+| **Identity**            | Partition directly by the column's raw value                                   | `PARTITIONED BY (region)`                                                      |
+| **Bucketing**           | Hash the column into a fixed number of buckets                                 | `PARTITIONED BY (bucket(16, customer_id))` — good for high-cardinality columns |
+| **Truncate**            | Truncate a value (string prefix, or numeric rounding) to a coarser granularity | `PARTITIONED BY (truncate(4, zip_code))`                                       |
+| **Temporal transforms** | Derive a time-based partition value directly from a timestamp column           | `PARTITIONED BY (day(event_timestamp))`, also `year()`, `month()`, `hour()`    |
 
 **Example — composite partition spec:**
 ```sql
@@ -309,13 +309,13 @@ A: Every write creates a new immutable **snapshot** rather than mutating existin
 **Q6: What's the difference between Iceberg and Delta Lake?**
 A: Both provide ACID transactions, schema evolution, and time travel on top of Parquet-based lake storage, but differ in emphasis and ecosystem fit:
 
-| | Iceberg | Delta Lake |
-|---|---|---|
-| Metadata structure | 3-tier (metadata file → manifest list → manifest files) | Single-tier JSON commit log + periodic Parquet checkpoints |
-| Partition evolution | First-class, headline feature | Not natively supported the same way (would typically require a rewrite) |
-| Engine support | Very broad multi-engine support (Spark, Trino, Flink, Snowflake, BigQuery, Athena, etc.) via open catalog spec | Strongest/most mature on Databricks/Spark; growing but historically narrower multi-engine support |
-| Catalog | Requires external catalog (Glue, HMS, REST, Nessie, JDBC) | Can work directory-based (log co-located with data) or via catalog |
-| Hidden partitioning | Yes | No (partition columns are explicit) |
+|                     | Iceberg                                                                                                        | Delta Lake                                                                                        |
+|---------------------|----------------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------|
+| Metadata structure  | 3-tier (metadata file → manifest list → manifest files)                                                        | Single-tier JSON commit log + periodic Parquet checkpoints                                        |
+| Partition evolution | First-class, headline feature                                                                                  | Not natively supported the same way (would typically require a rewrite)                           |
+| Engine support      | Very broad multi-engine support (Spark, Trino, Flink, Snowflake, BigQuery, Athena, etc.) via open catalog spec | Strongest/most mature on Databricks/Spark; growing but historically narrower multi-engine support |
+| Catalog             | Requires external catalog (Glue, HMS, REST, Nessie, JDBC)                                                      | Can work directory-based (log co-located with data) or via catalog                                |
+| Hidden partitioning | Yes                                                                                                            | No (partition columns are explicit)                                                               |
 
 Practical takeaway: Iceberg tends to be favored for **multi-engine, engine-agnostic** platforms and where partition evolution is a real requirement; Delta Lake tends to be favored in **Databricks-centric** stacks. (See also the companion Delta Lake notes for the Delta-side details.)
 
