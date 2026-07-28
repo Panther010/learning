@@ -49,22 +49,22 @@ flowchart LR
 
 ## 2. Key Concepts & Terminology
 
-| Term | Definition |
-|---|---|
-| **Dimension table** | Descriptive/reference data table (customer, product, employee, store, etc.) that gives context to facts. |
-| **Surrogate key** | A system-generated, meaningless artificial key (e.g., an auto-incrementing integer or UUID) used as the table's primary key — **not** derived from any business meaning. Enables multiple rows to represent the *same* real-world entity across different time periods (essential for SCD Type 2). |
-| **Natural / business key** | The real-world identifier for an entity (e.g., `customer_id` from the source system, an employee number) — stays constant across the entity's entire history, unlike the surrogate key which is unique **per version**. |
-| **Effective date / Expiry date** | Columns marking the time range during which a given dimension row version was the "current, valid" one. |
-| **Current flag** | A boolean column (`is_current`) marking whether a given row is the currently active version of that entity. |
-| **Version number** | An incrementing integer tracking which iteration of change a row represents, often used alongside effective/expiry dates. |
-| **Late-arriving dimension** | A situation where a **fact record arrives before its corresponding dimension record** even exists yet (e.g., a sale is recorded before the customer master record has been created/synced) — requires special handling so the fact isn't dropped or mis-joined. |
+| Term                             | Definition                                                                                                                                                                                                                                                                                         |
+|----------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **Dimension table**              | Descriptive/reference data table (customer, product, employee, store, etc.) that gives context to facts.                                                                                                                                                                                           |
+| **Surrogate key**                | A system-generated, meaningless artificial key (e.g., an auto-incrementing integer or UUID) used as the table's primary key — **not** derived from any business meaning. Enables multiple rows to represent the *same* real-world entity across different time periods (essential for SCD Type 2). |
+| **Natural / business key**       | The real-world identifier for an entity (e.g., `customer_id` from the source system, an employee number) — stays constant across the entity's entire history, unlike the surrogate key which is unique **per version**.                                                                            |
+| **Effective date / Expiry date** | Columns marking the time range during which a given dimension row version was the "current, valid" one.                                                                                                                                                                                            |
+| **Current flag**                 | A boolean column (`is_current`) marking whether a given row is the currently active version of that entity.                                                                                                                                                                                        |
+| **Version number**               | An incrementing integer tracking which iteration of change a row represents, often used alongside effective/expiry dates.                                                                                                                                                                          |
+| **Late-arriving dimension**      | A situation where a **fact record arrives before its corresponding dimension record** even exists yet (e.g., a sale is recorded before the customer master record has been created/synced) — requires special handling so the fact isn't dropped or mis-joined.                                    |
 
 **Example dimension row (Type 2 style) showing several of these together:**
 
-| surrogate_key | customer_id (natural key) | name | address | effective_date | expiry_date | is_current | version |
-|---|---|---|---|---|---|---|---|
-| 1001 | C-500 | Alice | 12 Elm St | 2024-01-01 | 2025-06-14 | false | 1 |
-| 1002 | C-500 | Alice | 45 Oak Ave | 2025-06-15 | 9999-12-31 | true | 2 |
+| surrogate_key | customer_id (natural key) | name  | address    | effective_date | expiry_date | is_current | version |
+|---------------|---------------------------|-------|------------|----------------|-------------|------------|---------|
+| 1001          | C-500                     | Alice | 12 Elm St  | 2024-01-01     | 2025-06-14  | false      | 1       |
+| 1002          | C-500                     | Alice | 45 Oak Ave | 2025-06-15     | 9999-12-31  | true       | 2       |
 
 ---
 
@@ -155,9 +155,9 @@ Combines all three simpler types: like Type 2, a **new row is added** for every 
 **Example:**
 
 | surrogate_key | customer_id | address (as of that version) | address_current (always latest) | effective_date | expiry_date | is_current |
-|---|---|---|---|---|---|---|
-| 1001 | C-500 | 12 Elm St | 45 Oak Ave | 2024-01-01 | 2025-06-14 | false |
-| 1002 | C-500 | 45 Oak Ave | 45 Oak Ave | 2025-06-15 | 9999-12-31 | true |
+|---------------|-------------|------------------------------|---------------------------------|----------------|-------------|------------|
+| 1001          | C-500       | 12 Elm St                    | 45 Oak Ave                      | 2024-01-01     | 2025-06-14  | false      |
+| 1002          | C-500       | 45 Oak Ave                   | 45 Oak Ave                      | 2025-06-15     | 9999-12-31  | true       |
 
 - ✅ Most flexible — supports point-in-time historical queries (via the versioned column), "what's the current value" queries even from a historical row (via the `_current` column), and change-tracking, all in one structure.
 - ❌ Most complex to implement and maintain — every new change requires **retroactively updating the `_current` column across all historical rows** for that entity, in addition to the normal Type 2 insert/expire logic.
@@ -166,14 +166,14 @@ Combines all three simpler types: like Type 2, a **new row is added** for every 
 
 ## 9. Choosing the Right SCD Type — Comparison Table
 
-| Type | History kept | Table growth | Complexity | Best for |
-|---|---|---|---|---|
-| **0** | None (immutable) | None | Trivial | Attributes that should never change (e.g., original signup channel) |
-| **1** | None (overwritten) | None | Trivial | Corrections/typos, attributes where history truly doesn't matter |
-| **2** | Full history | High (new row per change) | Moderate | Most common case — need accurate point-in-time historical reporting |
-| **3** | Only immediately previous value | None | Low | Simple "what changed most recently" tracking, not full history |
-| **4** | Full history (separate table) | Moderate (split across 2 tables) | High (2 tables to maintain) | Huge dimensions where most queries only need current state |
-| **6** | Full history + always-current value | High | Highest | Need both full history *and* easy access to latest value from any row |
+| Type  | History kept                        | Table growth                     | Complexity                  | Best for                                                              |
+|-------|-------------------------------------|----------------------------------|-----------------------------|-----------------------------------------------------------------------|
+| **0** | None (immutable)                    | None                             | Trivial                     | Attributes that should never change (e.g., original signup channel)   |
+| **1** | None (overwritten)                  | None                             | Trivial                     | Corrections/typos, attributes where history truly doesn't matter      |
+| **2** | Full history                        | High (new row per change)        | Moderate                    | Most common case — need accurate point-in-time historical reporting   |
+| **3** | Only immediately previous value     | None                             | Low                         | Simple "what changed most recently" tracking, not full history        |
+| **4** | Full history (separate table)       | Moderate (split across 2 tables) | High (2 tables to maintain) | Huge dimensions where most queries only need current state            |
+| **6** | Full history + always-current value | High                             | Highest                     | Need both full history *and* easy access to latest value from any row |
 
 ---
 

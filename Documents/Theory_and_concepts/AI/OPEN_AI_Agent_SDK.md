@@ -133,17 +133,17 @@ A key security principle: **credentials/secrets are injected by the sandbox prov
 
 ### Quick Recap Table
 
-| Term | One-liner |
-|---|---|
-| Agent | LLM + instructions + tools, bundled together |
-| Runner.run() | Executes the agent loop until a final answer |
-| trace() | Records/tracks what happens during a run |
-| Handoff | One agent fully transfers control to a specialist |
-| Agent-as-tool | One agent calls another but stays in control |
-| Guardrail | Safety check on input, output, or a tool call |
-| Tripwire | The trigger that halts a run when a guardrail fails |
-| Pydantic | Defines structured, validated output shapes |
-| Sandbox Agent | Agent that runs inside an isolated execution environment |
-| Manifest | Defines the sandbox's workspace (files, env vars, storage) |
-| Capabilities | Plug-ins that add abilities/tools to a sandbox agent |
+| Term          | One-liner                                                  |
+|---------------|------------------------------------------------------------|
+| Agent         | LLM + instructions + tools, bundled together               |
+| Runner.run()  | Executes the agent loop until a final answer               |
+| trace()       | Records/tracks what happens during a run                   |
+| Handoff       | One agent fully transfers control to a specialist          |
+| Agent-as-tool | One agent calls another but stays in control               |
+| Guardrail     | Safety check on input, output, or a tool call              |
+| Tripwire      | The trigger that halts a run when a guardrail fails        |
+| Pydantic      | Defines structured, validated output shapes                |
+| Sandbox Agent | Agent that runs inside an isolated execution environment   |
+| Manifest      | Defines the sandbox's workspace (files, env vars, storage) |
+| Capabilities  | Plug-ins that add abilities/tools to a sandbox agent       |
 

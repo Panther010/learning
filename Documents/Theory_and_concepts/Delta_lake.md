@@ -272,13 +272,13 @@ OPTIMIZE customers ZORDER BY (customer_id, region);
 
 **How it's different from partitioning:**
 
-| | Partitioning | Z-Ordering |
-|---|---|---|
-| Mechanism | Physically separates data into different **directories** by a column's value | Physically **sorts/clusters** data *within* files using multiple columns via a space-filling curve |
-| Cardinality fit | Best for low/medium cardinality | Works well even for **high-cardinality** columns |
-| Number of columns | Typically 1 (or a small composite) | Can effectively combine **multiple** columns for multi-dimensional clustering |
-| Skew risk | High-cardinality partition key → small-file explosion | No directory explosion — same file count, better internal organization |
-| Use case | Coarse-grained filtering (e.g., `date`) | Fine-grained filtering / range queries on multiple secondary columns (e.g., `customer_id` AND `region` together) |
+|                   | Partitioning                                                                 | Z-Ordering                                                                                                       |
+|-------------------|------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------|
+| Mechanism         | Physically separates data into different **directories** by a column's value | Physically **sorts/clusters** data *within* files using multiple columns via a space-filling curve               |
+| Cardinality fit   | Best for low/medium cardinality                                              | Works well even for **high-cardinality** columns                                                                 |
+| Number of columns | Typically 1 (or a small composite)                                           | Can effectively combine **multiple** columns for multi-dimensional clustering                                    |
+| Skew risk         | High-cardinality partition key → small-file explosion                        | No directory explosion — same file count, better internal organization                                           |
+| Use case          | Coarse-grained filtering (e.g., `date`)                                      | Fine-grained filtering / range queries on multiple secondary columns (e.g., `customer_id` AND `region` together) |
 
 Think of partitioning as "which folder do I even look in," and Z-Ordering as "within these files, are the rows I need physically packed together so I read fewer files/row-groups."
 
