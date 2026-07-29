@@ -20,3 +20,12 @@ Products
 6. Mult-agent in CLI, 3-5 agents
 7. 10+ agents in CLI manually managed
 8. Agent orchestrate agent
+
+
+5 principle of successful vibe coding 
+1. Invest in AGENT.md
+   - Concisely, spec, style, success
+2. Start SIMPLE
+3. Work incrementally, test constantly, validate success criteria
+4. Don't get lazy-challenge and demand evidence
+5. Handle frustration with style 
