@@ -6,11 +6,11 @@
 
 It has a few different "products" around the core idea:
 
-| Term | Simple Meaning |
-|---|---|
-| **CrewAI (open-source framework)** | The free, open-source Python library — the actual engine you code with. Independent of LangChain. |
-| **CrewAI AMP** | *Agent Management Platform* — the enterprise/managed platform for deploying, monitoring, and running crews at scale (includes things like SSO, on-premise deployment, observability). |
-| **CrewAI UI Studio** | A **visual, low-code editor** to build and configure crews/agents through a UI instead of writing all the code by hand. |
+| Term                               | Simple Meaning                                                                                                                                                                        |
+|------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **CrewAI (open-source framework)** | The free, open-source Python library — the actual engine you code with. Independent of LangChain.                                                                                     |
+| **CrewAI AMP**                     | *Agent Management Platform* — the enterprise/managed platform for deploying, monitoring, and running crews at scale (includes things like SSO, on-premise deployment, observability). |
+| **CrewAI UI Studio**               | A **visual, low-code editor** to build and configure crews/agents through a UI instead of writing all the code by hand.                                                               |
 
 ---
 
