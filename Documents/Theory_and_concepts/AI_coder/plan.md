@@ -216,3 +216,13 @@ The umbrella term for this whole approach — treating debugging as a **repeatab
 | Plugin                 | Bundle of MCP + Skills + Commands, simplest to install          |
 | Systematic Debugging   | Reproduce → hypothesize → prove root cause → fix → document     |
 
+
+
+Chaos --> YOLO, Ralph Loops, GSD, Swarms
+CONTROL  ---> Use of files, Self -correcting, Sandboxes, Orchestration
+The goal is controlled chaos
+
+
+Pro features
+/command creation using skills or command
+build agent and sub agent
