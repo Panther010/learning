@@ -98,7 +98,8 @@ were verified by the project owner. The verification container was stopped after
 
 Steps:
 1. Write `spark_jobs/bronze/ingest_raw.py`:
-   - read all 4 CSVs as StringType, `multiLine=True`, `escape='"'` for the athletes file
+   - read all 4 CSVs with explicit all-StringType schemas, `multiLine=True`, and
+     `escape='"'`; preserve parser-level malformed rows in `_corrupt_record`
    - add `_ingested_at`, `_source_file` metadata columns
    - write to `data/processed/olympic_2022/bronze/<table_name>/` as Parquet
    - do NOT drop bad rows at this layer
