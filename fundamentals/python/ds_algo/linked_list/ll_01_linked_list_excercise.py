@@ -10,6 +10,7 @@ class Node:
         self.value = value
         self.next = None
 
+
 class LinkedList:
     def __init__(self, value):
         """
@@ -27,7 +28,7 @@ class LinkedList:
         """
         temp = self.head
         while temp:
-            print(temp.value, end=' --> ')
+            print(temp.value, end = " --> ")
             temp = temp.next
 
     def append(self, value):
@@ -56,7 +57,7 @@ class LinkedList:
         if self.length == 0:
             return None
 
-        prev = temp = self.head
+        temp = prev = self.head
 
         while temp.next:
             prev = temp
@@ -80,17 +81,7 @@ class LinkedList:
         if this is the only element it will be both head and tail
         or else it will replace head and length +1
         """
-        new_node = Node(value)
-        if self.length == 0:
-            self.head = new_node
-            self.tail = new_node
-        else:
-            new_node.next = self.head
-            self.head = new_node
-
-        self.length += 1
-
-        return True
+        pass
 
 
     def pop_first(self):
@@ -99,20 +90,7 @@ class LinkedList:
         if there is no element cant remove return None
         otherwise replace head with next element length -1. If ater this length is 0 mark head and tail None
         """
-        if self.length == 0:
-            return None
-
-        temp = self.head
-        self.head = temp.next
-        temp.next = None
-
-        self.length -=1
-
-        if self.length == 0:
-            self.head = None
-            self.tail = None
-
-        return temp
+        pass
 
 
     def get(self, index):
