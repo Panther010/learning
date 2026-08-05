@@ -86,6 +86,7 @@ class CleanAthlete:
 
         silver_df = self.correct_data_type(dedup_athlete)
         self.write_silver(silver_df)
+        silver_df.printSchema()
         # Note: there are few athlete without birt year of missing first game value keep in mind
         athlete_df.filter(f.col("athlete_year_birth").isNull() | f.trim(f.col("athlete_year_birth") == f.lit(""))).show()
         athlete_df.filter(
