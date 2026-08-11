@@ -21,6 +21,14 @@ class CleanHost:
         self.log.info("reading file: %s", self.input_path)
         return self.spark.read.parquet(str(self.input_path))
 
+    def trim_string_col(self, df: DataFrame) -> DataFrame:
+        self.log.info("Trim of all the string column is in progress")
+        string_cols = [c for c, t in df.dtypes if t == "string"]
+        for col_name in string_cols:
+            df = df.withColumn(col_name, f.trim(f.col(f"{col_name}")))
+
+        return df
+
     def parse_data(self, df: DataFrame) -> DataFrame:
         self.log.info("Parsing the data and data type")
         result = df.select(
@@ -46,7 +54,8 @@ class CleanHost:
         print(raw_host.count())
         raw_host.show(100, truncate=False)
 
-        parsed_host = self.parse_data(raw_host)
+        trim_string_df = self.trim_string_col(raw_host)
+        parsed_host = self.parse_data(trim_string_df)
 
         parsed_host.printSchema()
         parsed_host.show(100, truncate=False)
