@@ -1,296 +1,313 @@
 # Databricks Lakehouse — Revision Notes
-*(Condensed & reorganized: what a lakehouse is → medallion architecture → batch vs. streaming → schema evolution → CDC & snapshots)*
+*(Organized basic → advanced: what a lakehouse is → architecture → processing modes → schema evolution → CDC & snapshots)*
+
+> 📌 A correction upfront: your rough notes had the **Batch vs. Streaming** section mixed up (some streaming characteristics were listed under "Batch" and vice versa, along with swapped code snippets). I've corrected this in §6/§7 — flagged there so you know what changed.
 
 ---
 
-# PART 1 — What Is a Data Lakehouse?
+# Lakehouse Fundamentals
 
-## 1. The Core Idea
+## 1. What Is a Data Lakehouse?
 
-A **Data Lakehouse** combines the strengths of a **Data Lake** (cheap, flexible storage for any data type) and a **Data Warehouse** (fast, reliable, structured querying) — into a **single system**, so organizations don't need separate, disconnected tools for different workloads (BI, ML, streaming, ad-hoc analytics all on the *same* data).
+A **Data Lakehouse** is a data management architecture that combines the **low-cost, flexible storage of a data lake** with the **performance, structure, and reliability of a data warehouse** — so organizations don't need two separate, disconnected systems for cheap raw storage vs. fast structured analytics.
 
-It typically follows a design pattern where data is **incrementally improved and refined** as it flows through layers — raw → cleaned → business-ready (this becomes the **Medallion Architecture**, see Part 2).
+- Provides **scalable storage and processing** in one unified system, avoiding isolated silos for different workloads (BI, ML, streaming, ad-hoc analysis).
+- Uses a **layered design pattern** — data incrementally improves, gets enriched, and is refined in stages as it moves through the system (this is the **Medallion Architecture**, covered in Part 2).
 
-**The two technologies that make Databricks' Lakehouse work:**
-| Technology | What it does |
-|---|---|
-| **Delta Lake** | An optimized storage layer on top of your files, adding **ACID transactions** and **schema enforcement** — the missing pieces that made raw data lakes unreliable. |
-| **Unity Catalog** | A **unified governance layer** for data *and* AI — access control, data lineage, and cataloging, all in one place across the whole lakehouse. |
+### Lakehouse vs. Data Warehouse vs. Data Lake
 
-## 2. Lakehouse vs. Data Lake vs. Data Warehouse
+|                             | **Data Warehouse**                                     | **Data Lake**                                          | **Data Lakehouse**                           |
+|-----------------------------|--------------------------------------------------------|--------------------------------------------------------|----------------------------------------------|
+| **Data types**              | Structured only                                        | Any format (structured, semi-structured, unstructured) | Any format                                   |
+| **ACID compliance**         | ✅ Yes                                                  | ❌ No                                                   | ✅ Yes (via Delta Lake)                       |
+| **Governance**              | Strong                                                 | Weak/inconsistent                                      | Strong (via Unity Catalog)                   |
+| **Schema approach**         | Schema-on-write                                        | Schema-on-read                                         | Supports both, with enforcement where needed |
+| **ML/Data Science support** | Limited                                                | Strong                                                 | Strong                                       |
+| **BI query performance**    | Very fast (optimized for it)                           | Weaker without extra tooling                           | Fast (optimized)                             |
+| **Cost at scale**           | Expensive at petabyte scale                            | Cheap                                                  | Cheap, with warehouse-like performance       |
+| **Concurrency handling**    | Designed to avoid conflicts between concurrent queries | Limited concurrency guarantees                         | Strong, via ACID transactions                |
 
-| | **Data Warehouse** | **Data Lake** | **Lakehouse** |
-|---|---|---|---|
-| **Data types** | Structured only | Any format (structured/semi/unstructured) | Any format |
-| **Storage cost at scale** | Expensive at petabyte scale | Cheap | Cheap (built on lake storage) |
-| **ACID compliance** | ✅ Yes | ❌ No (by default) | ✅ Yes (via Delta Lake) |
-| **Schema** | Schema-on-write | Schema-on-read | Both — flexible ingestion, enforced structure downstream |
-| **ML/Data Science support** | Limited | Good (raw data access) | Good — optimized indexing for ML too |
-| **BI query performance** | Very fast (purpose-built) | Weak (no optimization) | Fast (optimized like a warehouse) |
-| **Governance** | Strong | Historically weak | Strong (via Unity Catalog) |
-
-> Simple way to remember: **Warehouse = fast & structured but rigid and costly at scale. Lake = cheap & flexible but unreliable and ungoverned. Lakehouse = tries to get "cheap + flexible" AND "reliable + fast + governed" at the same time**, by adding a transactional/governance layer (Delta Lake + Unity Catalog) on top of lake storage.
-
-## 3. Key Capabilities (Condensed)
-
-- **Real-time + batch processing** on the same platform (see Part 3).
-- **Unified governance** — one system for access control, auditing, and **lineage tracking** (where did this data come from, what transformed it).
-- **Schema evolution** — adapt to changing data structures without breaking downstream pipelines (see Part 4).
-- **Spark-powered transformations** — speed, scale, reliability.
-- **ML/AI support** — same governed data can feed both BI dashboards and ML models.
-- **Data sharing** — collaborate across teams using the same curated, governed datasets.
-- **Data quality monitoring** — track data/model quality and drift over time.
+> Simple way to remember: **Data Warehouse** = fast & structured, but rigid and expensive at scale. **Data Lake** = cheap & flexible, but no guarantees (no ACID, weak governance). **Lakehouse** = tries to get **both** — cheap, flexible storage **plus** warehouse-grade reliability and performance.
 
 ---
 
-# PART 2 — Medallion Architecture (Bronze → Silver → Gold)
+## 2. The Two Key Technologies Behind the Databricks Lakehouse
 
-## 4. The Concept
+**Delta Lake**
+An **optimized storage layer** (built on top of Parquet files) that adds:
+- **ACID transactions** — safe, reliable reads/writes even with concurrent operations.
+- **Schema enforcement** — rejects data that doesn't match the expected structure (and supports controlled schema evolution — see Part 4).
+> This is what gives the lakehouse its warehouse-like reliability, while data still physically sits in cheap cloud object storage.
 
-The **Medallion Architecture** organizes lakehouse data into **progressive quality layers** — each layer is a real, queryable Delta table, and data gets more refined/trustworthy as it moves through the stages. This design also enforces ACID guarantees at each transformation step.
+**Unity Catalog**
+A **unified, fine-grained governance solution** for both data *and* AI assets across the lakehouse.
+- Central place to manage **access control** and **data isolation boundaries**.
+- Tracks **data lineage** — how data flows and transforms across every layer.
+- Enforces a single, consistent governance model to keep sensitive data private/secure across all workloads (SQL, ML, streaming).
+
+---
+
+## 3. Capabilities of a Databricks Lakehouse (Quick Reference)
+
+| Capability                | What it means                                                             |
+|---------------------------|---------------------------------------------------------------------------|
+| Real-time data processing | Handles both streaming and batch workloads natively                       |
+| Data integration          | Unifies data into one system — a single source of truth for collaboration |
+| Schema evolution          | Adapts table structure over time without breaking existing pipelines      |
+| Data transformations      | Powered by Apache Spark — scalable, fast, reliable                        |
+| Data analysis & reporting | An engine optimized for data-warehouse-style analytical queries           |
+| Machine learning & AI     | Apply ML directly on the same governed data, no separate copy needed      |
+| Versioning & lineage      | Full dataset version history + traceability of how data was derived       |
+| Data governance           | One unified system (Unity Catalog) for access control + auditing          |
+| Data sharing              | Share curated datasets/reports across teams safely                        |
+| Operational analytics     | Monitor data quality, model quality, and drift over time                  |
+
+---
+
+# The Medallion Architecture
+
+## What Is the Medallion Architecture?
+
+A layered data design pattern using **Bronze, Silver, and Gold** layers to represent increasing levels of **data quality and refinement** as data flows through the lakehouse. Each layer's transformations/validations help guarantee data reliability before it reaches the layer optimized for actual analytics use.
 
 ```mermaid
 flowchart LR
-    A[("Raw Sources<br/>(Kafka, Cloud Storage, Salesforce, etc.)")] --> B["🥉 BRONZE<br/>Raw ingestion, as-is<br/>No cleanup/validation"]
-    B --> C["🥈 SILVER<br/>Cleaned & validated<br/>Deduped, schema-enforced, joined"]
-    C --> D["🥇 GOLD<br/>Business-ready & aggregated<br/>Optimized for BI/reporting"]
-    D --> E[["Dashboards, ML, Reporting"]]
+    A[Raw Sources<br/>Cloud Storage, Kafka, Salesforce, etc.] --> B["🥉 BRONZE<br/>Raw ingestion, as-is<br/>No cleanup or validation"]
+    B --> C["🥈 SILVER<br/>Cleaned, validated, deduplicated<br/>Schema enforced, joined"]
+    C --> D["🥇 GOLD<br/>Aggregated, business-ready<br/>Optimized for BI & reporting"]
+    D --> E[Dashboards / ML / Reports]
 ```
 
-## 5. The Three Layers
+### Bronze Layer — Raw Data Ingestion
+- Ingests **raw data as-is** from sources like cloud storage, Kafka, Salesforce, etc.
+- **No cleanup or validation** happens here — it's a faithful, permanent copy of the source in its original format, converted into Delta tables.
+- **Grows incrementally** over time (append-only).
+- **Schema enforcement** (via Delta Lake) checks for missing/unexpected fields even at this raw stage, and **Unity Catalog** registers these tables according to the org's governance model.
 
-**🥉 Bronze — Raw Ingestion**
-- Ingests raw data from sources (cloud storage, Kafka, Salesforce, etc.) in its **original format**, exactly as received.
-- **No cleanup or validation** happens here — it's a permanent, "as-received" record of the source.
-- **Append-only** — grows incrementally over time, never overwritten.
+### Silver Layer — Cleaning & Validation
+- Data is **cleaned**: dropping nulls, quarantining invalid records, deduplication, normalization.
+- Handles **schema enforcement**, missing/null values, and **out-of-order/late-arriving data** issues.
+- Datasets get **joined together** into new, more useful combined datasets — early-stage modeling happens here.
+- Uses a **schema-on-write** approach for this layer — combined with Delta's schema evolution features, this layer can adapt to source changes **without necessarily rewriting** all the downstream logic that depends on it.
 
-**🥈 Silver — Cleaning & Validation**
-- Nulls dropped, invalid records quarantined, **deduplication**, normalization.
-- **Schema enforcement** applied (via Delta Lake).
-- Handles **out-of-order and late-arriving data** (see your Kafka/Streaming notes for why this matters).
-- Datasets get **joined/modeled together** here — this is where real data modeling starts to happen.
-
-**🥇 Gold — Business-Ready & Aggregated**
-- Aggregated data, shaped specifically for **analytics and reporting** (often dimensional/star-schema style — see your Data Modeling notes).
-- Aligned with actual **business logic and requirements**.
+### Gold Layer — Business-Ready, Aggregated Data
+- Contains **aggregated data** tailored specifically for analytics and reporting use cases.
+- Aligned with actual **business logic/requirements** (e.g., "monthly revenue by region").
 - **Optimized for query/dashboard performance** — this is what BI tools and end users actually query.
-
-> Rule of thumb: **Bronze = "what we received." Silver = "what we can trust." Gold = "what the business actually asks for."**
-
----
-
-# PART 3 — Batch vs. Streaming Processing
-
-## 6. The Databricks Definition
-
-Databricks treats streaming more broadly than you might expect: even **cloud object storage and Delta tables** can act as **streaming sources**, letting Databricks do **efficient incremental processing** on data that isn't "streaming" in the traditional Kafka sense.
-
-- Streaming can run in **triggered** mode (batches at intervals) or **continuous** mode — giving you a cost/performance dial to turn (see your Kafka/Streaming notes on triggers — same underlying idea).
-- The engine **tracks what's already been processed**, so subsequent runs only touch **new** data — this is exactly the "incremental processing" idea from your streaming notes.
-- Streaming latency in Databricks realistically ranges from **minutes to hours** — not built for true seconds/milliseconds latency.
-
-## 7. Batch vs. Streaming — Comparison
-
-| | **Batch** | **Streaming** |
-|---|---|---|
-| **What's processed** | All currently available data, all at once | Only *new* data since the last run |
-| **Processing logic** | Simpler | Can get complex — stateful ops (joins, aggregations, dedup) |
-| **Accuracy** | Always reflects all available data at that moment | Can be affected by out-of-order/late-arriving data |
-| **API (Python)** | `spark.read.load()` / `spark.write.save()` | `spark.readStream.load()` / `spark.writeStream.start()` |
-
-> This maps directly onto your earlier Kafka/Spark Structured Streaming notes — **Databricks just extends "streaming" to include file/Delta sources, not only Kafka-style message queues.**
+- Final tables are designed to serve **all** relevant use cases, with layouts optimized per task.
+- A unified governance model (Unity Catalog) lets you trace any Gold-layer number **all the way back** to its original raw source — a single source of truth.
 
 ---
 
-# PART 4 — Schema Evolution
+# Batch vs. Streaming Processing
 
-## 8. What Is Schema Evolution?
+## Batch Processing
 
-A system's ability to **adapt automatically (or semi-automatically) to changes in data structure over time**, without breaking the whole pipeline.
+- Processes **all data currently available** in the source, in one go, at the time of processing.
+- **Processing logic is simpler** — you're working with a complete, static snapshot of data each run, so you don't need to worry about "what happens when more data shows up mid-calculation."
+- **Results are always complete and accurate** *as of that run*, since all available data is considered.
+- Typically runs on a **schedule** (e.g., hourly/daily) — latency is measured in **minutes to hours**, not real-time.
+- **APIs:** `spark.read.load()` and `spark.write.save()`
+
+## Streaming Processing (Structured Streaming)
+
+- In Databricks, "streaming" has a **broader meaning** than just Kafka-style event streams — the engine can treat sources like **cloud object storage and Delta Lake itself** as streaming sources, enabling efficient **incremental processing** (only processing what's new since last time).
+- Can run in two modes:
+  - **Triggered (micro-batch)** — processes new data at defined intervals (see your Kafka/Spark streaming notes for `Trigger` types).
+  - **Continuous** — much lower latency processing, closer to real-time (sub-second), though with more operational complexity.
+- The engine **tracks what's already been processed** (via checkpointing) and only processes new data on each subsequent run — this is what makes it "incremental."
+- **Logic is often more complex** than batch — especially for **stateful** operations like joins, aggregations, and deduplication across a continuously arriving stream (see your Kafka streaming notes for windowing/watermarking).
+- **Results can be affected by out-of-order or late-arriving data** — unlike batch, which always sees the complete picture, streaming has to make a call on when a result is "final" (this is exactly what watermarking addresses).
+- **APIs:** `spark.readStream.load()` and `spark.writeStream.start()`
+
+**Quick Comparison**
+
+|                     | Batch                          | Streaming                                      |
+|---------------------|--------------------------------|------------------------------------------------|
+| Data scope per run  | Everything currently available | Only new data since last run                   |
+| Logic complexity    | Simpler                        | More complex (stateful ops, late data)         |
+| Result completeness | Always complete for that run   | Can be affected by late/out-of-order data      |
+| Typical latency     | Minutes to hours               | Seconds (triggered) to sub-second (continuous) |
+| Spark API           | `spark.read` / `spark.write`   | `spark.readStream` / `spark.writeStream`       |
+
+---
+
+# Schema Evolution
+
+## What Is Schema Evolution?
+
+**Schema evolution** is a system's ability to **adapt to changes in data structure over time**, without requiring a full manual rebuild every time the source data shape changes slightly.
 
 **Common types of schema changes:**
-| Change | Example |
-|---|---|
-| **New columns** | A `middle_name` field appears that wasn't there before. |
-| **Column renaming** | `name` → `full_name` |
-| **Dropped columns** | A field stops being sent. |
-| **Type widening** | `INT` → `DOUBLE` (a "safe" broadening of type). |
-| **Other type changes** | `INT` → `STRING` (not automatically "safe" — needs explicit handling). |
 
-## 9. The Four Independent Components
+| Change                 | Meaning                                                             | Example                            |
+|------------------------|---------------------------------------------------------------------|------------------------------------|
+| **New columns**        | Fields added that weren't there before                              | A new `phone_number` field appears |
+| **Column renaming**    | A column's name changes                                             | `name` → `full_name`               |
+| **Dropped columns**    | A column is removed                                                 | `fax_number` no longer sent        |
+| **Type widening**      | A column's type changes to a *broader* compatible type              | `INT` → `DOUBLE`                   |
+| **Other type changes** | A column's type changes to something *not* automatically compatible | `INT` → `STRING`                   |
 
-⚠️ **Key concept:** schema evolution in Databricks is handled **independently at four different layers** — configuring one doesn't automatically configure the others. You (the data engineer) are responsible for making sure all relevant layers are configured consistently.
+## 9. The Four Independent Components Involved
+
+This is the key mental model: schema evolution in Databricks is **not one single setting** — it's handled **independently** at four different stages of the pipeline. You must configure each stage separately to get the behavior you want end-to-end.
 
 ```mermaid
 flowchart LR
-    A["1. Connector<br/>(Auto Loader, Kafka, Kinesis...)"] --> B["2. Format Parser<br/>(from_json, from_avro...)"]
-    B --> C["3. Engine<br/>(Structured Streaming)"]
-    C --> D["4. Dataset<br/>(Delta table, streaming table, view...)"]
+    A["1️⃣ CONNECTORS<br/>Auto Loader, Kafka, Kinesis,<br/>Lakeflow connectors"] --> B["2️⃣ FORMAT PARSERS<br/>from_json, from_avro,<br/>from_xml, from_protobuf"]
+    B --> C["3️⃣ ENGINE<br/>Structured Streaming"]
+    C --> D["4️⃣ DATASETS<br/>Streaming Tables, Delta Tables,<br/>Materialized Views, Views"]
 ```
 
-| Layer | Role | Examples |
-|---|---|---|
-| **Connectors** | Ingest data from external sources | Auto Loader, Kafka, Kinesis, Lakeflow connectors |
-| **Format Parsers** | Decode raw bytes into structured data | `from_json`, `from_avro`, `from_xml`, `from_protobuf` |
-| **Engines** | Actually execute the query | Structured Streaming |
-| **Datasets** | Persist/serve the final data | Delta tables, streaming tables, materialized views, views |
+- **Connectors** — ingest data from external sources (Auto Loader, Kafka, Kinesis, Lakeflow connectors).
+- **Format Parsers** — decode raw formats into structured columns (`from_json`, `from_avro`, `from_xml`, `from_protobuf`).
+- **Engine** — the actual processing engine executing the query (Structured Streaming).
+- **Datasets** — where processed data ends up and is served from (Streaming Tables, Delta Tables, Materialized Views, Views).
 
-> ⚠️ Real-world gotcha (straight from the docs): if **Auto Loader** (connector) evolves its schema based on new incoming data, but the **target Delta table** (dataset) isn't also configured to evolve, the query simply **fails** — you have to explicitly keep both layers in sync.
+> 💡 **Practical implication:** e.g., when Auto Loader (connector) evolves its schema based on new incoming data, the *target Delta table* (dataset) must **also** evolve, or the pipeline fails. You either (a) enable schema evolution on the Delta table / use a DDL command, or (b) do a full table rewrite.
 
-## 10. Schema Evolution Support — Condensed Reference Table
+## 10. Schema Evolution Support — Condensed Reference
 
-*(This consolidates the very detailed per-component breakdown into one scannable table — use the docs for exact config flags when actually implementing.)*
+*(Consolidated from the detailed docs into quick-lookup tables — check official docs for exact config flags when implementing.)*
 
-| Component | New Columns | Rename | Drop | Type Widening | Other Type Changes |
-|---|---|---|---|---|---|
-| **Auto Loader** | ✅ (config-dependent, may need restart) | ✅ (treated as new col + old set NULL) | ✅ (soft delete → NULL) | ✅ (DBR 16.4+) | ❌ Manual only (or rescued data column) |
-| **Delta connector (streaming source)** | ✅ (with `mergeSchema`) | ✅ (needs Spark config flag) | ✅ (needs Spark config flag) | ✅ (DBR 16.4 LTS+) | ❌ Not supported |
-| **SaaS/CDC connectors** | ✅ (auto-restart) | ✅ (treated as new col) | ✅ (soft delete) | ❌ Needs full refresh | ❌ Needs full refresh |
-| **Kinesis/Kafka/Pub-Sub/Pulsar** | Delegated to the **format parser** (connector itself returns raw binary blob) | — | — | — | — |
-| **`from_json`** | ❌ Manual by default (auto if using Lakeflow schema evolution mode) | Same as above | Same as above | Same as above | Same as above |
-| **`from_avro` / `from_protobuf`** | ✅ if using Confluent Schema Registry, else manual | ✅ if Schema Registry | ✅ if Schema Registry | ✅ if Schema Registry | ✅ if Schema Registry |
-| **`from_csv` / `from_xml`** | ❌ Not supported at all | ❌ | ❌ | ❌ | ❌ |
-| **Structured Streaming (engine)** | ✅ but **query fails, needs manual restart** to re-plan | Same | Same | Same | Same |
-| **Streaming tables (dataset)** | ✅ (auto-restart) | ✅ (treated as new col) | ✅ (soft delete → NULL) | ✅ (must be enabled) | ❌ Needs full refresh |
-| **Materialized views (dataset)** | ⚠️ **Any** schema/query change triggers a **full recompute** | Same | Same | Same | Same |
-| **Delta tables (dataset)** | ✅ auto with `mergeSchema` | ✅ via `ALTER TABLE` + column mapping | ✅ via `ALTER TABLE` + column mapping | ✅ via type widening + `mergeSchema` | ✅ but requires **full table rewrite** (`overwriteSchema`) |
-| **Views (dataset)** | ✅ with `SCHEMA EVOLUTION` mode | ✅ with `SCHEMA EVOLUTION` mode | ✅ with `SCHEMA EVOLUTION` mode | ✅ with `SCHEMA TYPE EVOLUTION` mode | ✅ with `SCHEMA TYPE EVOLUTION` mode |
+**By Connector**
 
-**Key takeaways to actually remember (skip memorizing every cell above):**
-- **Delta tables are the most flexible dataset** for schema evolution — rename/drop/widen without a full rewrite; only a genuine type *change* (not widening) forces a full rewrite.
-- **Materialized views are the least flexible** — *any* schema change = full recompute, no exceptions.
-- **`from_avro`/`from_protobuf` + Confluent Schema Registry** is the cleanest path for automatic schema evolution on Kafka-sourced data — `from_csv`/`from_xml` give you *nothing* automatic.
-- **Structured Streaming always requires a restart** on schema change — the execution plan is locked in at planning time and can't be changed mid-flight.
+| Connector                              | New Columns                                                                                                                  | Rename                                        | Drop                   | Type Widening                                  | Other Type Changes               |
+|----------------------------------------|------------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------|------------------------|------------------------------------------------|----------------------------------|
+| **Auto Loader**                        | ✅ (via `schemaEvolutionMode`, requires restart)                                                                              | ✅ (old col treated as dropped, new col added) | ✅ (soft delete → NULL) | ✅ (DBR 16.4+, `addNewColumnsWithTypeWidening`) | ❌ (only via `rescuedDataColumn`) |
+| **Delta connector**                    | ✅ (`mergeSchema`, no rewrite needed)                                                                                         | ✅ (via Spark config, needs column mapping)    | ✅ (via Spark config)   | ✅ (DBR 16.4 LTS+)                              | ❌                                |
+| **SaaS / CDC connectors**              | ✅ (auto restart)                                                                                                             | ✅ (treated as new column)                     | ✅ (soft delete → NULL) | ❌ (needs full refresh)                         | ❌ (needs full refresh)           |
+| **Kinesis / Kafka / Pub/Sub / Pulsar** | Not natively handled — returns a raw **binary blob**; schema evolution is entirely delegated to the **Format Parser** stage. |                                               |                        |                                                |                                  |
 
-## 11. Minimal Example — Kafka (Avro) → Bronze Delta Table
+**By Format Parser**
 
-*(Condensed from the full example — showing just the schema-evolution-relevant parts.)*
+| Parser                        | Support                                                                                                              |
+|-------------------------------|----------------------------------------------------------------------------------------------------------------------|
+| `from_json`                   | ❌ Manual by default. Inside **Lakeflow pipelines**, can behave like Auto Loader if `schemaEvolutionMode` is enabled. |
+| `from_avro` / `from_protobuf` | ✅ Automatic **if** using Confluent Schema Registry; otherwise manual schema updates required.                        |
+| `from_csv` / `from_xml`       | ❌ Not supported at all — always manual.                                                                              |
 
-```python
-from pyspark.sql.functions import col
-from pyspark.sql.avro.functions import from_avro
+**By Engine**
 
-# 1. Read raw bytes from Kafka (connector — no native schema evolution, returns binary blob)
-raw_df = (spark.readStream.format("kafka")
-    .option("kafka.bootstrap.servers", BOOTSTRAP)
-    .option("subscribe", TOPIC)
-    .option("startingOffsets", "earliest")
-    .load())
+| Engine                   | Behavior                                                                                                                                                                                                                                                           |
+|--------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **Structured Streaming** | Schema is **locked in at planning time**; all micro-batches reuse that plan. **Any** mid-execution schema change (new/renamed/dropped columns, type changes) causes the query to **fail**, requiring a manual restart so Spark can re-plan against the new schema. |
 
-# 2. Decode Avro using Confluent Schema Registry (format parser — handles schema evolution here)
-decoded = from_avro(
-    data=col("value"), jsonFormatSchema=None, subject=f"{TOPIC}-value",
-    schemaRegistryAddress=SCHEMA_REG,
-    options={"avroSchemaEvolutionMode": "restart", "mode": "FAILFAST"}
-).alias("payload")
+**By Dataset (where data lands)**
 
-bronze_df = raw_df.select(decoded, "timestamp").select("payload.*", "timestamp")
+| Dataset               | New Columns                                                                   | Rename                                            | Drop                                              | Type Widening                       | Other Type Changes                                          |
+|-----------------------|-------------------------------------------------------------------------------|---------------------------------------------------|---------------------------------------------------|-------------------------------------|-------------------------------------------------------------|
+| **Streaming Table**   | ✅ auto-restart                                                                | ✅ (treated as new column)                         | ✅ (soft delete → NULL)                            | ✅ (must be explicitly enabled)      | ❌ requires full refresh                                     |
+| **Materialized View** | Any schema/query change triggers a **full recompute** — no partial evolution. |                                                   |                                                   |                                     |                                                             |
+| **Delta Table**       | ✅ auto with `mergeSchema`                                                     | ✅ via `ALTER TABLE` + column mapping (no rewrite) | ✅ via `ALTER TABLE` + column mapping (no rewrite) | ✅ auto or via `ALTER TABLE`         | ✅ but requires a **full table rewrite** (`overwriteSchema`) |
+| **Views**             | ✅ with `SCHEMA EVOLUTION` mode (auto, if no explicit column list)             | ✅ same as above                                   | ✅ same as above                                   | ✅ with `SCHEMA TYPE EVOLUTION` mode | ✅ same as type widening                                     |
 
-# 3. Write to Delta with schema evolution enabled (dataset layer)
-(bronze_df.writeStream
-    .format("delta")
-    .option("checkpointLocation", CHECKPOINT)
-    .option("mergeSchema", "true")   # only handles NEW columns; rename/drop/type-change need separate handling
-    .outputMode("append")
-    .trigger(availableNow=True)
-    .toTable(BRONZE_TABLE))
-```
-> Notice all **three** schema-evolution-aware layers being configured separately: Kafka (raw, no evolution), `from_avro` (Schema Registry-driven evolution), and the Delta write (`mergeSchema`) — exactly the "four independent components" concept from §9.
+> 🎯 **Key takeaway for interviews/design decisions:** **Delta Tables are the most flexible** target — most changes don't need a rewrite, except genuinely incompatible type changes. **Materialized Views are the least flexible** — any schema change forces a full recompute, so use them where the schema is expected to be stable.
 
 ---
 
-# PART 5 — Change Data Capture (CDC) & Snapshots
+# Change Data Capture (CDC) & Snapshots
 
-## 12. What Is CDC?
+## What Is CDC?
 
-**Change Data Capture (CDC)** treats a source database as a **stream of changes** (inserts/updates/deletes), instead of re-reading the entire table every time.
+**Change Data Capture (CDC)** treats a source database as a **stream of changes** (inserts, updates, deletes) rather than a static, complete dataset you re-read every time.
 
-> Example: An `employees` table has 50 rows. One employee's title changes. The CDC feed contains just **one UPDATE record** — not all 50 rows — so downstream processing only touches what actually changed.
+- Each CDC record typically includes: the **operation type** (INSERT/UPDATE/DELETE), the **actual data values**, and a **sequence number/timestamp** for correct ordering (so out-of-order updates are handled deterministically).
+- Traditional databases (SQL Server, MySQL, Oracle) can generate CDC feeds natively (often via tools like **Debezium** or **Oracle GoldenGate**). Delta tables generate their own version, called a **Change Data Feed (CDF)**.
 
-**Each CDC record typically includes:**
-- The **operation type** (`INSERT`/`UPDATE`/`DELETE`)
-- The actual **data values**
-- A **sequence number/timestamp** — critical for correctly applying out-of-order or late-arriving changes (same underlying challenge as late data in streaming — see your Kafka notes).
+**Why use CDC?**
+- Change data is **much smaller** than the full dataset — enables efficient **incremental** downstream processing.
+- Enables **reconstructing historical state** — full audit trail, point-in-time reporting, trend analysis.
+- Enables **stable surrogate keys** over time (since you're tracking the same logical row's changes, not re-deriving keys from scratch each load).
 
-**Benefits of CDC:**
-- Change data is much **smaller** than the full dataset → efficient incremental downstream processing.
-- Enables reconstructing **historical state** ("what did this record look like at time X") for auditing/point-in-time reporting.
-- Enables **stable surrogate keys** over time (ties back to your Data Modeling notes — surrogate keys shouldn't change even as underlying data does).
+## What Is a Snapshot?
 
-## 13. CDC Feed vs. Snapshot
+A **snapshot** is the **complete state** of a table at one point in time (as opposed to a CDC feed, which only contains what *changed*).
 
-| | **CDC Feed** | **Snapshot** |
-|---|---|---|
-| **What it contains** | Only the **changes** (inserts/updates/deletes) | The **entire table state** at one point in time |
-| **When it's used** | Source natively supports CDC (e.g., via Debezium, Oracle GoldenGate, or Delta's own Change Data Feed) | Source **doesn't** support CDC — due to cost, performance concerns on the source DB, legacy systems, or the ingestion team not owning the source |
-| **How changes are found** | Already explicit in the feed | Must be **inferred** by comparing consecutive snapshots |
-| **Limitation** | None significant | Only captures **net** change between snapshots — misses interim changes (e.g., address changed twice in one day between snapshots → you only see the final state, not the intermediate one) |
+**Why teams use snapshots instead of CDC:**
+- CDC isn't always available — cost concerns, performance impact on the source production database, legacy systems without CDC support, or the ingestion team simply doesn't own/control the upstream database.
+- Snapshots can come from: periodic exports (Oracle/Postgres/SQL Server), cloud storage file dumps, Delta table versions, or shared data from another org (OpenSharing).
+- Since a snapshot alone doesn't show *what changed*, you must **compare consecutive snapshots** to infer inserts/updates/deletes.
 
-## 14. SCD Type 1 vs. Type 2 — Databricks-Specific Details
-
-*(You already have the general SCD concept in your Data Modeling notes — here's how Databricks specifically implements it via CDC processing.)*
-
-| | **SCD Type 1** | **SCD Type 2** |
-|---|---|---|
-| **What's kept** | Only the **current/latest** state | **Full history** of every change |
-| **Use when** | You only need current state; want downstream materialized views to **incrementally refresh** rather than fully recompute; need stable surrogate keys | Auditability/regulatory needs; customer analytics needs to see how entities evolved; point-in-time reporting |
-| **How it's tracked in Databricks** | Simple overwrite — old value replaced | Uses **`__START_AT`** and **`__END_AT`** metadata columns per row to define each version's validity period. **`__END_AT = NULL`** marks the currently active row. |
-
-> Example (Type 2 in practice): Chris's `role` changes from `Owner` to `Manager`. Instead of overwriting, a **new row** is inserted for `Manager` (with `__END_AT = NULL`), and the old `Owner` row gets its `__END_AT` set to the change timestamp — so you can query "what was Chris's role on date X" and get the correct historical answer.
-
-## 15. AUTO CDC vs. AUTO CDC FROM SNAPSHOT (Databricks Lakeflow APIs)
-
-Databricks provides purpose-built APIs so you don't have to hand-write fragile `MERGE INTO` logic with staging tables and window functions yourself.
+> ⚠️ **Limitation to know:** snapshot comparison only sees the difference between two points in time — any changes that happened **and reverted in between** snapshots are invisible. E.g., daily snapshots won't catch a customer changing their address twice in one day (A→B→C) — you'll only see the net change (A→C).
 
 ```mermaid
-flowchart TD
-    A{"Does your source<br/>emit a CDC feed?"} -->|"Yes<br/>(Debezium, GoldenGate,<br/>Delta CDF, native CDC)"| B["Use AUTO CDC"]
-    A -->|"No — only periodic<br/>full table dumps"| C["Use AUTO CDC FROM SNAPSHOT"]
-    B --> D{"Need full history<br/>or just current state?"}
-    C --> D
-    D -->|"Just current state"| E["SCD Type 1"]
-    D -->|"Full history needed<br/>(audit, trends, point-in-time)"| F["SCD Type 2"]
+flowchart TB
+    subgraph CDC["Change Data Capture Path"]
+    direction LR
+    S1[Source DB] -->|"Native CDC feed<br/>Debezium / GoldenGate"| CF["Change Feed:<br/>INSERT/UPDATE/DELETE events"]
+    end
+    subgraph SNAP["Snapshot Path"]
+    direction LR
+    S2[Source DB / Files] -->|Periodic full dump| SN1[Snapshot v1] --> SN2[Snapshot v2]
+    SN1 -.compare.-> SYN["Synthetic Change Feed<br/>inferred INSERT/UPDATE/DELETE"]
+    SN2 -.compare.-> SYN
+    end
+    CF --> T[AUTO CDC API]
+    SYN --> T2[AUTO CDC FROM SNAPSHOT API]
+    T --> OUT[("Target Delta Table<br/>SCD Type 1 or 2")]
+    T2 --> OUT
 ```
 
-**AUTO CDC**
-- Use when the source already emits a **change feed** (native CDC, Debezium/GoldenGate, or a Delta table with **Change Data Feed** enabled).
-- Automatically handles **out-of-sequence records** using a required **sequencing column** (must be monotonically increasing, no NULLs, one update per key per sequence value).
-- **Initial hydration**: uses a **"once" flow** to fully load historical data one time, then switches to triggered/continuous mode for ongoing changes — same logic reused for both bulk and incremental loads (conceptually the same idea as `Trigger.AvailableNow` from your Spark Streaming notes, used specifically for backfilling).
+## SCD Type 1 vs. Type 2 (Databricks-Specific Implementation)
 
-**AUTO CDC FROM SNAPSHOT**
-- Use when the source **doesn't** support CDC — only periodic full snapshots are available.
-- Compares **consecutive snapshots** to infer inserts/updates/deletes, generating a **synthetic change feed** — then applies the same SCD Type 1/2 logic as AUTO CDC.
-- ⚠️ Only sees **net** change between snapshots, not interim changes (see §13).
-- Two ways to determine snapshot ordering:
-  - **Pipeline ingestion time** — simplest; assumes snapshots arrive regularly, in order.
-  - **Version function** — you explicitly return `(DataFrame, version_number)`; use when snapshots can arrive out of order or multiple can arrive at once.
-- Python-only API (not available in the SQL pipeline interface).
+**SCD Type 1 — Current State Only**
+- Overwrites old data with new data — **no history retained**, only the latest version of each record survives.
+- **Use when:** you only need the current state; you want downstream **materialized views to incrementally refresh** rather than fully recompute; you need **stable surrogate keys** for joins.
 
-**A few extra practical details:**
-- Target tables from AUTO CDC uniquely support `INSERT`/`UPDATE`/`DELETE`/`MERGE` **even while the pipeline is still running** — not true of standard streaming tables.
-- AUTO CDC targets (and even materialized views, in Beta) can **emit their own downstream Change Data Feed** — so CDC benefits can propagate further downstream, not just at the first hop.
-- You can track **only a subset of columns** for SCD Type 2 — so a change to an *untracked* column updates the row in place instead of creating a new historical version, saving storage/complexity when only certain fields matter for history.
-- Databricks auto-captures `num_upserted_rows` / `num_deleted_rows` metrics per run, for monitoring.
+**SCD Type 2 — Full Historical Tracking**
+- Maintains **multiple versions** of a record over time, each timestamped.
+- Uses **`__START_AT`** and **`__END_AT`** columns to define each version's validity window. The **current/active** record has `__END_AT = NULL`.
+- **Use when:** auditability/regulatory requirements demand history; customer analytics needs to see how an entity evolved; point-in-time reporting or trend analysis is required.
+
+## AUTO CDC vs. AUTO CDC FROM SNAPSHOT
+
+Databricks (via **Lakeflow pipelines**) provides two APIs that automate applying CDC logic — instead of hand-writing complex, error-prone `MERGE INTO` logic with staging tables and window functions yourself.
+
+| API                        | Use When                                                                                                           | What it does                                                                                                 |
+|----------------------------|--------------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------|
+| **AUTO CDC**               | Your source already emits a change feed (native DB CDC via Debezium/GoldenGate, or a Delta table with CDF enabled) | Applies incoming change events (in correct sequence order) directly to the target table as SCD Type 1 or 2   |
+| **AUTO CDC FROM SNAPSHOT** | Your source only gives you periodic full-table dumps, no CDC feed available                                        | Compares consecutive snapshots, **infers** a synthetic change feed, then applies the same SCD Type 1/2 logic |
+
+**Important details for AUTO CDC:**
+- Requires a **sequencing column** — must be **monotonically increasing** per key, with one distinct value per update. `NULL` sequencing values aren't supported.
+- **Initial hydration** (loading all historical data before switching to ongoing incremental processing) is handled via a **"once" flow** — processes everything available one time, then stops; you then switch to a triggered/continuous flow for ongoing processing. This keeps the logic consistent between the bulk initial load and later incremental runs.
+
+**Important details for AUTO CDC FROM SNAPSHOT:**
+- **Python-only** (not available in the SQL pipeline interface).
+- Snapshots must be processed in **ascending version order** — an out-of-order snapshot is simply **ignored**.
+- Not just for initial loads — designed for **ongoing** processing every time a new snapshot lands.
+- Two patterns for determining snapshot versions:
+  - **Pipeline ingestion time** — the snapshot version = when the pipeline actually read it. Use when snapshots arrive regularly, in order.
+  - **Version function** — you supply a function returning `(DataFrame, version_number)` explicitly. Use when snapshots can arrive out of order, multiple at once, or you need explicit control over sequencing.
+
+## 15. A Few Extra AUTO CDC Capabilities Worth Knowing
+
+- **Direct edits still work** — unlike standard streaming tables, Unity Catalog tables that are AUTO CDC targets still support direct `INSERT`/`UPDATE`/`DELETE`/`MERGE` statements even while the pipeline is actively running.
+- **Downstream CDF** — AUTO CDC target tables (and even Materialized Views, in Beta) can emit their **own** Change Data Feed — so downstream pipelines/teams can consume changes from your AUTO CDC output, chaining CDC through multiple layers.
+- **Built-in metrics** — every pipeline run automatically captures `num_upserted_rows` and `num_deleted_rows` for monitoring.
+- **Tracking a column subset for SCD Type 2** — by default, *any* column change creates a new historical version. You can restrict this to only track specific "important" columns — changes to untracked columns just update the current row in place instead of creating a new history row. Reduces storage/query cost while still preserving history where it actually matters.
 
 ---
 
 ## Quick Recap Table
 
-| Term | One-liner |
-|---|---|
-| Lakehouse | Combines data lake flexibility + data warehouse reliability/performance in one system |
-| Delta Lake | Storage layer adding ACID transactions + schema enforcement to lake files |
-| Unity Catalog | Unified governance layer — access control, lineage, cataloging for data & AI |
-| Medallion Architecture | Bronze (raw) → Silver (cleaned) → Gold (business-ready) progressive data layers |
-| Schema-on-read vs write | Structure applied at query time vs. enforced at insert time |
-| Schema Evolution | A system's ability to adapt to structural data changes over time |
-| 4 Independent Components | Connector → Format Parser → Engine → Dataset — each configured separately |
-| mergeSchema | Delta option auto-adding new columns on write |
-| CDC (Change Data Capture) | Treats a source as a stream of inserts/updates/deletes, not a full table |
-| Snapshot | Full table state at one point in time; changes must be inferred by comparison |
-| SCD Type 1 | Overwrite — current state only |
-| SCD Type 2 | Full history — new row per change, tracked via `__START_AT`/`__END_AT` |
-| AUTO CDC | Databricks API applying SCD logic from a native CDC/change feed |
-| AUTO CDC FROM SNAPSHOT | Databricks API deriving a synthetic change feed by comparing snapshots |
-| Once Flow | One-time full historical load, then switches to ongoing incremental processing |
+| Term                                   | One-liner                                                                       |
+|----------------------------------------|---------------------------------------------------------------------------------|
+| Lakehouse                              | Combines data-lake flexibility/cost with data-warehouse reliability/performance |
+| Delta Lake                             | Storage layer adding ACID transactions + schema enforcement on top of Parquet   |
+| Unity Catalog                          | Unified governance: access control, lineage, and auditing across data & AI      |
+| Medallion Architecture                 | Bronze (raw) → Silver (cleaned/validated) → Gold (business-ready/aggregated)    |
+| Batch Processing                       | Processes all currently available data at once; simpler logic, higher latency   |
+| Streaming Processing                   | Incremental processing of new data only; more complex, lower latency            |
+| Schema Evolution                       | A system's ability to adapt to structural changes in data over time             |
+| 4 Independent Components               | Connectors → Format Parsers → Engine → Datasets, each configured separately     |
+| Delta Table (schema flexibility)       | Most flexible target — most changes don't require a full rewrite                |
+| Materialized View (schema flexibility) | Least flexible — any schema change triggers a full recompute                    |
+| CDC (Change Data Capture)              | Treats a DB as a stream of INSERT/UPDATE/DELETE changes, not a static dump      |
+| Snapshot                               | Full state of a table at one point in time; changes inferred by comparison      |
+| SCD Type 1                             | Overwrite — current state only, no history                                      |
+| SCD Type 2                             | New row per change, with `__START_AT`/`__END_AT` validity window                |
+| AUTO CDC                               | Applies a native change feed to a target table automatically (SCD 1 or 2)       |
+| AUTO CDC FROM SNAPSHOT                 | Infers a synthetic change feed by comparing consecutive snapshots               |
 
