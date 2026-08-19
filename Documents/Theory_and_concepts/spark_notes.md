@@ -148,8 +148,6 @@ A **Spark cluster** is a distributed pool of machines managed by a resource sche
 | **Kubernetes**   | Modern, increasingly default choice for containerized deployments                |
 | **Apache Mesos** | Historically used for fine-grained, multi-framework scheduling                   |
 
-> ⚠️ Correction: **Mesos support was deprecated in Spark 3.2 and removed in Spark 3.6.** For any new deployment today, the realistic choices are **Standalone, YARN, or Kubernetes** — Kubernetes is now the most common choice for cloud-native deployments.
-
 **Cluster manager responsibilities:** track worker resources (CPU, memory, host locations); launch executors for an app; recover failed executors; allocate/deallocate resources on request (including dynamic allocation).
 
 **Application Master (AM)** *(YARN-specific)*: created by YARN per submitted application; runs the **Driver** inside its container; hosts the `SparkContext`/`SparkSession`.
