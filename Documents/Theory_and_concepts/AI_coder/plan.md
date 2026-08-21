@@ -226,3 +226,74 @@ The goal is controlled chaos
 Pro features
 /command creation using skills or command
 build agent and sub agent
+
+
+
+LLM Large Language Model - 
+    Agent - Virtual assistants who never sleep ask for raise and get things done. 
+    Agentic revolution - Action can take action and decision on behalf of you. 
+    AI
+        - ML
+        - Deep Learning
+
+Transformer Break through 2017
+    LLM Large Language Model -> 
+        Guess next piece of a word called token. Bases on massive patterns they learned from reading basically the internet
+    Temperature & Context Window -> 
+        Temperature -> Creativity/ Predictable textbook answers
+        Context window -> Feed balance context. Feed it appropriate amount of data to get the desired result
+    Chatbot vs Ai agent:
+        Chatbot -> Reactive . ask question and give answers
+        Ai Agent -> They are proactive. With goals, they can take actions. They have tools to performa actions.
+
+    Core Agent Loop:
+        Agent on continuous loop.
+            Perceive -> Look at environment (Done by you give environment)
+            Think -> Figure out best move (Done by LLM)
+            Act -> Use tool to take action (You give tool)
+            Observe -> check verify results (You are tool)
+        React Pattern: 
+            Reasoning + Acting -> Before taking any action explicitly write down its thought process. Prevent impulsive mistake
+
+    Tools: Ai Super power
+        LLM is genious locked in the room. Tools give it access to real world. Allowing it to call APIs 
+
+    Memory: Curing AI Amnesia
+        By default, LLM do not have any memory of past chats. Every conversation starts blank. To fix this agent use external databases
+
+    RAG: Private brain for AI
+        Retrieval Augmented Generation (RAG) lets you access AI access to your private data without retraining the model.
+
+    Vector Databases:
+        To make RAG work we convert text into Vectors. Long list of numbers acting as mathematical fingerprints.
+        Serach based on meaning not exact words.
+
+    MCP: Model Context Protocol
+        Connecting AI to different apps used to required messy custom code for every single tool. MCP acts like universal USB port for AI
+
+    Smart agent Architecture: Different problems need different setups
+        Chain of thought
+        Plan and execute
+        Evaluation
+        
+    Multi -Agent Syatems
+        Complex jobs need a team
+        Manager agent can make worker agent for you. But cost is very heavy with this.
+        Depends of time and money 
+
+    Safety and Guardrails
+        Giving AI tools is riskey. check the data before sending to LLM and chec the data coming from LLM.
+        Humnan in the loop.
+
+    Cost manangement
+        Use 60-30-10 rule 
+        60 simple tasks to fast model
+        30 mid-tier model
+        10 most powerful model
+
+    How to master Agentic AI
+        Start small 
+        Learn by building
+        Add tool 
+        Add memory and RAG
+        Get hands dirty 
