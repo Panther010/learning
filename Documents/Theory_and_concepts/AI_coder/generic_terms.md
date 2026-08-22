@@ -186,11 +186,11 @@ Key safety practices:
 
 Not every task needs your most powerful (and most expensive) model. A common cost-optimization heuristic — often described loosely as something like a **60-30-10 split** — is to **route tasks to different model tiers based on difficulty**:
 
-| Task complexity | Model tier | Example |
-|---|---|---|
-| **~60% — Simple tasks** | Fast, cheap, smaller model | Basic classification, simple lookups, formatting |
-| **~30% — Mid-complexity tasks** | Mid-tier model | Summarization, moderate reasoning |
-| **~10% — Hardest tasks** | Most powerful (and expensive) model | Complex multi-step reasoning, high-stakes decisions |
+| Task complexity                 | Model tier                          | Example                                             |
+|---------------------------------|-------------------------------------|-----------------------------------------------------|
+| **~60% — Simple tasks**         | Fast, cheap, smaller model          | Basic classification, simple lookups, formatting    |
+| **~30% — Mid-complexity tasks** | Mid-tier model                      | Summarization, moderate reasoning                   |
+| **~10% — Hardest tasks**        | Most powerful (and expensive) model | Complex multi-step reasoning, high-stakes decisions |
 
 > ⚠️ Treat the exact percentages as a **rough mental model, not a strict rule** — the real point is: **don't default to your most expensive model for everything.** Profile your actual task mix and route intelligently; this is sometimes called **model routing** in production agent systems, and can cut costs dramatically without hurting quality where it matters.
 
@@ -210,27 +210,27 @@ A sensible learning progression, rather than trying to absorb everything at once
 
 ## Quick Recap Table
 
-| Term | One-liner |
-|---|---|
-| AI / ML / Deep Learning | Broadest umbrella → learns from data → uses layered neural networks |
-| LLM | Deep learning model trained to predict the next token from massive text data |
-| Token | The small chunk of text (word/sub-word) an LLM reads and generates |
-| Transformer (2017) | The "attention"-based architecture that made modern LLMs possible |
-| Temperature | Controls randomness — low = predictable, high = creative |
-| Context Window | The max amount of text (tokens) a model can "see" at once |
-| Chatbot vs. Agent | Reactive Q&A vs. proactive, goal-driven, tool-using |
-| Agentic Revolution | The shift from AI that talks to AI that takes real actions |
-| Core Agent Loop | Perceive → Think → Act → Observe, repeating |
-| ReAct Pattern | Write out reasoning before acting — reduces impulsive mistakes |
-| Tools | Give the LLM the ability to call real APIs / take real actions |
-| Memory | External storage that fixes the LLM's default lack of persistent memory |
-| RAG | Retrieve your private data, feed it into the prompt, ground the answer in it |
-| Vector Database | Stores "meaning fingerprints" (embeddings) for fast, meaning-based search |
-| MCP | A universal, standardized connector between AI systems and external tools |
-| Chain of Thought | Step-by-step reasoning in text before answering |
-| Plan and Execute | Draft a full plan first, then execute it step by step |
-| Evaluator/Reflection | Agent checks and improves its own output before finalizing |
-| Multi-Agent System | A team of specialized agents — powerful, but expensive |
-| Guardrails / Human-in-the-loop | Validate input/output; require approval for risky, irreversible actions |
-| Model Routing | Send tasks to the cheapest model capable of handling them well |
+| Term                           | One-liner                                                                    |
+|--------------------------------|------------------------------------------------------------------------------|
+| AI / ML / Deep Learning        | Broadest umbrella → learns from data → uses layered neural networks          |
+| LLM                            | Deep learning model trained to predict the next token from massive text data |
+| Token                          | The small chunk of text (word/sub-word) an LLM reads and generates           |
+| Transformer (2017)             | The "attention"-based architecture that made modern LLMs possible            |
+| Temperature                    | Controls randomness — low = predictable, high = creative                     |
+| Context Window                 | The max amount of text (tokens) a model can "see" at once                    |
+| Chatbot vs. Agent              | Reactive Q&A vs. proactive, goal-driven, tool-using                          |
+| Agentic Revolution             | The shift from AI that talks to AI that takes real actions                   |
+| Core Agent Loop                | Perceive → Think → Act → Observe, repeating                                  |
+| ReAct Pattern                  | Write out reasoning before acting — reduces impulsive mistakes               |
+| Tools                          | Give the LLM the ability to call real APIs / take real actions               |
+| Memory                         | External storage that fixes the LLM's default lack of persistent memory      |
+| RAG                            | Retrieve your private data, feed it into the prompt, ground the answer in it |
+| Vector Database                | Stores "meaning fingerprints" (embeddings) for fast, meaning-based search    |
+| MCP                            | A universal, standardized connector between AI systems and external tools    |
+| Chain of Thought               | Step-by-step reasoning in text before answering                              |
+| Plan and Execute               | Draft a full plan first, then execute it step by step                        |
+| Evaluator/Reflection           | Agent checks and improves its own output before finalizing                   |
+| Multi-Agent System             | A team of specialized agents — powerful, but expensive                       |
+| Guardrails / Human-in-the-loop | Validate input/output; require approval for risky, irreversible actions      |
+| Model Routing                  | Send tasks to the cheapest model capable of handling them well               |
 
