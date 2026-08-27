@@ -1,5 +1,5 @@
 OLTP (Online Transaction Processing):
-- Is used live transactional system where we need to access data in high concurrency low latency mode.
+- Is used for live transactional system where we need to access data in high concurrency low latency mode.
 - To achieve this Milliseconds latency and high concurrency operations. It is preferred to have data is highly normalised (3rd normal form)
 - Data remained stored in row-oriented format 8-16 KB to get entire results in one read
 - Fast read, write and update are required. Vertical scaling.
@@ -7,12 +7,12 @@ OLTP (Online Transaction Processing):
 
 OLAP (Online Analytical Processing)
 - It is used for complex analytical aggregations with historical data.
-- Read heavy/ read huge amount of data with higher latency. It is expected to have denormalized(Start Schema/ Wide Tables)
+- Read heavy: read huge amount of data with higher latency. It is expected to have denormalized(Star Schema/ Snowflake Schema/ Wide Tables)
 - Data remained in columnar format (Parquet or Delta), This columnar storage help high compression, High I/O savings.
 - Scanning huge amount of data latency remain seconds to minutes. Scale horizontally. 
 - Priority remains high throughput read performance
 
-In modern data word these 2 system communicate with each other using CDC Change Data Capture(CDC)
+In modern data word these 2 system communicate with each other using CDC Change Data Capture(CDC) and ETL/ELT
 
 
 OLTP (Online Transaction Processing)

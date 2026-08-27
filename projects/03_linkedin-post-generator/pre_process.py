@@ -26,7 +26,7 @@ def get_project_root() -> Path:
 
 def process_posts(raw_file_name: str, processed_file_name: str) -> None:
     enriched_post = []
-    data_dir = get_project_root() / 'projects/linkedin-post-generator/data'
+    data_dir = get_project_root() / 'projects/03_linkedin-post-generator/data'
     abs_raw_path = data_dir / raw_file_name
     abs_processed_path = data_dir / processed_file_name
 
@@ -103,7 +103,7 @@ def extract_metadata(post):
     pt = PromptTemplate.from_template(template)
     chain = pt | llm
     response = chain.invoke(input={'post': post})
-    # print("response: ", response.content)
+    print("response: ", response.content)
 
     try:
         json_parser = JsonOutputParser()
