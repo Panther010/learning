@@ -22,22 +22,22 @@ class LinkedList:
         self.length = 1
 
 
-    def print_list(self):
+    def print_list(self) -> None:
         """
         for printing list will start from head and will go till tail
         """
-        temp = self.head
-        while temp:
-            print(temp.value, end = " --> ")
-            temp = temp.next
+        temp_node = self.head
+        while temp_node:
+            print(temp_node.value, ' --> ', end='')
+            temp_node = temp_node.next
 
-    def append(self, value):
+    def append(self, value) -> bool:
         """
         append at the end of the list. first create the node with value.
         If this is the only node this will be head and tail both otherwise this will be tail length +1
         """
         new_node = Node(value)
-        if self.length == 0:
+        if self.head is None:
             self.head = new_node
             self.tail = new_node
         else:
@@ -48,7 +48,7 @@ class LinkedList:
         return True
 
 
-    def pop(self):
+    def pop(self) -> Node | None:
         """
         Remove the last value from the Linked List
         if length == 0 cant remove
@@ -57,57 +57,126 @@ class LinkedList:
         if self.length == 0:
             return None
 
-        temp = prev = self.head
+        temp_node = self.head
+        pre = self.head
 
-        while temp.next:
-            prev = temp
-            temp = temp.next
+        while temp_node.next:
+            pre = temp_node
+            temp_node = temp_node.next
 
-        prev.next = None
-        self.tail = prev
+        self.tail = pre
+        self.tail.next = None
+
         self.length -= 1
 
         if self.length == 0:
             self.head = None
             self.tail = None
 
-        return prev
+        return temp_node
 
 
-    def prepend(self, value):
+    def prepend(self, value) -> bool:
 
         """
         Add the node at the beginning of the List
         if this is the only element it will be both head and tail
         or else it will replace head and length +1
         """
-        pass
+        new_node = Node(value)
+        if self.length == 0:
+            self.head = new_node
+            self.tail = new_node
+        else:
+            new_node.next= self.head
+            self.head = new_node
+
+        self.length += 1
+
+        return True
 
 
-    def pop_first(self):
+    def pop_first(self) -> Node | None:
         """
         Remove first element
         if there is no element cant remove return None
         otherwise replace head with next element length -1. If ater this length is 0 mark head and tail None
         """
-        pass
+        if self.head is None:
+            return None
+
+        temp_node = self.head
+        self.head = temp_node.next
+        temp_node.next = None
+        self.length -= 1
+
+        if self.length == 0:
+            self.head = None
+            self.tail = None
+
+        return temp_node
 
 
-    def get(self, index):
-        pass
+    def get(self, index) -> None | Node:
+        if index >= self.length or index < 0:
+            return None
+
+        temp_node = self.head
+        for i in range(index):
+            temp_node = temp_node.next
+
+        return temp_node
 
 
-    def set(self, index, value):
-        pass
+    def set(self, index, value) -> bool:
+        temp_node = self.get(index)
+
+        if temp_node:
+            temp_node.value = value
+            return True
+
+        return False
 
 
-    def insert(self, index, value):
-        pass
+    def insert(self, index, value) -> bool:
 
+        if index < 0 or index > self.length:
+            return False
 
-    def remove(self, index):
-        pass
+        if index == 0:
+            return self.prepend(value)
 
+        if index == self.length:
+            return self.append(value)
+
+        new_node = Node(value)
+        temp_node = self.get(index-1)
+        new_node.next = temp_node.next
+        temp_node.next = new_node
+        self.length += 1
+
+        return True
+
+    def remove(self, index) -> None | Node:
+        if index < 0 or index >= self.length:
+            return None
+        if index == 0:
+            return self.pop_first()
+        if index == self.length - 1:
+            return self.pop()
+
+        pre = self.get(index -1)
+        temp_node = pre.next
+
+        pre.next = temp_node.next
+        temp_node.next = None
+        self.length -= 1
+
+        if self.length == 0:
+            self.head = None
+            self.tail = None
+
+        return temp_node
 
 
     def reverse(self):
