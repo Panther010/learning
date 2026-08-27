@@ -18,7 +18,7 @@ def main():
         selected_length = st.selectbox("Length", options=LENGTH_OPTIONS)
 
     with col3:
-        selected_language = st.selectbox("Length", options=LANGUAGE_OPTIONS)
+        selected_language = st.selectbox("Language", options=LANGUAGE_OPTIONS)
 
     if st.button("Generate"):
         post = generate_post(selected_length, selected_language, selected_tag)
