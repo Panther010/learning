@@ -104,7 +104,7 @@ prob4_schema = StructType([
 ])
 
 prob4_df = spark.createDataFrame(prob4_data, prob4_schema)
-prob4_df = prob4_df.withColumn("txn_date", f.to_date("txn_date_str", "yyyy-mm-dd"))
+prob4_df = prob4_df.withColumn("txn_date", f.to_date("txn_date_str", "yyyy-MM-dd"))
 prob4_df.printSchema()
 prob4_df.show()
 prob4_df.select(f.col("txn_date"), f.col("txn_date"), f.col("amount"),
