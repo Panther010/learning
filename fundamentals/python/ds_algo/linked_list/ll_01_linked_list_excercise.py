@@ -47,7 +47,6 @@ class LinkedList:
         self.length += 1
         return True
 
-
     def pop(self) -> Node | None:
         """
         Remove the last value from the Linked List
@@ -75,7 +74,6 @@ class LinkedList:
 
         return temp_node
 
-
     def prepend(self, value) -> bool:
 
         """
@@ -94,7 +92,6 @@ class LinkedList:
         self.length += 1
 
         return True
-
 
     def pop_first(self) -> Node | None:
         """
@@ -116,7 +113,6 @@ class LinkedList:
 
         return temp_node
 
-
     def get(self, index) -> None | Node:
         if index >= self.length or index < 0:
             return None
@@ -127,7 +123,6 @@ class LinkedList:
 
         return temp_node
 
-
     def set(self, index, value) -> bool:
         temp_node = self.get(index)
 
@@ -136,7 +131,6 @@ class LinkedList:
             return True
 
         return False
-
 
     def insert(self, index, value) -> bool:
 
@@ -178,10 +172,8 @@ class LinkedList:
 
         return temp_node
 
-
     def reverse(self):
         pass
-
 
     def find_middel_node(self):
         pass
