@@ -143,47 +143,46 @@ class LinkedList:
 
 
 if __name__ == "__main__":
-    if __name__ == "__main__":
-        print("--- 1. Initialize List ---")
-        sll = LinkedList(10)
-        sll.print_ll()  # Expected: 10 --> None
+    print("--- 1. Initialize List ---")
+    sll = LinkedList(10)
+    sll.print_ll()  # Expected: 10 --> None
 
-        print("\n--- 2. Test append() ---")
-        sll.append(20)
-        sll.append(30)
-        sll.print_ll()  # Expected: 10 --> 20 --> 30 --> None
+    print("\n--- 2. Test append() ---")
+    sll.append(20)
+    sll.append(30)
+    sll.print_ll()  # Expected: 10 --> 20 --> 30 --> None
 
-        print("\n--- 3. Test prepend() ---")
-        sll.prepend(5)
-        sll.print_ll()  # Expected: 5 --> 10 --> 20 --> 30 --> None
+    print("\n--- 3. Test prepend() ---")
+    sll.prepend(5)
+    sll.print_ll()  # Expected: 5 --> 10 --> 20 --> 30 --> None
 
-        print("\n--- 4. Test pop() ---")
-        popped_node = sll.pop()
-        print(f"Popped value: {popped_node.value if popped_node else None}")  # Expected: 30
-        sll.print_ll()  # Expected: 5 --> 10 --> 20 --> None
+    print("\n--- 4. Test pop() ---")
+    popped_node = sll.pop()
+    print(f"Popped value: {popped_node.value if popped_node else None}")  # Expected: 30
+    sll.print_ll()  # Expected: 5 --> 10 --> 20 --> None
 
-        print("\n--- 5. Test pop_first() ---")
-        popped_first = sll.pop_first()
-        print(f"Popped first value: {popped_first.value if popped_first else None}")  # Expected: 5
-        sll.print_ll()  # Expected: 10 --> 20 --> None
+    print("\n--- 5. Test pop_first() ---")
+    popped_first = sll.pop_first()
+    print(f"Popped first value: {popped_first.value if popped_first else None}")  # Expected: 5
+    sll.print_ll()  # Expected: 10 --> 20 --> None
 
-        print("\n--- 6. Test get() ---")
-        node_at_1 = sll.get(1)
-        print(f"Value at index 1: {node_at_1.value if node_at_1 else None}")  # Expected: 20
+    print("\n--- 6. Test get() ---")
+    node_at_1 = sll.get(1)
+    print(f"Value at index 1: {node_at_1.value if node_at_1 else None}")  # Expected: 20
 
-        print("\n--- 7. Test set_value() ---")
-        sll.set_value(1, 25)
-        sll.print_ll()  # Expected: 10 --> 25 --> None
+    print("\n--- 7. Test set_value() ---")
+    sll.set_value(1, 25)
+    sll.print_ll()  # Expected: 10 --> 25 --> None
 
-        print("\n--- 8. Test insert() ---")
-        sll.insert(1, 15)  # Insert in the middle
-        sll.print_ll()  # Expected: 10 --> 15 --> 25 --> None
+    print("\n--- 8. Test insert() ---")
+    sll.insert(1, 15)  # Insert in the middle
+    sll.print_ll()  # Expected: 10 --> 15 --> 25 --> None
 
-        print("\n--- 9. Test remove() ---")
-        removed_node = sll.remove(1)  # Remove from the middle
-        print(f"Removed value: {removed_node.value if removed_node else None}")  # Expected: 15
-        sll.print_ll()  # Expected: 10 --> 25 --> None
+    print("\n--- 9. Test remove() ---")
+    removed_node = sll.remove(1)  # Remove from the middle
+    print(f"Removed value: {removed_node.value if removed_node else None}")  # Expected: 15
+    sll.print_ll()  # Expected: 10 --> 25 --> None
 
-        print("\n--- 10. Test reverse() ---")
-        sll.reverse()
-        sll.print_ll()  # Expected: 25 --> 10 --> None
+    print("\n--- 10. Test reverse() ---")
+    sll.reverse()
+    sll.print_ll()  # Expected: 25 --> 10 --> None
