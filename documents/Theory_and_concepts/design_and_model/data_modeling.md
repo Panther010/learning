@@ -19,11 +19,11 @@
 
 Data modeling is usually done in **three progressively detailed stages**:
 
-| Level | What it captures | Example |
-|---|---|---|
-| **Conceptual Model** | The **big picture** — what entities exist and how they relate, with **no technical detail** (no data types, no keys). For business stakeholders. | "A Customer places an Order. An Order contains Products." |
-| **Logical Model** | Adds structure — **attributes, data types, keys, relationships** — but still **independent of any specific database technology**. | `Customer(customer_id, name, email)`, `Order(order_id, customer_id, order_date)` |
-| **Physical Model** | The **actual implementation** — specific to your database system (e.g., PostgreSQL, Snowflake), including exact column types, indexes, partitioning, and storage details. | `CREATE TABLE customer (customer_id BIGINT PRIMARY KEY, ...)` |
+| Level                | What it captures                                                                                                                                                          | Example                                                                          |
+|----------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------|
+| **Conceptual Model** | The **big picture** — what entities exist and how they relate, with **no technical detail** (no data types, no keys). For business stakeholders.                          | "A Customer places an Order. An Order contains Products."                        |
+| **Logical Model**    | Adds structure — **attributes, data types, keys, relationships** — but still **independent of any specific database technology**.                                         | `Customer(customer_id, name, email)`, `Order(order_id, customer_id, order_date)` |
+| **Physical Model**   | The **actual implementation** — specific to your database system (e.g., PostgreSQL, Snowflake), including exact column types, indexes, partitioning, and storage details. | `CREATE TABLE customer (customer_id BIGINT PRIMARY KEY, ...)`                    |
 
 > Simple way to remember: **Conceptual = "what"**, **Logical = "how it's structured"**, **Physical = "how it's actually built."**
 
@@ -43,14 +43,14 @@ The classic starting point for modeling — **Entity-Relationship (ER) modeling*
 
 ## 4. Keys — How Rows Are Uniquely Identified & Linked
 
-| Key Type | Meaning | Example |
-|---|---|---|
-| **Primary Key (PK)** | Uniquely identifies **each row** in a table. No duplicates, no nulls. | `customer_id` in the `Customer` table |
-| **Candidate Key** | Any column (or combination) that *could* serve as the primary key — you pick one to actually be the PK. | A table might have both `customer_id` and `email` as candidate keys; you choose `customer_id` as the PK. |
-| **Foreign Key (FK)** | A column in one table that **references the Primary Key of another table** — this is *how* tables get linked/related. | `customer_id` in the `Order` table, pointing back to `Customer` |
-| **Composite Key** | A primary key made of **two or more columns combined**, when no single column is unique on its own. | `(order_id, product_id)` in an `OrderDetails` table |
-| **Natural Key** | A key based on real, **meaningful business data** (e.g., an email address, a national ID number). | `email` as a key |
-| **Surrogate Key** | An **artificial**, system-generated key with no business meaning — usually a simple auto-incrementing integer. | `customer_id = 10234` (means nothing on its own, just an internal reference) |
+| Key Type             | Meaning                                                                                                               | Example                                                                                                  |
+|----------------------|-----------------------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------|
+| **Primary Key (PK)** | Uniquely identifies **each row** in a table. No duplicates, no nulls.                                                 | `customer_id` in the `Customer` table                                                                    |
+| **Candidate Key**    | Any column (or combination) that *could* serve as the primary key — you pick one to actually be the PK.               | A table might have both `customer_id` and `email` as candidate keys; you choose `customer_id` as the PK. |
+| **Foreign Key (FK)** | A column in one table that **references the Primary Key of another table** — this is *how* tables get linked/related. | `customer_id` in the `Order` table, pointing back to `Customer`                                          |
+| **Composite Key**    | A primary key made of **two or more columns combined**, when no single column is unique on its own.                   | `(order_id, product_id)` in an `OrderDetails` table                                                      |
+| **Natural Key**      | A key based on real, **meaningful business data** (e.g., an email address, a national ID number).                     | `email` as a key                                                                                         |
+| **Surrogate Key**    | An **artificial**, system-generated key with no business meaning — usually a simple auto-incrementing integer.        | `customer_id = 10234` (means nothing on its own, just an internal reference)                             |
 
 > **Natural vs. Surrogate — a real trade-off:** Natural keys are meaningful but can **change** (e.g., someone updates their email) or aren't guaranteed unique across systems. Surrogate keys are stable and simple, but require an extra lookup to know what they "mean." **In practice, surrogate keys are strongly preferred** in most database and data warehouse designs, precisely because they never need to change.
 
@@ -58,11 +58,11 @@ The classic starting point for modeling — **Entity-Relationship (ER) modeling*
 
 ## 5. Types of Relationships
 
-| Relationship | Meaning | Example |
-|---|---|---|
-| **One-to-One (1:1)** | One row in Table A relates to exactly **one** row in Table B. | `Employee` ↔ `EmployeeBadge` (each employee has exactly one badge) |
-| **One-to-Many (1:N)** | One row in Table A relates to **many** rows in Table B. | One `Customer` → many `Orders` |
-| **Many-to-Many (N:N)** | Many rows in Table A relate to many rows in Table B. | Many `Students` ↔ many `Courses` (a student takes many courses; a course has many students) |
+| Relationship           | Meaning                                                       | Example                                                                                     |
+|------------------------|---------------------------------------------------------------|---------------------------------------------------------------------------------------------|
+| **One-to-One (1:1)**   | One row in Table A relates to exactly **one** row in Table B. | `Employee` ↔ `EmployeeBadge` (each employee has exactly one badge)                          |
+| **One-to-Many (1:N)**  | One row in Table A relates to **many** rows in Table B.       | One `Customer` → many `Orders`                                                              |
+| **Many-to-Many (N:N)** | Many rows in Table A relate to many rows in Table B.          | Many `Students` ↔ many `Courses` (a student takes many courses; a course has many students) |
 
 **Resolving Many-to-Many**
 A N:N relationship **can't be directly represented** in a relational table — it needs a **junction/bridge/associative table** in between, holding foreign keys to both sides.
@@ -81,10 +81,10 @@ Enrollment(student_id, course_id, enrollment_date)   -- the junction table
 
 **Normalization** is the process of organizing tables to **reduce data redundancy** and avoid **data anomalies**. Without it, the same piece of information gets duplicated across many rows, which causes problems:
 
-| Anomaly | What goes wrong |
-|---|---|
-| **Update anomaly** | The same fact (e.g., a customer's address) is stored in multiple rows — update it in one place, forget another, and now the data **contradicts itself**. |
-| **Insert anomaly** | You can't add certain data without also having *unrelated* data available (e.g., can't add a new product without an order for it, if product info is stuffed inside the orders table). |
+| Anomaly            | What goes wrong                                                                                                                                                                                            |
+|--------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **Update anomaly** | The same fact (e.g., a customer's address) is stored in multiple rows — update it in one place, forget another, and now the data **contradicts itself**.                                                   |
+| **Insert anomaly** | You can't add certain data without also having *unrelated* data available (e.g., can't add a new product without an order for it, if product info is stuffed inside the orders table).                     |
 | **Delete anomaly** | Deleting one row accidentally **wipes out unrelated information** you actually wanted to keep (e.g., deleting a customer's only order also deletes their contact info, if it was never stored separately). |
 
 > Example of a **denormalized** (unnormalized) mess: one giant `Orders` table with `customer_name`, `customer_email`, `product_name`, `product_price` repeated on **every single row** for every order — if a customer's email changes, you'd have to update it in hundreds of rows.
@@ -128,13 +128,13 @@ Normalization happens in progressive stages, each with stricter rules:
 
 ## 9. OLTP vs. OLAP
 
-| | **OLTP** (Online Transaction Processing) | **OLAP** (Online Analytical Processing) |
-|---|---|---|
-| **Purpose** | Day-to-day operations — recording individual transactions | Analysis, reporting, trends over large volumes of historical data |
-| **Example systems** | An e-commerce checkout system, a banking app | A sales dashboard, a data warehouse |
-| **Data model style** | Highly **normalized** (fewer duplicates, fast/safe writes) | Often **denormalized** (dimensional modeling, fast reads) |
-| **Typical queries** | "Insert this new order," "Update this customer's address" | "What were total sales by region last quarter?" |
-| **Read vs. Write** | Frequent small writes | Fewer, but very large, complex reads |
+|                      | **OLTP** (Online Transaction Processing)                   | **OLAP** (Online Analytical Processing)                           |
+|----------------------|------------------------------------------------------------|-------------------------------------------------------------------|
+| **Purpose**          | Day-to-day operations — recording individual transactions  | Analysis, reporting, trends over large volumes of historical data |
+| **Example systems**  | An e-commerce checkout system, a banking app               | A sales dashboard, a data warehouse                               |
+| **Data model style** | Highly **normalized** (fewer duplicates, fast/safe writes) | Often **denormalized** (dimensional modeling, fast reads)         |
+| **Typical queries**  | "Insert this new order," "Update this customer's address"  | "What were total sales by region last quarter?"                   |
+| **Read vs. Write**   | Frequent small writes                                      | Fewer, but very large, complex reads                              |
 
 > Simple way to remember: **OLTP = the cash register** (recording each sale), **OLAP = the year-end sales report** (analyzing all the sales together).
 
@@ -152,18 +152,20 @@ The **grain** defines exactly **what one row in the fact table represents** — 
 > Example: Is one row "one line item on a receipt," "one entire order," or "total daily sales per store"? Each is a different, valid grain — but it must be decided clearly and consistently, since it drives everything else about the table's design.
 
 **Types of Fact Tables**
-| Type | What it captures |
-|---|---|
-| **Transaction fact table** | One row per individual event/transaction (finest grain, e.g., one row per sale). |
-| **Periodic snapshot fact table** | A row captured at **regular intervals** (e.g., end-of-day account balances), even if nothing changed. |
+
+| Type                                 | What it captures                                                                                                                                                     |
+|--------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **Transaction fact table**           | One row per individual event/transaction (finest grain, e.g., one row per sale).                                                                                     |
+| **Periodic snapshot fact table**     | A row captured at **regular intervals** (e.g., end-of-day account balances), even if nothing changed.                                                                |
 | **Accumulating snapshot fact table** | One row per process/entity that gets **updated as it moves through stages** (e.g., an order's row gets updated as it moves from "placed" → "shipped" → "delivered"). |
 
 **Types of Facts (Measures)**
-| Type | Meaning | Example |
-|---|---|---|
-| **Additive** | Can be summed across **any** dimension. | `sales_amount` (safe to sum across time, product, region — all valid). |
+
+| Type              | Meaning                                                   | Example                                                                                                                                                        |
+|-------------------|-----------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **Additive**      | Can be summed across **any** dimension.                   | `sales_amount` (safe to sum across time, product, region — all valid).                                                                                         |
 | **Semi-additive** | Can be summed across **some** dimensions, but not others. | `account_balance` (summing across time doesn't make sense — you can't "add up" balances over days — but summing across accounts at one point in time is fine). |
-| **Non-additive** | Cannot be meaningfully summed at all. | A `ratio` or `percentage` (e.g., profit margin %) — must be recalculated, not summed. |
+| **Non-additive**  | Cannot be meaningfully summed at all.                     | A `ratio` or `percentage` (e.g., profit margin %) — must be recalculated, not summed.                                                                          |
 
 ## 11. Star Schema vs. Snowflake Schema
 
@@ -240,28 +242,28 @@ With cloud data lakes (Delta Lake, Iceberg, etc.), modeling philosophy has shift
 
 ## Quick Recap Table
 
-| Term | One-liner |
-|---|---|
-| Conceptual / Logical / Physical Model | What → how it's structured → how it's actually built |
-| Entity / Attribute / Relationship | A "thing" → its property → how two things connect |
-| Primary / Foreign / Composite Key | Uniquely IDs a row → links to another table → multi-column unique ID |
-| Natural vs. Surrogate Key | Meaningful business value vs. artificial, stable system-generated ID |
-| 1:1 / 1:N / N:N | One-to-one / one-to-many / many-to-many relationships |
-| Junction Table | Resolves an N:N relationship into two 1:N relationships |
-| Normalization | Organizing data to reduce redundancy & anomalies |
-| 1NF / 2NF / 3NF | Atomic values → full key dependency → no transitive dependency |
-| Denormalization | Deliberately reintroducing redundancy for faster reads |
-| OLTP vs OLAP | Transactional day-to-day ops vs. analytical reporting |
-| Fact Table / Dimension Table | Quantitative measures vs. descriptive context |
-| Grain | What exactly one row in a fact table represents |
-| Additive / Semi-additive / Non-additive | Can always sum / sum sometimes / can't meaningfully sum |
-| Star vs. Snowflake Schema | Flat denormalized dimensions vs. further-normalized sub-dimensions |
-| Degenerate Dimension | Dimension-like value stored directly in the fact table |
-| Junk Dimension | One table grouping several small unrelated flags |
-| Conformed Dimension | Shared, consistent dimension used across multiple fact tables |
-| Role-Playing Dimension | One dimension used multiple times for different purposes in a fact table |
-| SCD (Type 0–6) | Strategies for handling dimension data that changes over time |
-| Data Vault (Hub/Link/Satellite) | Flexible, history-preserving alternative to star schema |
-| Medallion Architecture | Bronze (raw) → Silver (cleaned) → Gold (business-ready) data layers |
-| One Big Table (OBT) | Flattened, denormalized alternative to star schema |
+| Term                                    | One-liner                                                                |
+|-----------------------------------------|--------------------------------------------------------------------------|
+| Conceptual / Logical / Physical Model   | What → how it's structured → how it's actually built                     |
+| Entity / Attribute / Relationship       | A "thing" → its property → how two things connect                        |
+| Primary / Foreign / Composite Key       | Uniquely IDs a row → links to another table → multi-column unique ID     |
+| Natural vs. Surrogate Key               | Meaningful business value vs. artificial, stable system-generated ID     |
+| 1:1 / 1:N / N:N                         | One-to-one / one-to-many / many-to-many relationships                    |
+| Junction Table                          | Resolves an N:N relationship into two 1:N relationships                  |
+| Normalization                           | Organizing data to reduce redundancy & anomalies                         |
+| 1NF / 2NF / 3NF                         | Atomic values → full key dependency → no transitive dependency           |
+| Denormalization                         | Deliberately reintroducing redundancy for faster reads                   |
+| OLTP vs OLAP                            | Transactional day-to-day ops vs. analytical reporting                    |
+| Fact Table / Dimension Table            | Quantitative measures vs. descriptive context                            |
+| Grain                                   | What exactly one row in a fact table represents                          |
+| Additive / Semi-additive / Non-additive | Can always sum / sum sometimes / can't meaningfully sum                  |
+| Star vs. Snowflake Schema               | Flat denormalized dimensions vs. further-normalized sub-dimensions       |
+| Degenerate Dimension                    | Dimension-like value stored directly in the fact table                   |
+| Junk Dimension                          | One table grouping several small unrelated flags                         |
+| Conformed Dimension                     | Shared, consistent dimension used across multiple fact tables            |
+| Role-Playing Dimension                  | One dimension used multiple times for different purposes in a fact table |
+| SCD (Type 0–6)                          | Strategies for handling dimension data that changes over time            |
+| Data Vault (Hub/Link/Satellite)         | Flexible, history-preserving alternative to star schema                  |
+| Medallion Architecture                  | Bronze (raw) → Silver (cleaned) → Gold (business-ready) data layers      |
+| One Big Table (OBT)                     | Flattened, denormalized alternative to star schema                       |
 
