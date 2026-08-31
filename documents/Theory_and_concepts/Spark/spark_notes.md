@@ -9,8 +9,7 @@
 1. [Section 1: Apache Spark Architecture & Core Concepts](#section-1-apache-spark-architecture--core-concepts)
    - [1.1 Fundamentals & Master-Slave Model](#11-fundamentals--master-slave-model)
    - [1.2 Execution Modes: Client vs Cluster vs Local](#12-execution-modes-client-vs-cluster-vs-local)
-   - [1.3 Resource Managers & Application Master](#13-resource-managers--application-master)
-   - [1.4 End-to-End Application Execution Flow](#14-end-to-end-application-execution-flow)
+   - [1.3 End-to-End Application Execution Flow](#14-end-to-end-application-execution-flow)
 2. [Section 2: Deep Dive into RDDs](#section-2-deep-dive-into-rdds)
    - [2.1 Internal Architecture & Lineage Graph](#21-internal-architecture--lineage-graph)
    - [2.2 RDD Creation Methods](#22-rdd-creation-methods)
@@ -135,26 +134,7 @@ spark-submit --master yarn --deploy-mode client ...
 spark-submit --master yarn --deploy-mode cluster ...
 ```
 
-### 1.3 Resource Managers & Application Master
-
-A **Spark cluster** is a distributed pool of machines managed by a resource scheduler, scaling from a small dev setup to thousands of machines.
-
-**Supported cluster managers:**
-
-| Cluster Manager  | Typical Use                                                                      |
-|------------------|----------------------------------------------------------------------------------|
-| **Standalone**   | Spark's own built-in simple manager — dev/test or small dedicated Spark clusters |
-| **Hadoop YARN**  | Multi-tenant Hadoop-ecosystem clusters shared with Hive/MapReduce/etc.           |
-| **Kubernetes**   | Modern, increasingly default choice for containerized deployments                |
-| **Apache Mesos** | Historically used for fine-grained, multi-framework scheduling                   |
-
-**Cluster manager responsibilities:** track worker resources (CPU, memory, host locations); launch executors for an app; recover failed executors; allocate/deallocate resources on request (including dynamic allocation).
-
-**Application Master (AM)** *(YARN-specific)*: created by YARN per submitted application; runs the **Driver** inside its container; hosts the `SparkContext`/`SparkSession`.
-
-**Containers**: isolated runtime environments (CPU + memory limits) that YARN (or Kubernetes pods, conceptually) allocate to run driver/executor processes.
-
-### 1.4 End-to-End Application Execution Flow
+### 1.3 End-to-End Application Execution Flow
 
 Typical `spark-submit` (cluster mode, YARN) flow:
 
@@ -501,8 +481,6 @@ Tasks come in two flavors:
 | **Shuffle Map Task** | In a stage that **produces** shuffle output | Partitions and writes data for the next stage to read                                                                                                                      |
 | **Result Task**      | In the **final** stage of a job             | Returns results directly to the driver (e.g., `collect()`/`count()`) **or** writes final output to storage — does **not** produce further shuffle output for another stage |
 
-> ⚠️ Correction to the original notes: they described **Result Tasks** identically to Shuffle Map Tasks ("run before the shuffle... prepare and write partitioned data for downstream stages") — that description is actually Shuffle Map Tasks, duplicated by mistake. Result tasks run in the **final** stage and either return to the driver or write final output — they don't feed another shuffle stage.
-
 ### 4.4 Scheduling Modes: FIFO vs FAIR
 
 The **Task Scheduler** assigns tasks to executors, factoring in **data locality** and available cores. Default: **one core per task**, configurable via `spark.task.cpus`.
@@ -684,8 +662,15 @@ A: `repartition(n)` can increase or decrease partition count and **always** trig
 
 **Q7: What are the different types of joins in Spark?**
 A: Two angles to this:
-- **Logical join types** (SQL semantics): `inner`, `left outer` (`left`), `right outer` (`right`), `full outer` (`full`), `left semi` (returns left rows that have a match, without duplicating/including right columns), `left anti` (returns left rows with **no** match), and `cross` (cartesian product).
-- **Physical join strategies** (how Spark actually executes a given logical join): **Broadcast Hash Join** (one side small enough to broadcast to all executors — avoids a shuffle entirely, fastest when applicable), **Shuffle Hash Join** (both sides shuffled/partitioned by join key, then a hash join per partition — used when broadcasting isn't possible but one side is still relatively small), **Sort-Merge Join** (both sides shuffled and sorted by join key, then merged — Spark's default/most robust strategy for large-large joins), and **Broadcast Nested Loop Join** / **Cartesian Join** (fallback for joins without an equi-join condition, or very small tables — expensive, generally avoided).
+- **Logical join types** 
+  - (SQL semantics): `inner`, `left outer` (`left`), `right outer` (`right`), `full outer` (`full`), 
+  - `left semi` (returns left rows that have a match, without duplicating/including right columns), 
+  - `left anti` (returns left rows with **no** match), and `cross` (cartesian product).
+- **Physical join strategies** (how Spark actually executes a given logical join): 
+  - **Broadcast Hash Join** (one side small enough to broadcast to all executors — avoids a shuffle entirely, fastest when applicable), 
+  - **Shuffle Hash Join** (both sides shuffled/partitioned by join key, then a hash join per partition — used when broadcasting isn't possible but one side is still relatively small), 
+  - **Sort-Merge Join** (both sides shuffled and sorted by join key, then merged — Spark's default/most robust strategy for large-large joins), and 
+  - **Broadcast Nested Loop Join** / **Cartesian Join** (fallback for joins without an equi-join condition, or very small tables — expensive, generally avoided).
 
 ### 7.2 Scenario-Based Questions
 
