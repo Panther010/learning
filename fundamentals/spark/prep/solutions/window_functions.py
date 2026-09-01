@@ -215,6 +215,16 @@ def que_31(spark:SparkSession):
     # - **Topics:** Window, rowsBetween, average
     #
     # Calculate a 3-period moving average of stock prices (current row and 2 preceding rows).
+    # Expected:
+    # +------+----------+-----+------------+
+    # |ticker|      date|price|moving_avg  |
+    # +------+----------+-----+------------+
+    # |  AAPL|2026-06-01|150.0|      150.00|
+    # |  AAPL|2026-06-02|155.0|      152.50|
+    # |  AAPL|2026-06-03|152.0|      152.33|
+    # |  AAPL|2026-06-04|160.0|      155.67|
+    # |  AAPL|2026-06-05|158.0|      156.67|
+    # +------+----------+-----+------------+
     # ============================================================
     data = [
         ("AAPL", "2026-06-01", 150.0),
@@ -244,6 +254,12 @@ def que_32(spark:SparkSession):
     # - **Topics:** Window, row_number, date arithmetic
     #
     # Find users who logged in for 3 or more consecutive days.
+    # Expected:
+    # +-----+------------------+
+    # |user |consecutive_days  |
+    # +-----+------------------+
+    # |Alice|                3 |
+    # +-----+------------------+
     # ============================================================
     data = [
         ("Alice", "2026-06-01"),
@@ -281,6 +297,16 @@ def que_33(spark:SparkSession):
     # - **Topics:** Window, first, last
     #
     # For each transaction log, show the first and last amount recorded for that customer across all their transactions.
+    # Expected:
+    # +------+--------+------+----------+------------+-----------+
+    # |txn_id|customer|amount|      date|first_amount|last_amount|
+    # +------+--------+------+----------+------------+-----------+
+    # |     1|   Alice|  50.0|2026-06-01|        50.0|      150.0|
+    # |     2|   Alice| 100.0|2026-06-03|        50.0|      150.0|
+    # |     3|   Alice| 150.0|2026-06-05|        50.0|      150.0|
+    # |     4|     Bob| 200.0|2026-06-02|       200.0|      250.0|
+    # |     5|     Bob| 250.0|2026-06-04|       200.0|      250.0|
+    # +------+--------+------+----------+------------+-----------+
     # ============================================================
     data = [
         (1, "Alice", 50.0, "2026-06-01"),
@@ -317,6 +343,13 @@ def que_34(spark: SparkSession):
     # - **Difficulty:** Hard
     #
     # Calculate day-1 retention: Users who logged in on Day N and also logged in on Day N+1.
+    # Expected:
+    # +----------+------------+----------------+
+    # |base_date |total_users |retained_users  |
+    # +----------+------------+----------------+
+    # |2026-06-01|           2|               1|
+    # |2026-06-02|           1|               1|
+    # +----------+------------+----------------+
     # ============================================================
     data = [
         ("Alice", "2026-06-01"),
@@ -352,11 +385,44 @@ def que_34(spark: SparkSession):
         F.count_distinct(F.when(F.col('streak_days') > F.lit(1), F.col('user')).otherwise(F.lit(None))).alias('retained_users')
     ).show())
 
+def que_35(spark: SparkSession):
+    # ============================================================
+    # Problem 35: Inter-Event Time Calculation
+    # - **Topics:** Window, lag, timestamp diff
+    #
+    # Calculate the time gap in minutes between consecutive user actions.
+    # Expected:
+    # +-----+-------------------+-------------------+
+    # |user |action_time        |minutes_since_last |
+    # +-----+-------------------+-------------------+
+    # |Alice|2026-06-01 10:00:00|               NULL|
+    # |Alice|2026-06-01 10:15:00|               15.0|
+    # |Alice|2026-06-01 10:45:00|               30.0|
+    # +-----+-------------------+-------------------+
+    # ============================================================
+    data = [
+        ("Alice", "2026-06-01 10:00:00"),
+        ("Alice", "2026-06-01 10:15:00"),
+        ("Alice", "2026-06-01 10:45:00"),
+    ]
+
+    schema = StructType([
+        StructField("user", StringType()),
+        StructField("action_time", StringType()),
+    ])
+
+    win_spec = Window.partitionBy(F.col('user')).orderBy(F.col('action_time'))
+
+    df = spark.createDataFrame(data, schema)
+    df.select(
+        F.col('*'),
+        F.timestamp_diff("MINUTE", F.lag(F.col('action_time'), 1).over(win_spec), F.col('action_time')).alias('minutes_since_last')
+    ).show()
 
 
 def main():
     spark = SparkSession.builder.appName("window").master("local").getOrCreate()
-    que_34(spark)
+    que_35(spark)
 
 if __name__ == '__main__':
     main()
