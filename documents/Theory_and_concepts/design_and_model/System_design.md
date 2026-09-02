@@ -377,7 +377,40 @@ Walk through these steps **in this order, out loud**, in every system design int
 
 
 
+Here are 10 practice prompts, each stressing a different part of your framework so you don't just get comfortable with one pattern. Mixed in a couple of variations you'll likely actually see (telecom, given your target role).
 
+1. Ride-sharing surge pricing & driver matching
+Design the system that computes real-time surge multipliers and matches drivers to riders, while also feeding a nightly "earnings & demand" report to finance. Stresses: Lambda-style split off one event stream, low-latency matching vs. batch reporting, semi-additive measures (surge multiplier can't just be summed/averaged naively).
+
+2. Video streaming watch-time & recommendations (Netflix/YouTube-style)
+Design the pipeline that tracks watch events (play/pause/seek/complete) to power both a "continue watching" real-time feature and a quarterly content-performance report for content buyers. Stresses: very high event volume, late/out-of-order events (buffering, offline mobile playback syncing later), funnel/drop-off analysis.
+
+3. Fraud detection for card transactions
+Design a system that flags potentially fraudulent transactions within 500ms of swipe, while also maintaining a compliant, immutable audit trail for regulators. Stresses: strict latency SLA, exactly-once/idempotency under financial correctness requirements, why you can't just use eventual consistency here — good contrast case against your other "batch is fine" answers.
+
+4. IoT sensor telemetry (smart factory or fleet vehicles)
+Design ingestion and processing for 100,000 devices sending telemetry every 5 seconds (temperature, GPS, battery), used for both live anomaly alerting and long-term predictive-maintenance model training. Stresses: back-of-envelope at genuinely high steady throughput, small-file/write-amplification concerns, hot/cold storage tiering.
+
+5. Telecom network performance monitoring (PM counters, CDRs, alarms) — directly relevant to your interview
+Design a pipeline ingesting Performance Management counters and Call Detail Records from thousands of network elements, computing rolling KPIs (call drop rate, throughput) for an NOC dashboard, plus daily regulatory reporting. Stresses: exactly the domain vocabulary you flagged as a gap earlier — good chance to rehearse PM-counter/CDR/KPI language in a design context, windowed aggregation, alarm severity handling.
+
+6. Ad-tech real-time bidding + campaign reporting
+Design a system that must respond to an ad auction bid request in under 100ms, while also aggregating campaign performance (impressions, clicks, spend) for advertiser dashboards updated hourly. Stresses: extremely tight latency at massive scale, budget-pacing state management (a stateful streaming problem), separating the "must respond fast" path from the "must be accurate eventually" path.
+
+7. Social media feed & engagement analytics
+Design the pipeline behind a social app's news feed ranking plus the creator-facing analytics dashboard (likes/shares/views per post, updated within minutes). Stresses: fan-out-on-write vs. fan-out-on-read trade-offs, semi-additive/non-additive engagement-rate metrics, schema evolution as new interaction types get added over time.
+
+8. Warehouse/logistics inventory tracking
+Design a system tracking inventory levels across thousands of warehouses in real time (for stock-out alerts) plus a daily replenishment-planning batch job. Stresses: CDC from an OLTP inventory system into the lakehouse, SCD Type 2 on product/warehouse dimensions, reconciling real-time counts against a periodic accurate snapshot (classic snapshot-vs-CDC tension).
+
+9. SaaS product usage & billing metering
+Design the pipeline that meters customer API usage in near-real-time (for a live usage dashboard and rate-limiting) and rolls it up into monthly invoices. Stresses: correctness under retries/idempotency is existential here (double-billing a customer is a real failure), exactly-once semantics, backfill/correction handling when a bug is found after invoices already went out.
+
+10. Healthcare/wearable device monitoring
+Design a system ingesting continuous vitals data (heart rate, SpO2) from wearables, triggering real-time critical alerts, plus supporting longitudinal historical analysis for physicians. Stresses: life-safety latency requirements, data retention/compliance (HIPAA-style), handling device connectivity gaps (late-arriving/out-of-order data at the edge).
+
+How to run these well against an AI interviewer:
+Paste one question in a fresh conversation, tell it to act as a staff-level data engineering interviewer, and — importantly — tell it to stay quiet on requirements it hasn't been asked for (i.e., not volunteer scale/SLA numbers unless you ask), so you're forced to actually drive the requirements-gathering step yourself rather than being handed the answer. Then walk your own framework out loud: requirements → back-of-envelope → batch/streaming → pipeline design → data modeling → data quality → resilience, in that order, before asking it to review.
 
 
 
