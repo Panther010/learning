@@ -1,98 +1,76 @@
-from shared.logger import get_logger
-from shared.path_utils import get_project_root, get_data_dir, get_raw_data_dir, get_processed_data_dir
-from shared.spark_session import get_or_create_spark, stop_spark
-
-from pyspark.sql import SparkSession
-from pyspark.sql import functions as F
-from pyspark.sql.types import *
-from pyspark.sql import DataFrame
+import os
+import subprocess
+from datetime import datetime
 
 
-class CreditCardAnalysis:
+def run_git_command(command: str, cwd: str) -> str:
+    """
+    Run a Git command in the specified directory.
+    :param command: Git command to execute.
+    :param cwd: Directory containing the Git repository.
+    :return: Output of the Git command.
+    """
+    result = subprocess.run(command, shell=True, cwd=cwd, capture_output=True, text=True)
+    # Log command execution details
+    print(f"Running: {command} in {cwd}")
+    print(f"Exit Code: {result.returncode}")
 
-    def __init__(self):
-        self.spark = get_or_create_spark()
-        self.raw_dir = get_raw_data_dir() / 'banking/credit_card.csv'
+    if result.stdout:
+        print(f"STDOUT: {result.stdout.strip()}")
 
-        print(self.raw_dir)
-        self.log = get_logger(__name__)
+    if result.stderr:
+        print(f"STDERR: {result.stderr.strip()}")
 
-    def read_data(self) -> DataFrame:
-        raw_df = self.spark.read.format("csv").option("header", True).option("inferSchema", True).load(str(self.raw_dir))
-        raw_df.printSchema()
-        return raw_df
+    if result.returncode != 0:
+        raise Exception(f"Git command failed: {command}\nError: {result.stderr.strip()}")
 
-    def camel_to_snake_case(self, column_name: str) -> str:
-        """
-        Converts a CamelCase string to snake_case.
-        """
-        return ''.join(['_' + char.lower() if char.isupper() else char for char in column_name]).lstrip('_')
+    return result.stdout.strip()
 
 
-    def correct_column_names(self, input_df: DataFrame) -> DataFrame:
-        """
-        Converts all column names in the input DataFrame to snake_case.
-        """
-        new_col = [self.camel_to_snake_case(col).strip() for col in input_df.columns]
-        new_df = input_df.toDF(*new_col)
-        return new_df
+def auto_commit_and_push(repo_path: str, branch_name: str, commit_message: str = "Auto-commit"):
+    """
+    Automatically commits all changes in the repository and optionally pushes them to the remote.
+    :param repo_path: Path to the Git repository.
+    :param branch_name: Name of the new branch.
+    :param commit_message: Commit message to use.
+    """
+    # Step 1: Ensure we're in a valid Git repository
+    if not os.path.exists(os.path.join(repo_path, ".git")):
+        raise FileNotFoundError(f"No Git repository found at {repo_path}")
+    # Step 1.1 Create new branch
+    run_git_command(f"git checkout -b {branch_name}", cwd=repo_path)
+    # Step 2: Add all changes
+    run_git_command("git add .", cwd=repo_path)
+    print("All changes staged.")
+    # Step 3: Commit changes
+    run_git_command(f'git commit -m "{commit_message}"', cwd=repo_path)
+    print(f"Changes committed with message: '{commit_message}'")
+    # Step 4: Retrieve and log the commit SHA and ID
+    commit_sha = run_git_command("git rev-parse HEAD", cwd=repo_path)
+    commit_id = run_git_command("git log --format='%H' -n 1", cwd=repo_path)
+    print(f"Commit successful!")
+    print(f"Commit SHA: {commit_sha}")
+    print(f"Commit ID: {commit_id}")
+    # Step 5: Push changes to the remote repository
+    run_git_command(f"git push -u origin {branch_name}", cwd=repo_path)
+    print("Changes pushed to the remote repository.")
 
-    def eligible_for_cards(self, card_df: DataFrame) -> DataFrame:
-        """
-        User fulfilling fllowing criteria will be eligible for cards
-            1. Salary more than 50000
-            2. Age more than 18 years
-            3. Credit score more than 650
-        """
-        self.log.info(f"calculating eligible customers")
-        result = card_df.filter(
-            (F.col('estimated_salary') > F.lit(50000)) &
-            (F.col('age') > F.lit(18)) &
-            (F.col('credit_score') > F.lit(650))
-        )
 
-        return result
-
-    def active_eligible_cust(self, eligible_cust: DataFrame) -> DataFrame:
-        self.log.info(f"calculating the active customer from the list of eligible customers")
-        result = eligible_cust.filter(
-            F.col('is_active_member') == F.lit(1)
-        )
-
-        return result
-
-    def potential_target(self, eligible_df: DataFrame) -> DataFrame:
-        self.log.info(f"Customers having balance more than 25000 are potential customer")
-        result = eligible_df.filter(
-            F.col('balance') >= F.lit(25000)
-        )
-
-        return result
-
-    def tenure_check(self, target_df:DataFrame) -> DataFrame:
-        self.log.info(f'Count of targeted user with tenure less than 5 is ')
-
-        result = target_df.filter(
-            F.col('tenure') < F.lit(5)
-        )
-
-        return result
-
-    def main(self):
-        raw_credit_data = self.read_data()
-        correct_df = self.correct_column_names(raw_credit_data)
-
-        eligible_cust = self.eligible_for_cards(correct_df)
-        print(eligible_cust.count())
-        active_cust = self.active_eligible_cust(eligible_cust)
-        print(active_cust.count())
-        target_cust = self.potential_target(active_cust)
-        print(target_cust.count())
-        tenure_validation = self.tenure_check(target_cust)
-        print(tenure_validation.count())
+def main():
+    # Path to your Git repository (PyCharm project directory)
+    repo_path = os.path.abspath(os.path.dirname(__file__))
+    print(f'repo_path: {repo_path}')
+    # Dynamically detects current script's directory
+    git_path = os.path.abspath(os.path.join(repo_path, "..", ".."))
+    print(f'git_path : {git_path}')
+    changes_today = input("Hi Good day what all changes you have made today? \n")
+    branch = changes_today.replace(' ', '_')
+    commit_message = f"Auto-commit for {changes_today} on {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"
+    try:
+        auto_commit_and_push(git_path, branch, commit_message)
+    except Exception as e:
+        print(f"Error during Git automation: {e}")
 
 
 if __name__ == "__main__":
-    cca = CreditCardAnalysis()
-    cca.main()
-    stop_spark()
+    main()
