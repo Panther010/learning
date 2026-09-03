@@ -22,7 +22,7 @@ class CleanTransactions:
         self.log.info('Cleaning data: cleaning data and filling missing values')
         result = tfx_df.withColumn('account_no',
                                    f.replace(f.col('account_no'), f.lit("'"), f.lit(""))) \
-                  .withColumn('value_date', f.to_date(f.col('value_date'), "d-MMM-yy"))
+                  .withColumn('value_date', f.to_date(f.col('value_date'), "dd-MMM-yy"))
 
         return result.fillna(0, ['withdrawal_amt', 'deposit_amt', 'balance_amt'])
 
