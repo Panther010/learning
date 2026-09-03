@@ -1,3 +1,4 @@
+import os
 from pyspark.sql import SparkSession
 from pyspark.sql.types import *
 from pyspark.sql import functions as f
@@ -276,9 +277,36 @@ def que_46(spark: SparkSession):
     print(f"Final Partition Count: {grouped_df.rdd.getNumPartitions()}")
     grouped_df.show()
 
+def que_47(spark: SparkSession):
+    # ============================================================
+    # Problem 47: Bucketing Tables for Optimized Joins
+    # - **Difficulty:** Hard
+    # - **Topics:** saveAsTable, bucketing concept
+    # - **Time:** 25 min
+    #
+    # Write a simulation of bucketing two tables by a common join key to avoid shuffle joins.
+    #
+    # **Task:** Write out code syntax using `.bucketBy(4, "id").sortBy("id").saveAsTable(...)` for a managed warehouse table. (Verify syntax and explain shuffle reduction.)
+    # ============================================================
+    spark1 = SparkSession.builder.appName("LocalPyCharmBucketing") \
+    .master("local[*]") \
+    .config("spark.sql.warehouse.dir", os.path.abspath("./spark-warehouse")) \
+    .getOrCreate()
+
+    df1 = spark1.createDataFrame([(1, "A"), (2, "B"), (3, "C"), (4, "D"), (5, "E"), (6, "F"), (7, "G"), (8, "H")], ["id", "val1"])
+    df2 = spark1.createDataFrame([(1, "X"), (2, "Y"), (3, "Z"), (4, "W"), (5, "V"), (6, "V"), (7, "S"), (8, "T")], ["id", "val2"])
+
+    df1.write.mode("overwrite").bucketBy(4, "id").sortBy("id").saveAsTable("bucketed_table1")
+    df2.write.mode("overwrite").bucketBy(4, "id").sortBy("id").saveAsTable("bucketed_table2")
+
+    t1 = spark1.table("bucketed_table1")
+    t2 = spark1.table("bucketed_table2")
+
+    t1.join(t2, "id").show()
+
 def main():
     spark = SparkSession.builder.appName("opt").master("local").getOrCreate()
-    que_46(spark)
+    que_47(spark)
 
 if __name__ == "__main__":
     main()
