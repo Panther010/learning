@@ -377,7 +377,7 @@ Walk through these steps **in this order, out loud**, in every system design int
 
 
 
-Here are 10 practice prompts, each stressing a different part of your framework so you don't just get comfortable with one pattern. Mixed in a couple of variations you'll likely actually see (telecom, given your target role).
+ Here are 10 practice prompts, each stressing a different part of your framework so you don't just get comfortable with one pattern. Mixed in a couple of variations you'll likely actually see (telecom, given your target role).
 
 1. Ride-sharing surge pricing & driver matching
 Design the system that computes real-time surge multipliers and matches drivers to riders, while also feeding a nightly "earnings & demand" report to finance. Stresses: Lambda-style split off one event stream, low-latency matching vs. batch reporting, semi-additive measures (surge multiplier can't just be summed/averaged naively).
@@ -415,5 +415,59 @@ Paste one question in a fresh conversation, tell it to act as a staff-level data
 
 
 
-
+                                    ┌─────────────────────────────────────┐
+                                    │         EVENT SOURCES                │
+                                    │  Rider app / Driver app:             │
+                                    │  GPS pings, ride requests,           │
+                                    │  driver availability, acceptance,    │
+                                    │  cancellation                        │
+                                    └──────────────┬────────────────────────┘
+                                                   ▼
+                                    ┌─────────────────────────────────────┐
+                                    │         Kafka / MSK                  │
+                                    │  (single event stream, source        │
+                                    │   of truth, 7-day hot retention)      │
+                                    └──────┬───────────────────────┬────────┘
+                     ┌─────────────────────┘                       └─────────────────────┐
+                     ▼                                                                    ▼
+      ┌─────────────────────────────┐                                    ┌─────────────────────────────┐
+      │     SPEED LAYER              │                                    │     BATCH LAYER              │
+      │  Flink / Spark Structured    │                                    │  Firehose → S3 (raw)         │
+      │  Streaming                   │                                    │  EMR/Spark → Medallion        │
+      │                              │                                    │  Bronze → Silver → Gold       │
+      │  Job A — Location tracking:  │                                    │  (Delta Lake)                 │
+      │   upserts driver GPS →       │                                    │                                │
+      │   Redis (GEOADD)             │                                    │  Bronze: raw events, as-is    │
+      │                              │                                    │  Silver: cleaned, deduped,     │
+      │  Job B — Surge computation:  │                                    │   joined into Fact_Rides,      │
+      │   windowed agg (1–5 min) per │                                    │   Fact_SurgeWindow (additive   │
+      │   geohash/H3 cell →          │                                    │   components: request_count,   │
+      │   ride_requests_count,       │                                    │   driver_count, match_count)   │
+      │   available_drivers_count →  │                                    │  Gold: nightly earnings &      │
+      │   writes to Redis            │                                    │   demand report, weighted-avg  │
+      │                              │                                    │   surge for finance/ops        │
+      └──────────┬───────────────────┘                                    └──────────────┬────────────────┘
+                 ▼                                                                        ▼
+      ┌─────────────────────────────┐                                    ┌─────────────────────────────┐
+      │  Redis / KeyDB               │                                    │  Data Warehouse / Delta Gold │
+      │  - Geospatial index of       │                                    │  - Fact_Rides, Dim_Driver,   │
+      │    driver locations          │                                    │    Dim_Rider, Fact_Earnings  │
+      │  - Live surge multiplier     │                                    │  - 7-yr retention (audit)    │
+      │    per geohash (derived,     │                                    └──────────────┬────────────────┘
+      │    not stored pre-summed)    │                                                   ▼
+      └──────────┬───────────────────┘                                    ┌─────────────────────────────┐
+                 ▼                                                        │  Finance BI Dashboard        │
+      ┌─────────────────────────────┐                                    │  Nightly report, ready 6 AM  │
+      │  Matching Service            │                                    └─────────────────────────────┘
+      │  - Nearby-driver lookup      │
+      │  - Applies live surge        │
+      │  - P99 < 2s match latency    │
+      └──────────┬───────────────────┘
+                 ▼
+      ┌─────────────────────────────┐
+      │  Rider / Driver Apps         │
+      │  (only ever talk to Redis /  │
+      │   Matching Service — never   │
+      │   to Gold/Delta directly)    │
+      └─────────────────────────────┘
 
