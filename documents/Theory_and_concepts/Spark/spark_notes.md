@@ -713,25 +713,26 @@ A: It's Tungsten's technique of generating specialized JVM bytecode that **fuses
 ---
 
 #### Section 1 — Architecture & Core Concepts
-How would you design a multi-tenant Spark platform where teams shouldn't be able to starve each other's jobs of cluster resources?
-What's the operational difference between running Spark on YARN vs Kubernetes, and which would you pick for a greenfield platform today — why?
-Walk me through what actually happens on the wire between spark-submit and the first executor becoming active. Where are the biggest sources of startup latency?
-How do you handle driver high availability for long-running streaming applications, given the driver has no in-app failover?
-When would you deliberately choose client mode in a production system, if ever?
+* How would you design a multi-tenant Spark platform where teams shouldn't be able to starve each other's jobs of cluster resources?
+* What's the operational difference between running Spark on YARN vs Kubernetes, and which would you pick for a greenfield platform today why?
+* Walk me through what actually happens on the wire between spark-submit and the first executor becoming active. Where are the biggest sources of startup latency?
+* How do you handle driver high availability for long-running streaming applications, given the driver has no in-app failover?
+* When would you deliberately choose client mode in a production system, if ever?
 
 #### Section 2 — RDDs
-Give an example of a real transformation pipeline where you'd deliberately drop down to the RDD API instead of DataFrames, and justify it.
-How does Spark decide how many partitions to create when reading from HDFS/S3 vs from a JDBC source?
-What's the relationship between number of partitions and number of concurrent tasks when dynamic allocation is also enabled?
-If you needed deterministic custom partitioning across a join and a downstream aggregation, how would you design it to avoid a second shuffle?
-What are the risks of very long RDD lineage chains in production jobs, beyond just checkpointing cost?
+* Give an example of a real transformation pipeline where you'd deliberately drop down to the RDD API instead of DataFrames, and justify it.
+* How does Spark decide how many partitions to create when reading from HDFS/S3 vs from a JDBC source?
+* What's the relationship between number of partitions and number of concurrent tasks when dynamic allocation is also enabled?
+* If you needed deterministic custom partitioning across a join and a downstream aggregation, how would you design it to avoid a second shuffle?
+* What are the risks of very long RDD lineage chains in production jobs, beyond just checkpointing cost?
 
 #### Section 3 — DataFrames & Spark SQL
-How would you convince a team still writing raw RDD pipelines to migrate to DataFrames — what's the actual measurable win, not just "it's more modern"?
-Where does Catalyst's cost-based optimizer get its statistics from, and what happens when those stats are stale or missing?
-What are the limits of predicate/filter pushdown — give an example of a filter that won't push down and why.
-How do UDFs (especially Python UDFs) interact with Catalyst and Tungsten's optimizations — what do you lose by using one?
-How would you enforce schema contracts across teams writing to a shared set of tables, to prevent silent schema drift breaking downstream DataFrame jobs?
+* How would you convince a team still writing raw RDD pipelines to migrate to DataFrames — what's the actual measurable win, not just "it's more modern"?
+* Where does Catalyst's cost-based optimizer get its statistics from, and what happens when those stats are stale or missing?
+* What are the limits of predicate/filter pushdown — give an example of a filter that won't push down and why.
+* How do UDFs (especially Python UDFs) interact with Catalyst and Tungsten's optimizations — what do you lose by using one?
+* How would you enforce schema contracts across teams writing to a shared set of tables, to prevent silent schema drift breaking downstream DataFrame jobs?
+
 #### Section 4 — Jobs, Stages, Tasks & Scheduling
 You're told a job "has too many stages" — is that inherently a problem? How do you know if stage count is actually the bottleneck vs something else?
 How would you design a shared cluster's scheduling policy (FIFO/FAIR pools) to support both SLA-bound ETL and ad hoc analyst queries?
