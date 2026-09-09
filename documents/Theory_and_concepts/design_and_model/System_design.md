@@ -416,12 +416,12 @@ Paste one question in a fresh conversation, tell it to act as a staff-level data
 
 
                                     ┌─────────────────────────────────────┐
-                                    │         EVENT SOURCES                │
-                                    │  Rider app / Driver app:             │
-                                    │  GPS pings, ride requests,           │
-                                    │  driver availability, acceptance,    │
-                                    │  cancellation                        │
-                                    └──────────────┬────────────────────────┘
+                                    │         EVENT SOURCES               │
+                                    │  Rider app / Driver app:            │
+                                    │  GPS pings, ride requests,          │
+                                    │  driver availability, acceptance,   │
+                                    │  cancellation                       │
+                                    └──────────────┬──────────────────────┘
                                                    ▼
                                     ┌─────────────────────────────────────┐
                                     │         Kafka / MSK                  │
