@@ -24,7 +24,7 @@
 ## 1. Lakehouse Foundations
 
 ### 1.1 The Problem: Why Plain Data Lakes Aren't Enough
-**Definition:** A data lake (raw Parquet/CSV/JSON on S3/ADLS/HDFS) gives cheap, flexible storage with **schema-on-read** — but no engine enforces correctness at write time.
+**Definition:** A data lake (raw Parquet/CSV/JSON on S3/ADLS/HDFS) gives cheap, flexible storage with **schema-on-read** but no engine enforces correctness at write time.
 
 **Key problems this causes:**
 
@@ -35,7 +35,10 @@
 | No ACID guarantees        | No atomicity, no isolation between concurrent readers/writers                    |
 | No time travel            | Once overwritten/deleted, previous state is gone — no audit trail, no rollback   |
 
-**Interview line:** *"A data lake is cheap and flexible but has no transactional layer — Delta Lake (or Iceberg/Hudi) adds a metadata layer on top of the same Parquet files to bring warehouse-grade reliability (ACID, schema enforcement, time travel) without losing the lake's scale and cost profile. That combination is the Lakehouse."*
+**Interview line:** *"
+* A data lake is cheap and flexible but has no transactional layer.
+* Delta Lake (or Iceberg/Hudi) adds a metadata layer on top of the same Parquet files to bring warehouse-grade reliability (ACID, schema enforcement, time travel)
+* Without losing the lake's scale and cost profile. That combination is the Lakehouse."*
 
 ### 1.2 Lakehouse vs. Data Warehouse vs. Data Lake
 
@@ -94,7 +97,10 @@ COPY INTO employees FROM '/Volumes/catalog/schema/myfiles/' FILEFORMAT = CSV;
 
 **Lineage:** full column/table-level lineage is viewable directly in Catalog Explorer for any UC-registered table.
 
-**Interview line:** *"Unity Catalog is a three-level namespace — catalog, schema, table/volume — that gives one governance model (access control, lineage, audit) across every workload type, replacing the old per-workspace Hive Metastore silos."*
+**Interview line:** 
+* "Unity Catalog is a three-level namespace — catalog, schema, table/volume 
+* That gives one governance model (access control, lineage, audit) across every workload type, 
+* replacing the old per-workspace Hive Metastore silos."
 
 ---
 
@@ -116,7 +122,11 @@ flowchart LR
 | **Silver** | Cleaning & validation | Drop nulls, quarantine invalid rows, dedupe, normalize; handle late/out-of-order data; join into combined datasets; schema-on-write with evolution support |
 | **Gold**   | Business-ready        | Aggregated per business logic (e.g. "monthly revenue by region"); optimized for BI/dashboard performance; traceable back to raw source via UC lineage      |
 
-**Interview line:** *"Bronze is the immutable source of truth, Silver is where correctness/dedup/joins happen, Gold is shaped specifically for the consumer — and Unity Catalog lineage lets you trace any Gold number back to its raw Bronze origin."*
+**Interview line:** 
+* "Bronze is the immutable source of truth, 
+* Silver is where correctness/dedup/joins happen, 
+* Gold is shaped specifically for the consumer 
+* Unity Catalog lineage lets you trace any Gold number back to its raw Bronze origin."
 
 ---
 
@@ -125,12 +135,12 @@ flowchart LR
 ### 4.1 ACID Transactions
 **Definition:** Delta brings all four ACID properties to lake writes **without a traditional database engine** — just Parquet files + an append-only transaction log.
 
-| Property | What it means in Delta |
-|---|---|
-| Atomicity | A write fully commits or has zero effect — no partial files ever visible |
-| Consistency | Table always reflects a schema-valid state after every commit |
-| Isolation | Concurrent readers/writers don't see uncommitted changes (snapshot isolation via the log) |
-| Durability | Once committed, permanently recorded in the log + files |
+| Property    | What it means in Delta                                                                    |
+|-------------|-------------------------------------------------------------------------------------------|
+| Atomicity   | A write fully commits or has zero effect — no partial files ever visible                  |
+| Consistency | Table always reflects a schema-valid state after every commit                             |
+| Isolation   | Concurrent readers/writers don't see uncommitted changes (snapshot isolation via the log) |
+| Durability  | Once committed, permanently recorded in the log + files                                   |
 
 ### 4.2 The Transaction Log (`_delta_log`)
 **Definition:** A hidden directory that is the single source of truth for "what does this table look like right now."
@@ -152,12 +162,17 @@ flowchart LR
 - **Checkpoints**: a periodic Parquet snapshot (default every 10 commits) of the full current state, so readers don't replay from commit 0 every time.
 - Commits are atomic via optimistic concurrency (see 4.3).
 
-**Interview line:** *"Delta is just Parquet plus an ordered, atomically-written JSON log of add/remove file actions. Readers reconstruct current state from the latest checkpoint plus any commits after it — that's the entire mechanism, no external database needed."*
+**Interview line:** 
+* "Delta is just Parquet plus an ordered, atomically-written JSON log of add/remove file actions. 
+* Readers reconstruct current state from the latest checkpoint plus any commits after it 
+* that's the entire mechanism, no external database needed."
 
 ### 4.3 Optimistic Concurrency Control (OCC)
 **Definition:** Multiple writers can attempt writes simultaneously; Delta doesn't lock — it detects conflicts at commit time.
 
-**Flow:** writer reads current version → computes changes with no lock → tries to atomically write `version+1` → if someone beat it there, Delta checks whether the two commits **actually touch overlapping files/partitions**:
+**Flow:** 
+- writer reads current version → computes changes with no lock → tries to atomically write `version+1` → if someone beat it there, 
+    - Delta checks whether the two commits **actually touch overlapping files/partitions**:
 - **No overlap** → safe to retry automatically against the new version.
 - **Overlap (conflict)** → commit fails; application must retry.
 
@@ -165,9 +180,14 @@ flowchart LR
 - **`ConcurrentAppendException`** — your transaction's matched-file-set is now stale because a concurrent write added files in the range you were scanning (e.g., two concurrent `MERGE`s on overlapping partitions).
 - **`ConcurrentTransactionException`** — two commits from the **same streaming query's application ID** collide (protects exactly-once idempotency for a single logical stream, e.g., an accidental duplicate stream start).
 
-**Architecting around conflicts:** partition/shard concurrent writers onto disjoint key ranges; scope `MERGE ON` predicates tightly (e.g., always partition-prune); implement retry-with-backoff in application code (Delta doesn't auto-retry conflicting commits); serialize genuinely overlapping writers through one upstream stream if disjointness isn't achievable.
+**Architecting around conflicts:** 
+* partition/shard concurrent writers onto disjoint key ranges; scope `MERGE ON` predicates tightly (e.g., always partition-prune); 
+* implement retry-with-backoff in application code (Delta doesn't auto-retry conflicting commits); 
+* serialize genuinely overlapping writers through one upstream stream if disjointness isn't achievable.
 
-**Interview line:** *"OCC means no locking — writers just try to commit the next version and get rejected if a real conflict occurred. `ConcurrentAppend` = your read-set went stale; `ConcurrentTransaction` = a duplicate write from the same streaming source."*
+**Interview line:** 
+* "OCC means no locking — writers just try to commit the next version and get rejected if a real conflict occurred. 
+* `ConcurrentAppend` = your read-set went stale; `ConcurrentTransaction` = a duplicate write from the same streaming source."*
 
 ### 4.4 Time Travel
 **Definition:** Query the table as it existed at a previous version/timestamp, since every historical state is reconstructable from the log.
@@ -540,41 +560,41 @@ Billing is based on **DBUs (Databricks Units)** — processing capability consum
 
 ## 12. One-Page Glossary
 
-| Term | One-liner |
-|---|---|
-| Lakehouse | Data-lake flexibility/cost + data-warehouse reliability/performance |
-| Delta Lake | Storage layer adding ACID + schema enforcement on Parquet |
-| Unity Catalog | Unified governance: access control, lineage, audit across data & AI |
-| `_delta_log` | Ordered JSON commit log = source of truth for table state |
-| Checkpoint (Delta) | Periodic Parquet snapshot of full state, avoids replaying from commit 0 |
-| OCC | No locking — writers commit optimistically, conflicts detected/rejected at commit time |
-| Time Travel | Query a table as of a past version/timestamp via the log |
-| Schema Enforcement | Default: reject writes that don't match table schema |
-| Schema Evolution | Opt-in: allow specific schema-changing writes to succeed |
-| MERGE | Atomic insert+update+delete in one operation |
-| OPTIMIZE | Compacts small files into fewer, larger ones |
-| ZORDER | Multi-column co-location within files for better data skipping |
-| VACUUM | Physically deletes old, unreferenced files past retention |
-| CDF | Row-level change events (insert/update/delete) queryable incrementally |
-| Medallion Architecture | Bronze (raw) → Silver (cleaned) → Gold (aggregated/business-ready) |
-| Batch | All available data processed at once; simple, higher latency |
-| Streaming | Only new data processed incrementally; complex, lower latency |
-| CDC | Treats a DB as a stream of I/U/D changes, not a static dump |
-| Snapshot | Full table state at one point in time; changes inferred by diff |
-| SCD Type 1 | Overwrite — current state only |
-| SCD Type 2 | New row per change, `__START_AT`/`__END_AT` validity window |
-| AUTO CDC | Applies a native change feed to a target as SCD 1/2 |
-| AUTO CDC FROM SNAPSHOT | Infers a synthetic change feed from consecutive snapshots |
-| Lakeflow | End-to-end suite: Connect (ingest) → Pipelines (transform) → Jobs (orchestrate) |
-| Auto Loader (`cloudFiles`) | Incremental, stateful, exactly-once file ingestion |
-| `_rescued_data` | Captures schema-mismatched fields instead of dropping them |
-| `badRecordsPath` | Redirects unparseable records so the main stream keeps running |
-| Declarative Pipelines (DLT) | Describe the result; engine handles orchestration/parallelism/retries |
-| Streaming Table / MV / View | Exactly-once incremental / auto-recomputed / not persisted |
-| Expectations | Declarative data quality rules: WARN / DROP ROW / FAIL UPDATE |
-| Serverless vs. Classic | Instant/managed/scale-to-zero vs. full control but slow & self-managed |
-| All-Purpose vs. Job Compute | Shared interactive (pricier) vs. dedicated per-job (cheaper) |
-| DBU | Databricks' billing unit — processing capability consumed per hour |
+| Term                        | One-liner                                                                              |
+|-----------------------------|----------------------------------------------------------------------------------------|
+| Lakehouse                   | Data-lake flexibility/cost + data-warehouse reliability/performance                    |
+| Delta Lake                  | Storage layer adding ACID + schema enforcement on Parquet                              |
+| Unity Catalog               | Unified governance: access control, lineage, audit across data & AI                    |
+| `_delta_log`                | Ordered JSON commit log = source of truth for table state                              |
+| Checkpoint (Delta)          | Periodic Parquet snapshot of full state, avoids replaying from commit 0                |
+| OCC                         | No locking — writers commit optimistically, conflicts detected/rejected at commit time |
+| Time Travel                 | Query a table as of a past version/timestamp via the log                               |
+| Schema Enforcement          | Default: reject writes that don't match table schema                                   |
+| Schema Evolution            | Opt-in: allow specific schema-changing writes to succeed                               |
+| MERGE                       | Atomic insert+update+delete in one operation                                           |
+| OPTIMIZE                    | Compacts small files into fewer, larger ones                                           |
+| ZORDER                      | Multi-column co-location within files for better data skipping                         |
+| VACUUM                      | Physically deletes old, unreferenced files past retention                              |
+| CDF                         | Row-level change events (insert/update/delete) queryable incrementally                 |
+| Medallion Architecture      | Bronze (raw) → Silver (cleaned) → Gold (aggregated/business-ready)                     |
+| Batch                       | All available data processed at once; simple, higher latency                           |
+| Streaming                   | Only new data processed incrementally; complex, lower latency                          |
+| CDC                         | Treats a DB as a stream of I/U/D changes, not a static dump                            |
+| Snapshot                    | Full table state at one point in time; changes inferred by diff                        |
+| SCD Type 1                  | Overwrite — current state only                                                         |
+| SCD Type 2                  | New row per change, `__START_AT`/`__END_AT` validity window                            |
+| AUTO CDC                    | Applies a native change feed to a target as SCD 1/2                                    |
+| AUTO CDC FROM SNAPSHOT      | Infers a synthetic change feed from consecutive snapshots                              |
+| Lakeflow                    | End-to-end suite: Connect (ingest) → Pipelines (transform) → Jobs (orchestrate)        |
+| Auto Loader (`cloudFiles`)  | Incremental, stateful, exactly-once file ingestion                                     |
+| `_rescued_data`             | Captures schema-mismatched fields instead of dropping them                             |
+| `badRecordsPath`            | Redirects unparseable records so the main stream keeps running                         |
+| Declarative Pipelines (DLT) | Describe the result; engine handles orchestration/parallelism/retries                  |
+| Streaming Table / MV / View | Exactly-once incremental / auto-recomputed / not persisted                             |
+| Expectations                | Declarative data quality rules: WARN / DROP ROW / FAIL UPDATE                          |
+| Serverless vs. Classic      | Instant/managed/scale-to-zero vs. full control but slow & self-managed                 |
+| All-Purpose vs. Job Compute | Shared interactive (pricier) vs. dedicated per-job (cheaper)                           |
+| DBU                         | Databricks' billing unit — processing capability consumed per hour                     |
 
 ---
 
