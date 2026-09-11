@@ -390,10 +390,10 @@ flowchart LR
 
 **Discovery modes:**
 
-| Mode | Mechanism | Best for |
-|---|---|---|
-| **Directory Listing** (default) | Optimized lexicographical listing scan | Small–medium volume (< a few million files) |
-| **File Notification** | Cloud-native event queue (S3→SQS, Azure Event Grid→Storage Queue) | Large scale (tens of millions of files/day) |
+| Mode                            | Mechanism                                                         | Best for                                    |
+|---------------------------------|-------------------------------------------------------------------|---------------------------------------------|
+| **Directory Listing** (default) | Optimized lexicographical listing scan                            | Small–medium volume (< a few million files) |
+| **File Notification**           | Cloud-native event queue (S3→SQS, Azure Event Grid→Storage Queue) | Large scale (tens of millions of files/day) |
 
 **Schema inference & evolution:** samples a subset of files (`cloudFiles.maxFilesPerTrigger`) rather than scanning the whole dataset; handles upstream schema drift automatically per configured `schemaEvolutionMode`.
 
@@ -467,19 +467,19 @@ CREATE OR REFRESH STREAMING TABLE clean_orders (
 AS SELECT * FROM STREAM(LIVE.raw_orders);
 ```
 
-| Violation mode | Behavior |
-|---|---|
-| `WARN` (default) | Record passes through; violation only logged in metrics |
-| `DROP ROW` | Bad record filtered out before reaching target |
-| `FAIL UPDATE` | **Halts the entire pipeline** on first violation — reserve for truly critical constraints |
+| Violation mode   | Behavior                                                                                  |
+|------------------|-------------------------------------------------------------------------------------------|
+| `WARN` (default) | Record passes through; violation only logged in metrics                                   |
+| `DROP ROW`       | Bad record filtered out before reaching target                                            |
+| `FAIL UPDATE`    | **Halts the entire pipeline** on first violation — reserve for truly critical constraints |
 
 ### 9.5 Dev Mode vs. Production Mode
 
-| | Development | Production |
-|---|---|---|
-| Compute lifecycle | Stays warm between runs | Terminates immediately after completion |
-| Retries | Disabled — errors surface instantly | Automatic, progressive retries |
-| Purpose | Fast iterative testing | Cost-efficient, resilient execution |
+|                   | Development                         | Production                              |
+|-------------------|-------------------------------------|-----------------------------------------|
+| Compute lifecycle | Stays warm between runs             | Terminates immediately after completion |
+| Retries           | Disabled — errors surface instantly | Automatic, progressive retries          |
+| Purpose           | Fast iterative testing              | Cost-efficient, resilient execution     |
 
 ### 9.6 Diagnosing a Failed Pipeline Run
 1. **DAG visualization** — Pipeline UI highlights failed nodes in red.
@@ -503,13 +503,13 @@ AS SELECT * FROM STREAM(LIVE.raw_orders);
 
 **Workspace limits (good to know for design discussions):**
 
-| Limit | Value |
-|---|---|
+| Limit                          | Value                        |
+|--------------------------------|------------------------------|
 | Concurrent task runs/workspace | 2,000 (HTTP 429 beyond this) |
-| Jobs created/hour | 10,000 |
-| Saved jobs/workspace | 12,000 |
-| Tasks/job | 1,000 |
-| Dynamic parameter value length | 10,000 chars |
+| Jobs created/hour              | 10,000                       |
+| Saved jobs/workspace           | 12,000                       |
+| Tasks/job                      | 1,000                        |
+| Dynamic parameter value length | 10,000 chars                 |
 
 ---
 
@@ -517,39 +517,39 @@ AS SELECT * FROM STREAM(LIVE.raw_orders);
 
 ### 11.1 The Three Compute Types
 
-| Type | What it is |
-|---|---|
-| **Serverless** | Fully managed, auto-scales, you provision nothing |
-| **Classic** | VMs you create/configure/manage yourself |
+| Type               | What it is                                                                        |
+|--------------------|-----------------------------------------------------------------------------------|
+| **Serverless**     | Fully managed, auto-scales, you provision nothing                                 |
+| **Classic**        | VMs you create/configure/manage yourself                                          |
 | **SQL Warehouses** | Optimized specifically for SQL workloads; can be serverless or classic underneath |
 
 ### 11.2 Classic vs. Serverless
 
-| | Classic | Serverless |
-|---|---|---|
-| How it works | VMs provisioned in **your** cloud subscription/VPC | Runs in a pre-warmed pool inside Databricks' control plane |
-| Startup time | Slow — 3–7+ min | Near-instant — seconds |
-| Scaling | Waits on cloud provider provisioning | Automatic, **scale-to-zero** |
-| Control | Full — custom VPC, security, libraries, specific hardware | Limited — custom networking/legacy libraries may need extra config |
-| Operational overhead | High — you own infra | Near-zero |
+|                      | Classic                                                   | Serverless                                                         |
+|----------------------|-----------------------------------------------------------|--------------------------------------------------------------------|
+| How it works         | VMs provisioned in **your** cloud subscription/VPC        | Runs in a pre-warmed pool inside Databricks' control plane         |
+| Startup time         | Slow — 3–7+ min                                           | Near-instant — seconds                                             |
+| Scaling              | Waits on cloud provider provisioning                      | Automatic, **scale-to-zero**                                       |
+| Control              | Full — custom VPC, security, libraries, specific hardware | Limited — custom networking/legacy libraries may need extra config |
+| Operational overhead | High — you own infra                                      | Near-zero                                                          |
 
 ### 11.3 Clusters vs. SQL Warehouses
 
-| | Clusters (DE/ML/DS) | SQL Warehouses (BI/Analytics) |
-|---|---|---|
-| Engine | General-purpose Spark | Photon (vectorized C++) |
-| Languages | Python, Scala, SQL, R, ML libs | ANSI SQL only |
-| Typical use | Notebooks, pipelines, ML training | BI dashboards, interactive SQL |
-| Sizing | Node count (Driver + Workers) | T-shirt size (2X-Small → Large) |
+|             | Clusters (DE/ML/DS)               | SQL Warehouses (BI/Analytics)   |
+|-------------|-----------------------------------|---------------------------------|
+| Engine      | General-purpose Spark             | Photon (vectorized C++)         |
+| Languages   | Python, Scala, SQL, R, ML libs    | ANSI SQL only                   |
+| Typical use | Notebooks, pipelines, ML training | BI dashboards, interactive SQL  |
+| Sizing      | Node count (Driver + Workers)     | T-shirt size (2X-Small → Large) |
 
 ### 11.4 All-Purpose vs. Job Compute
 
-| | All-Purpose | Job Compute |
-|---|---|---|
-| Created | Manually, for interactive work | Dynamically, by Workflows/Jobs |
-| Sharing | Multiple users share one cluster | Dedicated to one job execution |
-| Lifecycle | Runs until manually paused/auto-terminated | Terminates immediately on job completion |
-| Relative DBU cost | ~3x higher | ~1x (baseline) |
+|                   | All-Purpose                                | Job Compute                              |
+|-------------------|--------------------------------------------|------------------------------------------|
+| Created           | Manually, for interactive work             | Dynamically, by Workflows/Jobs           |
+| Sharing           | Multiple users share one cluster           | Dedicated to one job execution           |
+| Lifecycle         | Runs until manually paused/auto-terminated | Terminates immediately on job completion |
+| Relative DBU cost | ~3x higher                                 | ~1x (baseline)                           |
 
 **Practical rule:** scheduled production pipelines → **Job Compute** (cheaper, auto-terminates); interactive notebook work during the day → **All-Purpose**. Leaving All-Purpose clusters idle is one of the most common silent cost leaks in Databricks billing.
 
