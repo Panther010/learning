@@ -599,3 +599,4 @@ Billing is based on **DBUs (Databricks Units)** — processing capability consum
 ---
 
 *End of consolidated notes — use the [Contents](#-contents) above to jump to any topic for quick revision.*
+small sample
