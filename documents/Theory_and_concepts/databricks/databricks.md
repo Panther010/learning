@@ -233,7 +233,9 @@ flowchart LR
 | **Engine**         | Structured Streaming locks schema at planning time — **any** mid-execution schema change fails the query; requires a manual restart to re-plan                                            |
 | **Datasets**       | **Delta Tables = most flexible** (most changes need no rewrite, `mergeSchema` handles most cases); **Materialized Views = least flexible** (any schema change forces a full recompute)    |
 
-**Interview line:** *"Schema evolution isn't one setting — it has to be configured independently at the connector, parser, engine, and target-table level. Delta tables are the most forgiving target; materialized views are the least, since any change there triggers a full recompute."*
+**Interview line:** 
+* Schema evolution isn't one setting it has to be configured independently at the connector, parser, engine, and target-table level 
+* Delta tables are the most forgiving target; materialized views are the least, since any change there triggers a full recompute.
 
 ### 4.6 MERGE (Upsert)
 **Definition:** SQL-style `MERGE INTO` performs insert + update + delete in a **single atomic operation** — the backbone of CDC-style upserts.
@@ -256,7 +258,10 @@ Add `.whenMatchedDelete()` for full upsert+delete/soft-delete/CDC handling.
 **Interview line:** *"MERGE is atomic — it either fully succeeds or fully fails, so a reader never sees a half-applied upsert. This is the mechanism virtually every CDC pipeline is built on."*
 
 ### 4.7 OPTIMIZE / Compaction & Z-Ordering
-**`OPTIMIZE`** — bin-packs many small files into fewer, right-sized files (~1GB target), without changing logical data. It's a normal atomic commit: adds new files, marks old ones removed (doesn't physically delete — that's `VACUUM`'s job, which is also why time travel to a pre-`OPTIMIZE` version still works until vacuumed).
+**`OPTIMIZE`** 
+* bin-packs many small files into fewer, right-sized files (~1GB target), without changing logical data.
+* It's a normal atomic commit: adds new files, marks old ones removed 
+* doesn't physically delete — that's `VACUUM`'s job, which is also why time travel to a pre-`OPTIMIZE` version still works until vacuumed.
 ```python
 delta_table.optimize().executeCompaction()
 ```
@@ -276,9 +281,16 @@ OPTIMIZE customers ZORDER BY (customer_id, region);
 | Skew risk        | High-cardinality key → small-file explosion    | No directory explosion               |
 | Use case         | Coarse filtering (e.g. `date`)                 | Fine-grained multi-column filtering  |
 
-**When Z-Ordering can hurt:** too many Z-Order columns (curve loses discriminating power past ~3–4); Z-Ordering a column never actually filtered on in production queries (wasted compute, zero benefit); running it too frequently on a fast-changing table (full rewrite cost each time, write amplification); mixing with Liquid Clustering on the same table (alternative, not complementary, strategies).
+**When Z-Ordering can hurt:** 
+* too many Z-Order columns (curve loses discriminating power past ~3–4); 
+* Z-Ordering a column never actually filtered on in production queries (wasted compute, zero benefit); 
+* running it too frequently on a fast-changing table (full rewrite cost each time, write amplification); 
+* mixing with Liquid Clustering on the same table (alternative, not complementary, strategies).
 
-**Interview line:** *"Partitioning answers 'which folder do I look in'; Z-Ordering answers 'within these files, are the rows I need physically packed together.' Z-Ordering is a data-skipping investment — its cost only pays off if you're actually filtering on those exact columns."*
+**Interview line:** 
+* "Partitioning answers 'which folder do I look in';
+* Z-Ordering answers 'within these files, are the rows I need physically packed together.
+* Z-Ordering is a data-skipping investment — its cost only pays off if you're actually filtering on those exact columns."
 
 ### 4.8 VACUUM
 **Definition:** **Physically deletes** data files no longer referenced by the current version **and** older than the retention threshold (default 7 days / 168 hours).
@@ -289,8 +301,11 @@ delta_table.vacuum(168)
 VACUUM customers RETAIN 168 HOURS;
 ```
 - Only removes files already marked "removed" by a prior commit (merge/optimize/delete) **and** past retention.
-- **Danger:** a concurrent streaming query or long-running batch reader holding file references from before the vacuum will hit a file-not-found error if those files get deleted mid-read. `RETAIN 0 HOURS` removes this safety margin entirely and should be used only in tightly controlled scenarios (e.g., pre-drop cleanup), never routinely on a live production table.
-- Breaks time travel to any version depending on the deleted files.
+
+**Danger:** 
+* A concurrent streaming query or long-running batch reader holding file references from before the vacuum will hit a file-not-found error if those files get deleted mid-read. 
+* `RETAIN 0 HOURS` removes this safety margin entirely and should be used only in tightly controlled scenarios (e.g., pre-drop cleanup), never routinely on a live production table.
+* Breaks time travel to any version depending on the deleted files.
 
 **Interview line:** *"VACUUM's retention window is a concurrency safety margin for readers holding stale file references — not just a storage-cleanup setting. Reducing it to zero on a live table is destructive."*
 
