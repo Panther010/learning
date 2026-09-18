@@ -1,14 +1,15 @@
+# services/content_strategist.py
 import os
 import sys
 from pathlib import Path
 from dotenv import load_dotenv
 
-# Ensure project root is in sys.path
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.append(str(PROJECT_ROOT))
 
 from schemas import ContentStrategy, TechnicalAnalysis
+from langchain_core.output_parsers import PydanticOutputParser
 from langchain_core.prompts import PromptTemplate
 from langchain_groq import ChatGroq
 
@@ -16,40 +17,41 @@ load_dotenv()
 
 
 def plan_content_strategy(analysis: TechnicalAnalysis) -> ContentStrategy:
-    """Takes a TechnicalAnalysis object and determines the best LinkedIn post format,
-
-    hook angle, and visual strategy.
-    """
     llm = ChatGroq(
         groq_api_key=os.getenv("GROQ_API_KEY"),
         model_name="openai/gpt-oss-20b",
-        temperature=0.3,
+        temperature=0.2,
     )
 
-    structured_llm = llm.with_structured_output(ContentStrategy)
+    parser = PydanticOutputParser(pydantic_object=ContentStrategy)
 
     template = """
-System: You are a Principal Content Strategist for Senior Data Engineers and Software Architects.
-Task: Analyze the technical breakdown below and design a strategic content approach for a LinkedIn post.
+System: You are a Lead Technical Content Strategist for senior data engineering audiences.
+Task: Design a content execution strategy using the provided technical analysis.
 
-Input Technical Analysis:
+CONTRACT & FORMATTING RULES:
+1. `post_format`: Select EXACTLY ONE of:
+   - "Problem-Solution Flow"
+   - "Key-Value Tradeoff Bullets"
+   - "Architecture Breakdown"
+   - "Post-Mortem Style Lesson"
+   (NOTE: Markdown tables are strictly prohibited by the renderer/writer).
+
+2. `visual_concept`: Design ONLY a single-line horizontal sequence or bulleted text workflow.
+   - Example: `Producer -> Kafka -> Flink -> Iceberg`
+   - STRICTLY PROHIBITED: Multi-line ASCII diagrams, box drawings (`+---+`), or vertical arrows (`|`).
+
+3. `tags`: Generate EXACTLY 3 to 5 relevant technical hashtags (e.g. ["#DataEngineering", "#DistributedSystems", "#SystemDesign", "#Kafka"]).
+
+INPUT ANALYSIS:
 - Topic: {topic}
 - Core Lesson: {core_lesson}
-- Common Misconception: {common_misconception}
-- Practical Takeaway: {practical_takeaway}
-- Architecture Flow: {architecture_pattern}
-- Key Tradeoffs: {useful_comparison}
+- Misconception: {common_misconception}
+- Takeaway: {practical_takeaway}
+- Architecture: {architecture_pattern}
+- Tradeoffs: {useful_comparison}
 
-Strategy Instructions:
-1. Select the `post_format` that best highlights these specific insights (e.g., 'Comparison Table' for trade-offs, 'Production Post-Mortem' for mistakes).
-2. Choose a `hook_angle` that creates immediate tension (e.g., pointing out a costly production mistake or a strong architectural opinion).
-3. Design a `visual_concept` (such as an ASCII architecture diagram or side-by-side comparison block) to embed in the post text.
-4. Provide up to 3 Title Case technical hashtags.
-
-Format Rules:
-- DO NOT suggest Markdown tables or complex ASCII diagrams (LinkedIn does not render them).
-- Suggest 'Bullet Matrix', 'Production Post-Mortem', or 'Architectural Breakdown'.
-- Visual concepts must rely strictly on standard text bullets (e.g., 🔹, ▪️) or simple 1-line text flows.
+{format_instructions}
 """
 
     prompt = PromptTemplate(
@@ -62,11 +64,14 @@ Format Rules:
             "architecture_pattern",
             "useful_comparison",
         ],
+        partial_variables={
+            "format_instructions": parser.get_format_instructions()
+        },
     )
 
-    chain = prompt | structured_llm
+    chain = prompt | llm | parser
 
-    strategy_result: ContentStrategy = chain.invoke({
+    return chain.invoke({
         "topic": analysis.topic,
         "core_lesson": analysis.core_lesson,
         "common_misconception": analysis.common_misconception,
@@ -74,8 +79,6 @@ Format Rules:
         "architecture_pattern": analysis.architecture_pattern,
         "useful_comparison": analysis.useful_comparison,
     })
-
-    return strategy_result
 
 
 # ==========================================
