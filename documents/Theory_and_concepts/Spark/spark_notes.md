@@ -9,7 +9,7 @@
 1. [Section 1: Apache Spark Architecture & Core Concepts](#section-1-apache-spark-architecture--core-concepts)
    - [1.1 Fundamentals & Master-Slave Model](#11-fundamentals--master-slave-model)
    - [1.2 Execution Modes: Client vs Cluster vs Local](#12-execution-modes-client-vs-cluster-vs-local)
-   - [1.3 End-to-End Application Execution Flow](#14-end-to-end-application-execution-flow)
+   - [1.3 End-to-End Application Execution Flow](#13-end-to-end-application-execution-flow)
 2. [Section 2: Deep Dive into RDDs](#section-2-deep-dive-into-rdds)
    - [2.1 Internal Architecture & Lineage Graph](#21-internal-architecture--lineage-graph)
    - [2.2 RDD Creation Methods](#22-rdd-creation-methods)

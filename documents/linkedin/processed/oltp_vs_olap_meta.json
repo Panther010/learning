@@ -1,0 +1,23 @@
+{
+  "source_file": "/Users/bakulseth/PycharmProjects/learning/documents/linkedin/raw/oltp_vs_olap.txt",
+  "processed_at": "2026-09-18T17:15:32.525314",
+  "technical_analysis": {
+    "topic": "OLTP vs OLAP",
+    "core_lesson": "OLTP prioritizes low\u2011latency, ACID\u2011compliant row\u2011store operations; OLAP prioritizes high\u2011throughput, column\u2011store analytics with denormalized schemas",
+    "common_misconception": "Assuming OLTP can handle analytical workloads without redesign",
+    "practical_takeaway": "Use CDC to stream changes from OLTP to OLAP, but design separate schemas and storage formats to match each system\u2019s performance goals",
+    "architecture_pattern": "OLTP -> CDC -> OLAP",
+    "useful_comparison": "Row\u2011store, ACID, high concurrency vs Column\u2011store, high compression, batch analytics"
+  },
+  "content_strategy": {
+    "post_format": "Comparison Table",
+    "angle": "Debunking a Myth",
+    "hook_angle": "Assuming OLTP can handle analytical workloads without redesign",
+    "visual_concept": "ASCII architecture diagram showing OLTP -> CDC -> OLAP flow with side\u2011by\u2011side row\u2011store vs column\u2011store comparison blocks",
+    "tags": [
+      "#OLTP",
+      "#OLAP",
+      "#DataArchitecture"
+    ]
+  }
+}
