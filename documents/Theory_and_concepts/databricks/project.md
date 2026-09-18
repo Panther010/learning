@@ -3,8 +3,6 @@
 - **Delta Live Tables (DLT)** → now called **Lakeflow Pipelines** (also sometimes "Spark Declarative Pipelines")
 - **Databricks Workflows** → now called **Lakeflow Jobs**
 
-Half the blog posts and tutorials you've read use the old names, half use the new ones — that alone explains most of the "too many tools" feeling. Once you know it's the same handful of things wearing two name tags, it collapses fast.
-
 ---
 
 ## Part 1 — The one-line mental model

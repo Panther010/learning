@@ -98,7 +98,7 @@ def generate_linkedin_post(topic_data: dict, topic_key: str = "topic_key"):
     {raw_post}
     - Desired Angle/Tone: {angle}
     Instructions for the Post Structure:
-    1. HOOK (Line 1): Craft a punchy, scroll-stopping first line. Use contrast, a bold engineering opinion, or a relatable system failure scenario. DO NOT start with generic greetings like "Hey network" or plain titles.
+    1. HOOK (Line 1): Craft a punchy, scroll-stopping first line. Use contrast, a bold data engineering opinion, or a relatable system failure scenario. DO NOT start with generic greetings like "Hey network" or plain titles.
     2. RE-HOOK (Line 2-3): Briefly explain WHY this tradeoff matters in production.
     3. BODY: Present the core technical takeaways clearly.
        - Use short sentences and line breaks.
@@ -157,4 +157,5 @@ if __name__ == "__main__":
     }
 
     generated_post = generate_linkedin_post(data, 'oltp vs olap')
+    print("******************")
     print(generated_post)
