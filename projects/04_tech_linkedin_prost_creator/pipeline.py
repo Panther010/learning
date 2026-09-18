@@ -1,10 +1,10 @@
+# pipeline.py
 import json
 import shutil
 import sys
 from datetime import datetime
 from pathlib import Path
 
-# Add project root to sys.path
 PROJECT_ROOT = Path(__file__).resolve().parent
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.append(str(PROJECT_ROOT))
@@ -25,19 +25,22 @@ def sanitize_post_content(post_text: str) -> str:
     return post_text.replace("**", "")
 
 
+def extract_hook_line(post_text: str) -> str:
+    """Extracts the first non-empty line of the generated post as the hook."""
+    lines = [line.strip() for line in post_text.splitlines() if line.strip()]
+    return lines[0] if lines else ""
+
+
 def process_single_file(
     file_path: Path,
     output_dir: Path,
     processed_dir: Path,
+    failed_dir: Path,
     review_dir: Path,
 ) -> dict:
-    """Orchestrates Stage 1 -> Stage 2 -> Stage 3 -> Stage 4 for a single text file
-
-    and routes outputs based on validation pass/fail status.
-    """
     logger.info(f"Starting Pipeline for: {file_path.name}")
 
-    # Read Raw Text
+    # Read Raw Source Text
     raw_text = file_path.read_text(encoding="utf-8")
 
     # Stage 1: Technical Analysis
@@ -52,6 +55,7 @@ def process_single_file(
     logger.info("Running Stage 3: Post Writing...")
     raw_post = generate_final_post(tech_analysis, strategy)
     final_post = sanitize_post_content(raw_post)
+    extracted_hook = extract_hook_line(final_post)
 
     # Stage 4: Post Validation
     logger.info("Running Stage 4: Post Validation (LLM-as-a-Judge)...")
@@ -65,23 +69,26 @@ def process_single_file(
     if validation.passed:
         logger.info(f"✅ Validation PASSED for {file_path.name} (Score: {validation.score}/10.0)")
 
-        # Save copy-paste ready LinkedIn post (.txt)
+        # 1. Save copy-paste ready post (.txt)
         output_post_path = output_dir / f"{base_name}_post.txt"
         output_post_path.write_text(final_post, encoding="utf-8")
 
-        # Save metadata and audit trail
+        # 2. Save enriched metadata (.json)
         output_meta_path = output_dir / f"{base_name}_metadata.json"
         metadata = {
-            "source_file": str(file_path.name),
+            "source_file": file_path.name,
             "processed_at": datetime.now().isoformat(),
             "validation_score": validation.score,
+            "final_hook": extracted_hook,
+            "final_post_text": final_post,
+            "source_evidence": raw_text,
             "validation_criteria": validation.criteria.model_dump(),
             "technical_analysis": tech_analysis.model_dump(),
             "content_strategy": strategy.model_dump(),
         }
         output_meta_path.write_text(json.dumps(metadata, indent=2), encoding="utf-8")
 
-        # Move source file from raw/ to processed/
+        # 3. Move source file from raw/ to processed/
         target_processed_path = processed_dir / file_path.name
         shutil.move(str(file_path), str(target_processed_path))
         logger.info(f"Moved source file to: {target_processed_path}")
@@ -101,22 +108,26 @@ def process_single_file(
             f"❌ Validation FAILED for {file_path.name} (Score: {validation.score}/10.0)"
         )
 
-        # Save diagnostic fail report in review_required/ directory
+        # 1. Save diagnostic fail report in review_required/
         review_report_path = review_dir / f"{base_name}_FAILED.json"
         failed_report = {
-            "source_file": str(file_path.name),
+            "source_file": file_path.name,
             "evaluated_at": datetime.now().isoformat(),
             "score": validation.score,
             "passed": validation.passed,
+            "final_hook": extracted_hook,
+            "generated_post_draft": final_post,
+            "source_evidence": raw_text,
             "criteria_checks": validation.criteria.model_dump(),
             "issues_identified": validation.issues,
             "improvement_suggestions": validation.improvement_suggestions,
-            "generated_post_draft": final_post,
         }
         review_report_path.write_text(json.dumps(failed_report, indent=2), encoding="utf-8")
-        logger.info(f"Saved failure report to: {review_report_path}")
 
-        # DO NOT move source file - leave it in raw/ for manual inspection/retry
+        # 2. Move source file from raw/ to failed/ so it is NOT retried endlessly
+        target_failed_path = failed_dir / file_path.name
+        shutil.move(str(file_path), str(target_failed_path))
+        logger.info(f"Moved failed raw file to: {target_failed_path}")
 
         return {
             "file_name": file_path.name,
@@ -128,18 +139,19 @@ def process_single_file(
 
 
 def run_pipeline():
-    """Batch processes all .txt files in the raw directory."""
     project_root = get_project_root()
     raw_dir = project_root / "documents/linkedin/raw/"
     processed_dir = project_root / "documents/linkedin/processed/"
+    failed_dir = project_root / "documents/linkedin/failed/"
     output_dir = project_root / "documents/linkedin/output/"
     review_dir = project_root / "documents/linkedin/review_required/"
 
-    # Ensure all required directory structures exist
+    # Ensure all directories exist
     if not raw_dir.is_dir():
         raise FileNotFoundError(f"Raw directory not found: {raw_dir}")
 
     processed_dir.mkdir(parents=True, exist_ok=True)
+    failed_dir.mkdir(parents=True, exist_ok=True)
     output_dir.mkdir(parents=True, exist_ok=True)
     review_dir.mkdir(parents=True, exist_ok=True)
 
@@ -157,17 +169,16 @@ def run_pipeline():
                 file_path=file_path,
                 output_dir=output_dir,
                 processed_dir=processed_dir,
+                failed_dir=failed_dir,
                 review_dir=review_dir,
             )
             summary.append(result)
-            logger.info(f"Finished processing {file_path.name}\n")
         except Exception as e:
             logger.error(f"Execution Error on {file_path.name}: {e}", exc_info=True)
             summary.append(
                 {"file_name": file_path.name, "status": "EXECUTION_ERROR", "error": str(e)}
             )
 
-    # Print Summary Console Alert
     print("\n" + "=" * 60)
     print("PIPELINE EXECUTION SUMMARY")
     print("=" * 60)
@@ -179,10 +190,8 @@ def run_pipeline():
         elif item["status"] == "FAILED_VALIDATION":
             print(f"❌ REJECTED | File: {item['file_name']} | Score: {item['score']}/10.0")
             print(f"   Topic: {item['topic']}")
-            print("   Issues Identified:")
-            for issue in item.get("issues", []):
-                print(f"   • {issue}")
-            print(f"   Diagnostic saved to: documents/linkedin/review_required/\n")
+            print(f"   Moved raw file to: documents/linkedin/failed/")
+            print(f"   Diagnostic report: documents/linkedin/review_required/\n")
         else:
             print(f"💥 ERROR | File: {item['file_name']} | Exception: {item.get('error')}\n")
 

@@ -36,7 +36,10 @@ class ContentStrategy(BaseModel):
 
     visual_concept: str = Field(description="Idea or text layout for a visual element in the post (e.g., ASCII flow, key metric matrix, side-by-side bullet block).")
 
-    tags: List[str] = Field(description="Up to 3 relevant technical hashtags in Title Case (e.g., ['#DataEngineering', '#OLAP', '#Architecture']).")
+    tags: List[str] = Field(
+        description="List of 3 to 5 relevant technical hashtags without spaces",
+        min_items=3,
+        max_items=5)
 
 
 # ==========================================
