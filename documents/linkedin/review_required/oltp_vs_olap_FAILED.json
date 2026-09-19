@@ -1,0 +1,27 @@
+{
+  "source_file": "oltp_vs_olap.txt",
+  "evaluated_at": "2026-09-18T22:20:57.004286",
+  "score": 0.0,
+  "passed": false,
+  "final_hook": "#OLTP #OLAP #DataWarehouse #CDC",
+  "generated_post_draft": "\n\n#OLTP #OLAP #DataWarehouse #CDC",
+  "source_evidence": "OLTP (Online Transaction Processing):\n- Is used for live transactional system where we need to access data in high concurrency low latency mode.\n- To achieve this Milliseconds latency and high concurrency operations. It is preferred to have data is highly normalised (3rd normal form)\n- Data remained stored in row-oriented format 8-16 KB to get entire results in one read\n- Fast read, write and update concurrency, and transactional integrity are required. Vertical scaling\n- Priority remains low latency and write integrity. Build around strict ACID compliance\n\nOLAP (Online Analytical Processing)\n- It is used for complex analytical aggregations with historical data.\n- Read heavy: read huge amount of data with higher latency. It is expected to have denormalized(Star Schema/ Snowflake Schema/ Wide Tables)\n- Data remained in columnar format (Parquet or Delta), This columnar storage help high compression, High I/O savings, columnar layouts usually improve large scans, compression, and aggregations.\n- Scanning huge amount of data latency remain seconds to minutes. Scale horizontally.\n- Priority remains high throughput read performance\n\nIn modern data word these 2 system communicate with each other using CDC Change Data Capture(CDC) and ETL/ELT",
+  "criteria_checks": {
+    "has_useful_hook": false,
+    "is_technically_accurate": false,
+    "is_understandable_and_scannable": false,
+    "is_free_of_fluff": false,
+    "teaches_concrete_lesson": false,
+    "has_clear_takeaway": false
+  },
+  "issues_identified": [
+    "The LinkedIn post content to audit was not provided in the input.",
+    "Without the actual post, none of the evaluation criteria can be assessed.",
+    "The scoring system requires a concrete text to determine technical accuracy, hook quality, formatting, and other attributes."
+  ],
+  "improvement_suggestions": [
+    "Include the full text of the generated LinkedIn post in the input so that it can be evaluated against the checklist.",
+    "Ensure the post follows LinkedIn best practices: a clear hook, concise technical details, no Markdown tables or ASCII art, minimal fluff, a concrete lesson, and a clear takeaway with 3\u20115 technical hashtags.",
+    "Once the post is provided, run the audit again to receive a detailed score and actionable feedback."
+  ]
+}

@@ -1,0 +1,38 @@
+{
+  "source_file": "oltp_vs_olap.txt",
+  "processed_at": "2026-09-18T22:30:35.767873",
+  "validation_score": 9.0,
+  "final_hook": "If you store OLTP data in the same schema as your analytics, you\u2019re courting a performance disaster. \ud83c\udfd7\ufe0f",
+  "final_post_text": "If you store OLTP data in the same schema as your analytics, you\u2019re courting a performance disaster. \ud83c\udfd7\ufe0f  \n\nEvery transaction hits the same row store that your BI queries scan, leading to lock contention, p99 latency spikes, and disk I/O thrashing. \ud83d\udd04  \n\nThe core of the issue is that OLTP systems are built for low\u2011latency, ACID, row\u2011oriented workloads. In contrast, OLAP thrives on columnar, denormalised storage that compresses and parallelises scans.  \n\nWhen you force the same schema onto both, you pay in both directions: transactional throughput drops because analytical scans lock rows; analytical queries stall because they have to read uncompressed row pages.  \n\nA proven pattern is a one\u2011way stream: OLTP -> CDC -> OLAP. Capture changes with a change\u2011data\u2011capture engine, then transform and load into a columnar store. This keeps each layer optimized for its workload.  \n\n\u2022 Row\u2011store, 3NF, ACID, low latency  \n\u2022 Column\u2011store, denormalised, high compression, high throughput \ud83d\udcca  \n\nRule of thumb: Keep OLTP row\u2011store and OLAP columnar store separate; stream and transform changes before analytics.  \n\nWhat CDC solutions and transformation pipelines have you deployed to keep OLTP and OLAP separate in your production stack?\n\n#OLTP #OLAP #DataEngineering #CDC",
+  "visual_concept": "One\u2011way CDC stream separating OLTP row store from OLAP column store to avoid performance contention.",
+  "image_prompt": "Flat 2D orthographic diagram, deep navy background (#050B14). White cylinders: left side representing OLTP row store, right side representing OLAP column store, a small white node between them representing CDC. Thin cool\u2011grey infrastructure lines connect them. A bright cyan arrow flows one\u2011way from the OLTP cylinder through the CDC node to the OLAP cylinder, illustrating data capture and transformation. No text, clean developer\u2011tool aesthetic, high negative space, centered composition.",
+  "source_evidence": "OLTP (Online Transaction Processing):\n- Is used for live transactional system where we need to access data in high concurrency low latency mode.\n- To achieve this Milliseconds latency and high concurrency operations. It is preferred to have data is highly normalised (3rd normal form)\n- Data remained stored in row-oriented format 8-16 KB to get entire results in one read\n- Fast read, write and update concurrency, and transactional integrity are required. Vertical scaling\n- Priority remains low latency and write integrity. Build around strict ACID compliance\n\nOLAP (Online Analytical Processing)\n- It is used for complex analytical aggregations with historical data.\n- Read heavy: read huge amount of data with higher latency. It is expected to have denormalized(Star Schema/ Snowflake Schema/ Wide Tables)\n- Data remained in columnar format (Parquet or Delta), This columnar storage help high compression, High I/O savings, columnar layouts usually improve large scans, compression, and aggregations.\n- Scanning huge amount of data latency remain seconds to minutes. Scale horizontally.\n- Priority remains high throughput read performance\n\nIn modern data word these 2 system communicate with each other using CDC Change Data Capture(CDC) and ETL/ELT",
+  "validation_criteria": {
+    "has_useful_hook": true,
+    "is_technically_accurate": true,
+    "is_understandable_and_scannable": true,
+    "is_free_of_fluff": true,
+    "teaches_concrete_lesson": true,
+    "has_clear_takeaway": true
+  },
+  "technical_analysis": {
+    "topic": "OLTP vs OLAP",
+    "core_lesson": "OLTP prioritizes low\u2011latency, ACID compliance with row\u2011oriented, highly normalised data, while OLAP prioritises high\u2011throughput analytical queries on columnar, denormalised storage",
+    "common_misconception": "Assuming OLTP and OLAP can share the same schema and storage format without performance penalties",
+    "practical_takeaway": "Use CDC to stream changes from OLTP to OLAP, but design separate schemas: keep OLTP row\u2011store for transactional integrity, and transform data into columnar, denormalised form for analytics",
+    "architecture_pattern": "OLTP -> CDC -> OLAP",
+    "useful_comparison": "Row\u2011store & 3NF & ACID & low latency vs Column\u2011store & denormalised & high compression & high throughput"
+  },
+  "content_strategy": {
+    "post_format": "Debunking a Myth",
+    "angle": "Opinionated Lead Engineer",
+    "hook_angle": "Common architectural mistake",
+    "visual_concept": "OLTP -> CDC -> OLAP",
+    "tags": [
+      "#OLTP",
+      "#OLAP",
+      "#DataEngineering",
+      "#CDC"
+    ]
+  }
+}

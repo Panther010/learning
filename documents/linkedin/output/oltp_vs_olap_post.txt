@@ -1,0 +1,18 @@
+If you store OLTP data in the same schema as your analytics, you’re courting a performance disaster. 🏗️  
+
+Every transaction hits the same row store that your BI queries scan, leading to lock contention, p99 latency spikes, and disk I/O thrashing. 🔄  
+
+The core of the issue is that OLTP systems are built for low‑latency, ACID, row‑oriented workloads. In contrast, OLAP thrives on columnar, denormalised storage that compresses and parallelises scans.  
+
+When you force the same schema onto both, you pay in both directions: transactional throughput drops because analytical scans lock rows; analytical queries stall because they have to read uncompressed row pages.  
+
+A proven pattern is a one‑way stream: OLTP -> CDC -> OLAP. Capture changes with a change‑data‑capture engine, then transform and load into a columnar store. This keeps each layer optimized for its workload.  
+
+• Row‑store, 3NF, ACID, low latency  
+• Column‑store, denormalised, high compression, high throughput 📊  
+
+Rule of thumb: Keep OLTP row‑store and OLAP columnar store separate; stream and transform changes before analytics.  
+
+What CDC solutions and transformation pipelines have you deployed to keep OLTP and OLAP separate in your production stack?
+
+#OLTP #OLAP #DataEngineering #CDC

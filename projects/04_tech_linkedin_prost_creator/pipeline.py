@@ -2,6 +2,7 @@
 import json
 import shutil
 import sys
+import time
 from datetime import datetime
 from pathlib import Path
 
@@ -9,11 +10,12 @@ PROJECT_ROOT = Path(__file__).resolve().parent
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.append(str(PROJECT_ROOT))
 
-from schemas import ContentStrategy, TechnicalAnalysis, ValidationResult
+from schemas import ContentStrategy, TechnicalAnalysis, ValidationResult, VisualBrief
 from services.content_strategist import plan_content_strategy
 from services.post_validator import validate_linkedin_post
 from services.post_writer import generate_final_post
 from services.technical_analyzer import analyze_technical_notes
+from services.visual_prompt_generator import generate_visual_brief  # <--- Added Stage 5 import
 from shared.logger import get_logger
 from shared.path_utils import get_project_root
 
@@ -46,20 +48,24 @@ def process_single_file(
     # Stage 1: Technical Analysis
     logger.info("Running Stage 1: Technical Analysis...")
     tech_analysis: TechnicalAnalysis = analyze_technical_notes(raw_text)
+    time.sleep(1.5)
 
     # Stage 2: Content Strategy
     logger.info("Running Stage 2: Content Strategy...")
     strategy: ContentStrategy = plan_content_strategy(tech_analysis)
+    time.sleep(1.5)
 
     # Stage 3: Post Generation
     logger.info("Running Stage 3: Post Writing...")
     raw_post = generate_final_post(tech_analysis, strategy)
     final_post = sanitize_post_content(raw_post)
     extracted_hook = extract_hook_line(final_post)
+    time.sleep(1.5)
 
     # Stage 4: Post Validation
     logger.info("Running Stage 4: Post Validation (LLM-as-a-Judge)...")
     validation: ValidationResult = validate_linkedin_post(final_post, tech_analysis)
+    time.sleep(1.5)
 
     base_name = file_path.stem
 
@@ -69,11 +75,22 @@ def process_single_file(
     if validation.passed:
         logger.info(f"✅ Validation PASSED for {file_path.name} (Score: {validation.score}/10.0)")
 
+        # Stage 5: Visual Prompt Generation
+        logger.info("Running Stage 5: Visual Prompt Generation...")
+        visual_brief: VisualBrief = generate_visual_brief(final_post)
+
         # 1. Save copy-paste ready post (.txt)
         output_post_path = output_dir / f"{base_name}_post.txt"
         output_post_path.write_text(final_post, encoding="utf-8")
 
-        # 2. Save enriched metadata (.json)
+        # 2. Save Stage 5 visual brief (.json)
+        output_visual_path = output_dir / f"{base_name}_visual.json"
+        output_visual_path.write_text(
+            json.dumps(visual_brief.model_dump(), indent=2), encoding="utf-8"
+        )
+        logger.info(f"Saved visual brief to: {output_visual_path.name}")
+
+        # 3. Save enriched metadata (.json) including visual references
         output_meta_path = output_dir / f"{base_name}_metadata.json"
         metadata = {
             "source_file": file_path.name,
@@ -81,6 +98,8 @@ def process_single_file(
             "validation_score": validation.score,
             "final_hook": extracted_hook,
             "final_post_text": final_post,
+            "visual_concept": visual_brief.visual_concept,
+            "image_prompt": visual_brief.image_prompt,
             "source_evidence": raw_text,
             "validation_criteria": validation.criteria.model_dump(),
             "technical_analysis": tech_analysis.model_dump(),
@@ -88,7 +107,7 @@ def process_single_file(
         }
         output_meta_path.write_text(json.dumps(metadata, indent=2), encoding="utf-8")
 
-        # 3. Move source file from raw/ to processed/
+        # 4. Move source file from raw/ to processed/
         target_processed_path = processed_dir / file_path.name
         shutil.move(str(file_path), str(target_processed_path))
         logger.info(f"Moved source file to: {target_processed_path}")
