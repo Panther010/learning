@@ -60,3 +60,21 @@ class ValidationResult(BaseModel):
     criteria: ValidationCriteria = Field(description="Itemized evaluation checklist")
     issues: List[str] = Field(description="Actionable feedback bullet points explaining what to fix if score < 7.0")
     improvement_suggestions: List[str] = Field(description="Specific rewrite instructions to pass in the next attempt")
+
+
+# ==========================================
+# NEW MODEL: Stage 5 Visual Brief Schema
+# ==========================================
+class VisualBrief(BaseModel):
+    visual_concept: str = Field(
+        description="One concise sentence explaining the single core technical idea shown in the graphic."
+    )
+    image_prompt: str = Field(
+        description="A complete image-generator prompt for Midjourney/Flux/DALL-E, maximum 110 words."
+    )
+    negative_prompt: str = Field(
+        description="A concise exclusion list specifying what must not appear in the graphic."
+    )
+    accessibility_alt_text: str = Field(
+        description="One human-readable sentence describing the diagram for screen readers / LinkedIn alt text."
+    )

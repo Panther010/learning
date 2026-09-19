@@ -1,0 +1,6 @@
+{
+  "visual_concept": "One\u2011way CDC stream separating OLTP row store from OLAP column store to avoid performance contention.",
+  "image_prompt": "Flat 2D orthographic diagram, deep navy background (#050B14). White cylinders: left side representing OLTP row store, right side representing OLAP column store, a small white node between them representing CDC. Thin cool\u2011grey infrastructure lines connect them. A bright cyan arrow flows one\u2011way from the OLTP cylinder through the CDC node to the OLAP cylinder, illustrating data capture and transformation. No text, clean developer\u2011tool aesthetic, high negative space, centered composition.",
+  "negative_prompt": "text, labels, numbers, code snippets, UI screenshots, excessive glow, cyberpunk, 3D renders, realistic textures, photorealistic people, rainbow colors, floating icons without system relationships, duplicate nodes, arbitrary arrows, decorative elements, generic corporate stock graphics",
+  "accessibility_alt_text": "Diagram shows a left\u2011side OLTP row store cylinder, a right\u2011side OLAP column store cylinder, and a bright cyan arrow flowing one\u2011way from the OLTP cylinder through a CDC node to the OLAP cylinder, illustrating a one\u2011way data stream that keeps transactional and analytical workloads separate."
+}
