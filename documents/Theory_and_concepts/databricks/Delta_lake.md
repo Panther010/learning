@@ -163,13 +163,19 @@ df_yesterday = spark.read.format("delta") \
 delta_table.history().select("version", "timestamp", "operation").show()
 ```
 
-**How it works internally:** the reader simply resolves the requested version/timestamp to a specific commit number, replays the log up to (and including) that commit, gets the resulting file list, and reads only those Parquet files — **as long as they still physically exist** (this is the key interaction with `VACUUM`, see [Section 17](#17-qa--common-follow-ups)).
+**How it works internally:** 
+* The reader simply resolves the requested version/timestamp to a specific commit number.
+* Replays the log up to (and including) that commit.
+* Gets the resulting file list, and reads only those Parquet files.
+* **As long as they still physically exist** (this is the key interaction with `VACUUM`, see [Section 17](#17-qa--common-follow-ups)).
 
 ---
 
 ## 6. Schema Enforcement vs Schema Evolution
 
-- **Schema enforcement** (default behavior): writes are **rejected** if the incoming data's schema doesn't match the target table's schema (wrong column names, types, or extra/missing columns). This is what prevents "garbage" or drifted data from silently corrupting a table.
+- **Schema enforcement** (default behavior): writes are **rejected** if the incoming data's schema doesn't match the target table's schema 
+  - (wrong column names, types, or extra/missing columns). 
+  - This is what prevents "garbage" or drifted data from silently corrupting a table.
 - **Schema evolution**: explicitly opting in to **allow** a write to change the table's schema (e.g., add a new column), via:
 ```python
 df.write.format("delta") \
@@ -179,13 +185,17 @@ df.write.format("delta") \
 ```
   or at the Spark session level: `spark.databricks.delta.schema.autoMerge.enabled = true`.
 
-**Rule of thumb:** keep enforcement **on** by default everywhere (protects against silent corruption); only enable evolution deliberately for known, intentional schema changes (e.g., a new column being added upstream) — not as a blanket setting, since that would defeat the purpose of enforcement.
+**Rule of thumb:** 
+* keep enforcement **on** by default everywhere (protects against silent corruption); 
+* only enable evolution deliberately for known, intentional schema changes (e.g., a new column being added upstream) 
+* not as a blanket setting, since that would defeat the purpose of enforcement.
 
 ---
 
 ## 7. MERGE (Upsert)
 
-Delta supports SQL-style `MERGE INTO`, letting you perform **insert, update, and delete in a single atomic operation** — critical for CDC-style upserts (e.g., syncing changes from an OLTP source).
+* Delta supports SQL-style `MERGE INTO`, letting you perform **insert, update, and delete in a single atomic operation** 
+* critical for CDC-style upserts (e.g., syncing changes from an OLTP source).
 
 ```sql
 MERGE INTO customers AS target
