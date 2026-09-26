@@ -53,7 +53,10 @@
 | **Natural Key**      | Based on real business data                         | `email`                  |
 | **Surrogate Key**    | Artificial, system-generated, no business meaning   | `customer_id = 10234`    |
 
-**Natural vs. surrogate trade-off:** natural keys are meaningful but can change or collide across systems; surrogate keys are stable and simple but meaningless on their own. **Surrogate keys are strongly preferred** in most warehouse designs — expanded in [Section 7](#7-surrogate-keys-in-a-warehouse).
+**Natural vs. surrogate trade-off:** 
+* natural keys are meaningful but can change or collide across systems; 
+* surrogate keys are stable and simple but meaningless on their own. 
+* **Surrogate keys are strongly preferred** in most warehouse designs — expanded in [Section 7](#7-surrogate-keys-in-a-warehouse).
 
 ### 1.5 Relationship Types
 
@@ -148,11 +151,18 @@ flowchart LR
     end
 ```
 
-**Why ELT became popular:** modern cloud warehouses (Snowflake, BigQuery, Databricks SQL) have cheap, elastic, massively parallel compute — cheaper/simpler to push raw data in and transform there than maintain a separate transformation cluster. **dbt** is built entirely around this pattern.
+**Why ELT became popular:** 
+* Modern cloud warehouses (Snowflake, BigQuery, Databricks SQL) have cheap, elastic, massively parallel compute
+* cheaper/simpler to push raw data in and transform there than maintain a separate transformation cluster. 
+* **dbt** is built entirely around this pattern.
 
-**Trade-off to name explicitly:** ELT trades "cheap elastic warehouse compute" for "raw data stored longer → more storage cost, needs strong governance on the raw zone" — not simply "ELT is newer/better."
+**Trade-off to name explicitly:** 
+* ELT trades "cheap elastic warehouse compute" for raw data stored longer → more storage cost, 
+* needs strong governance on the raw zone not simply "ELT is newer/better."
 
-**Interview line:** *"ETL cleans it in the truck before it enters the warehouse; ELT dumps it at the loading dock and cleans it with the warehouse's own machinery."*
+**Interview line:** 
+* ETL cleans it in the truck before it enters the warehouse; 
+* ELT dumps it at the loading dock and cleans it with the warehouse's own machinery.*
 
 ---
 
