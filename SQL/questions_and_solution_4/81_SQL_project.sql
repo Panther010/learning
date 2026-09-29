@@ -5,6 +5,8 @@
     --     within each cuisine type.
     -- Q2: find the daily count of NEW customers (customers placing
     --     their first-ever order) since launch.
+    -- Q3: Count of all the users who were acquired in Jan 2025 and
+    --      only placed one order in Jan and did not place any other order after that
 
 -- create table statement
 CREATE TABLE orders1(
@@ -237,3 +239,19 @@ from cte
 group by first_order_date
 order by first_order_date;
 
+--SQL solution3 --
+with jan_cust_single_order as (
+	select
+		customer_code
+	from orders1
+	where extract(month from  placed_at) = 1 and extract(year from  placed_at) =2025
+	group by customer_code
+	having count(*) = 1),
+other_month_orders as (
+	select distinct
+		customer_code
+	from orders1
+	where extract(month from  placed_at) > 1 and extract(year from  placed_at) = 2025
+)
+select count(*) from jan_cust_single_order a left join other_month_orders b on a.customer_code = b.customer_code
+where b.customer_code is null
