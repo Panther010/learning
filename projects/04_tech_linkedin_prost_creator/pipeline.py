@@ -23,8 +23,23 @@ logger = get_logger(__name__)
 
 
 def sanitize_post_content(post_text: str) -> str:
-    """Removes raw Markdown bold syntax (**) that LinkedIn doesn't render natively."""
-    return post_text.replace("**", "")
+    """Prepare plain-text copy for LinkedIn using portable punctuation."""
+    replacements = str.maketrans({
+        "•": "-",
+        "◦": "-",
+        "→": "->",
+        "‑": "-",
+        "‐": "-",
+        "–": "-",
+        "—": "-",
+        "−": "-",
+        "“": '"',
+        "”": '"',
+        "‘": "'",
+        "’": "'",
+        "\u00a0": " ",
+    })
+    return post_text.translate(replacements).replace("**", "")
 
 
 def extract_hook_line(post_text: str) -> str:
@@ -57,7 +72,11 @@ def process_single_file(
 
     # Stage 3: Post Generation
     logger.info("Running Stage 3: Post Writing...")
-    raw_post = generate_final_post(tech_analysis, strategy)
+    raw_post = generate_final_post(
+        analysis=tech_analysis,
+        strategy=strategy,
+        source_notes=raw_text,
+    )
     final_post = sanitize_post_content(raw_post)
     extracted_hook = extract_hook_line(final_post)
     time.sleep(1.5)
@@ -66,6 +85,24 @@ def process_single_file(
     logger.info("Running Stage 4: Post Validation (LLM-as-a-Judge)...")
     validation: ValidationResult = validate_linkedin_post(final_post, tech_analysis)
     time.sleep(1.5)
+
+    # Make one targeted repair attempt using the validator's feedback.
+    if not validation.passed:
+        logger.info("Validation failed; revising the post once using validator feedback...")
+        revision_feedback = "\n".join(
+            [*validation.issues, *validation.improvement_suggestions]
+        )
+        raw_post = generate_final_post(
+            analysis=tech_analysis,
+            strategy=strategy,
+            source_notes=raw_text,
+            previous_draft=final_post,
+            revision_feedback=revision_feedback,
+        )
+        final_post = sanitize_post_content(raw_post)
+        extracted_hook = extract_hook_line(final_post)
+        validation = validate_linkedin_post(final_post, tech_analysis)
+        time.sleep(1.5)
 
     base_name = file_path.stem
 
@@ -77,7 +114,7 @@ def process_single_file(
 
         # Stage 5: Visual Prompt Generation
         logger.info("Running Stage 5: Visual Prompt Generation...")
-        visual_brief: VisualBrief = generate_visual_brief(final_post)
+        visual_brief: VisualBrief = generate_visual_brief(final_post=final_post, visual_concept=strategy.visual_concept,)
 
         # 1. Save copy-paste ready post (.txt)
         output_post_path = output_dir / f"{base_name}_post.txt"
@@ -129,6 +166,9 @@ def process_single_file(
 
         # 1. Save diagnostic fail report in review_required/
         review_report_path = review_dir / f"{base_name}_FAILED.json"
+        review_draft_path = review_dir / f"{base_name}_FAILED_post.txt"
+        review_draft_path.write_text(final_post, encoding="utf-8")
+
         failed_report = {
             "source_file": file_path.name,
             "evaluated_at": datetime.now().isoformat(),
@@ -140,6 +180,7 @@ def process_single_file(
             "criteria_checks": validation.criteria.model_dump(),
             "issues_identified": validation.issues,
             "improvement_suggestions": validation.improvement_suggestions,
+            "draft_text_file": review_draft_path.name,
         }
         review_report_path.write_text(json.dumps(failed_report, indent=2), encoding="utf-8")
 

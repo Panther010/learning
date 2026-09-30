@@ -7,7 +7,6 @@ Translates a verified LinkedIn post into a structured VisualBrief JSON output.
 import os
 from dotenv import load_dotenv
 from langchain_core.prompts import ChatPromptTemplate
-from langchain_core.output_parsers import JsonOutputParser
 from langchain_groq import ChatGroq
 
 from schemas import VisualBrief
@@ -22,27 +21,22 @@ load_dotenv()
 
 def generate_visual_brief(
     final_post: str,
+    visual_concept: str,
     model_name: str = "openai/gpt-oss-20b",
 ) -> VisualBrief:
     """Generates a structured VisualBrief from a verified LinkedIn post."""
-    parser = JsonOutputParser(pydantic_object=VisualBrief)
-
-    # Format base system prompt
     formatted_system_prompt = VISUAL_GENERATOR_SYSTEM_TEMPLATE.format(
         brand_constraints=FIXED_BRAND_PROMPT_BLOCK,
         negative_prompt=GLOBAL_NEGATIVE_PROMPT,
     )
-
-    # Escape curly braces in format instructions so ChatPromptTemplate doesn't treat them as f-string variables
-    format_instructions = parser.get_format_instructions().replace("{", "{{").replace("}", "}}")
-    formatted_system_prompt += f"\n\n{format_instructions}"
 
     prompt = ChatPromptTemplate.from_messages(
         [
             ("system", formatted_system_prompt),
             (
                 "human",
-                "Generate the visual brief for the following verified post:\n\n{final_post}",
+                "Strategist's visual concept:\n{visual_concept}\n\n"
+                "Verified LinkedIn post:\n{final_post}",
             ),
         ]
     )
@@ -50,16 +44,22 @@ def generate_visual_brief(
     llm = ChatGroq(
         model=model_name,
         temperature=0.2,
-        max_tokens=1024,
-        model_kwargs={"response_format": {"type": "json_object"}},
+        max_tokens=512,
+        reasoning_format="hidden",
+        reasoning_effort="none" if model_name.startswith("qwen/") else "low",
         api_key=os.environ.get("GROQ_API_KEY"),
     )
 
-    chain = prompt | llm | parser
-
-    # Parses directly into the VisualBrief Pydantic model
-    raw_dict = chain.invoke({"final_post": final_post})
-    return VisualBrief(**raw_dict)
+    structured_llm = llm.with_structured_output(
+        VisualBrief,
+        method="json_schema",
+        strict=True,
+    )
+    chain = prompt | structured_llm
+    return chain.invoke({
+        "final_post": final_post,
+        "visual_concept": visual_concept,
+    })
 
 
 if __name__ == "__main__":
@@ -71,7 +71,7 @@ if __name__ == "__main__":
         "from analytical reads. Data flows seamlessly from OLTP to OLAP without impacting production."
     )
 
-    brief = generate_visual_brief(sample_post)
+    brief = generate_visual_brief(sample_post, visual_concept="OLTP database -> CDC pipeline -> OLAP warehouse",)
     print("\n=== GENERATED VISUAL BRIEF ===")
     print(f"Visual Concept:\n{brief.visual_concept}\n")
     print(f"Image Prompt:\n{brief.image_prompt}\n")

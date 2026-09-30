@@ -28,7 +28,7 @@ def analyze_technical_notes(raw_post_content: str) -> TechnicalAnalysis:
     # 1. Initialize LLM (Using active Groq model with low temperature for analytical precision)
     llm = ChatGroq(
         groq_api_key=os.getenv("GROQ_API_KEY"),
-        model_name="openai/gpt-oss-20b",
+        model_name="qwen/qwen3.8-27b",
         temperature=0.1,
     )
 
@@ -97,3 +97,5 @@ if __name__ == "__main__":
 
         print("\nJSON Dump:")
         print(result.model_dump_json(indent=2))
+
+        # "qwen/qwen3.8-27b", "canopylabs/orpheus-arabic-saudi", "canopylabs/orpheus-v1-english", "meta-llama/llama-prompt-guard-2-22m", "meta-llama/llama-prompt-guard-2-86m", "openai/gpt-oss-120b", "openai/gpt-oss-20b", "openai/gpt-oss-safeguard-20b", "whisper-large-v3", "whisper-large-v3-turbo"

@@ -1,18 +1,34 @@
-If you store OLTP data in the same schema as your analytics, you’re courting a performance disaster. 🏗️  
+Heavy analytical queries on a live order‑processing database is a silent performance killer.
+When a customer places an order, the OLTP system must keep up.
+Running month‑over‑month revenue reports on the same engine can make both workloads lag.
 
-Every transaction hits the same row store that your BI queries scan, leading to lock contention, p99 latency spikes, and disk I/O thrashing. 🔄  
+• OLTP (Online Transaction Processing)
+  ◦ Frequent, short, concurrent transactions
+  ◦ INSERT / UPDATE / DELETE operations
+  ◦ Low‑latency reads and writes
+  ◦ Highly normalized schemas
+  ◦ Strong consistency and transactional guarantees
 
-The core of the issue is that OLTP systems are built for low‑latency, ACID, row‑oriented workloads. In contrast, OLAP thrives on columnar, denormalised storage that compresses and parallelises scans.  
+• OLAP (Online Analytical Processing)
+  ◦ Large scans and aggregations
+  ◦ Complex joins
+  ◦ Historical data
+  ◦ Often denormalized or star schemas
+  ◦ Read‑heavy workloads
 
-When you force the same schema onto both, you pay in both directions: transactional throughput drops because analytical scans lock rows; analytical queries stall because they have to read uncompressed row pages.  
+Imagine an e‑commerce platform:
 
-A proven pattern is a one‑way stream: OLTP -> CDC -> OLAP. Capture changes with a change‑data‑capture engine, then transform and load into a columnar store. This keeps each layer optimized for its workload.  
+• Operational flow – Customer → Cart → Payment → Order → Inventory
+• Analytical question – “What was monthly revenue by region and product category over the last 3 years?”
 
-• Row‑store, 3NF, ACID, low latency  
-• Column‑store, denormalised, high compression, high throughput 📊  
+Trade‑offs:
 
-Rule of thumb: Keep OLTP row‑store and OLAP columnar store separate; stream and transform changes before analytics.  
+• Heavy analytical scans compete with transactional CPU, memory, and I/O, degrading latency.
+• Using an OLAP warehouse for thousands of tiny transactional updates is inefficient and defeats its read‑optimised design.
 
-What CDC solutions and transformation pipelines have you deployed to keep OLTP and OLAP separate in your production stack?
+Rule of thumb: isolate OLTP and OLAP.
+Use CDC/ETL/ELT to move changes into a dedicated warehouse, then feed BI tools.
 
-#OLTP #OLAP #DataEngineering #CDC
+How do you currently separate your transactional and analytical workloads?
+
+#OLTP #OLAP #DataWarehouse #CDC #ETL

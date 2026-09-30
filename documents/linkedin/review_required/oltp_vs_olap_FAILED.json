@@ -1,11 +1,11 @@
 {
   "source_file": "oltp_vs_olap.txt",
-  "evaluated_at": "2026-09-18T22:20:57.004286",
+  "evaluated_at": "2026-09-30T19:02:07.784507",
   "score": 0.0,
   "passed": false,
-  "final_hook": "#OLTP #OLAP #DataWarehouse #CDC",
-  "generated_post_draft": "\n\n#OLTP #OLAP #DataWarehouse #CDC",
-  "source_evidence": "OLTP (Online Transaction Processing):\n- Is used for live transactional system where we need to access data in high concurrency low latency mode.\n- To achieve this Milliseconds latency and high concurrency operations. It is preferred to have data is highly normalised (3rd normal form)\n- Data remained stored in row-oriented format 8-16 KB to get entire results in one read\n- Fast read, write and update concurrency, and transactional integrity are required. Vertical scaling\n- Priority remains low latency and write integrity. Build around strict ACID compliance\n\nOLAP (Online Analytical Processing)\n- It is used for complex analytical aggregations with historical data.\n- Read heavy: read huge amount of data with higher latency. It is expected to have denormalized(Star Schema/ Snowflake Schema/ Wide Tables)\n- Data remained in columnar format (Parquet or Delta), This columnar storage help high compression, High I/O savings, columnar layouts usually improve large scans, compression, and aggregations.\n- Scanning huge amount of data latency remain seconds to minutes. Scale horizontally.\n- Priority remains high throughput read performance\n\nIn modern data word these 2 system communicate with each other using CDC Change Data Capture(CDC) and ETL/ELT",
+  "final_hook": "#OLTP #OLAP #DataWarehouse #CDC #ETL",
+  "generated_post_draft": "\n\n#OLTP #OLAP #DataWarehouse #CDC #ETL",
+  "source_evidence": "OLTP vs OLAP they both store data, but they solve very different problems.\nOLTP \u2192 Run the business\nOLAP \u2192 Understand the business\n\nOLTP (Online Transaction Processing) is designed for frequent, short, concurrent transactions:\nINSERT / UPDATE / DELETE\nLow-latency reads and writes\nHighly normalized schemas\nStrong consistency and transactional guarantees\n\nOLAP (Online Analytical Processing) is designed for analytical workloads:\nLarge scans and aggregations\nComplex joins\nHistorical data\nOften denormalized/star schemas\nOptimized for read-heavy workloads\n\nReal-world example\nImagine an e-commerce platform.\nWhen a customer places an order:\nCustomer \u2192 Cart \u2192 Payment \u2192 Order \u2192 Inventory\nThat operational workflow belongs in OLTP.\n\nBut when the business asks:\n\"What was monthly revenue by region and product category over the last 3 years?\"\nThat's an OLAP workload.\n\nA typical architecture might look like:\nOLTP DB \u2192 CDC/ETL/ELT \u2192 Data Warehouse \u2192 BI/Analytics\n\nTrade-off\nTrying to run heavy analytical queries directly on an OLTP database can compete with production transactions for CPU, memory and I/O.\nConversely, using an OLAP warehouse to handle thousands of tiny transactional updates isn't what it is optimized for.\nThat's why modern data architectures usually separate the two workloads.\n\nTakeaway\nThink of it this way:\n\nOLTP = What is happening right now?\nOLAP = What has happened, and what can we learn from it?\n\nThe real engineering challenge isn't choosing one over the other.\nIt's designing the data flow between them.",
   "criteria_checks": {
     "has_useful_hook": false,
     "is_technically_accurate": false,
@@ -15,13 +15,11 @@
     "has_clear_takeaway": false
   },
   "issues_identified": [
-    "The LinkedIn post content to audit was not provided in the input.",
-    "Without the actual post, none of the evaluation criteria can be assessed.",
-    "The scoring system requires a concrete text to determine technical accuracy, hook quality, formatting, and other attributes."
+    "No LinkedIn post content was provided for audit; without the text the checklist cannot be evaluated.",
+    "Because the required input is missing, all validation criteria automatically fail."
   ],
   "improvement_suggestions": [
-    "Include the full text of the generated LinkedIn post in the input so that it can be evaluated against the checklist.",
-    "Ensure the post follows LinkedIn best practices: a clear hook, concise technical details, no Markdown tables or ASCII art, minimal fluff, a concrete lesson, and a clear takeaway with 3\u20115 technical hashtags.",
-    "Once the post is provided, run the audit again to receive a detailed score and actionable feedback."
+    "Supply the full generated LinkedIn post (including line breaks, hashtags, and any formatting) so it can be evaluated against the checklist.",
+    "Ensure the post contains a strong, non\u2011generic hook, accurate technical details, scannable bullet points, no filler language, concrete teaching of OLTP/OLAP mechanics, and a clear takeaway with exactly 3\u20115 technical hashtags at the bottom."
   ]
 }
