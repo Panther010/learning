@@ -1,15 +1,43 @@
-OLTP (Online Transaction Processing):
-- Is used for live transactional system where we need to access data in high concurrency low latency mode.
-- To achieve this Milliseconds latency and high concurrency operations. It is preferred to have data is highly normalised (3rd normal form)
-- Data remained stored in row-oriented format 8-16 KB to get entire results in one read
-- Fast read, write and update concurrency, and transactional integrity are required. Vertical scaling
-- Priority remains low latency and write integrity. Build around strict ACID compliance
+OLTP vs OLAP they both store data, but they solve very different problems.
+OLTP → Run the business
+OLAP → Understand the business
 
-OLAP (Online Analytical Processing)
-- It is used for complex analytical aggregations with historical data.
-- Read heavy: read huge amount of data with higher latency. It is expected to have denormalized(Star Schema/ Snowflake Schema/ Wide Tables)
-- Data remained in columnar format (Parquet or Delta), This columnar storage help high compression, High I/O savings, columnar layouts usually improve large scans, compression, and aggregations.
-- Scanning huge amount of data latency remain seconds to minutes. Scale horizontally.
-- Priority remains high throughput read performance
+OLTP (Online Transaction Processing) is designed for frequent, short, concurrent transactions:
+INSERT / UPDATE / DELETE
+Low-latency reads and writes
+Highly normalized schemas
+Strong consistency and transactional guarantees
 
-In modern data word these 2 system communicate with each other using CDC Change Data Capture(CDC) and ETL/ELT
+OLAP (Online Analytical Processing) is designed for analytical workloads:
+Large scans and aggregations
+Complex joins
+Historical data
+Often denormalized/star schemas
+Optimized for read-heavy workloads
+
+Real-world example
+Imagine an e-commerce platform.
+When a customer places an order:
+Customer → Cart → Payment → Order → Inventory
+That operational workflow belongs in OLTP.
+
+But when the business asks:
+"What was monthly revenue by region and product category over the last 3 years?"
+That's an OLAP workload.
+
+A typical architecture might look like:
+OLTP DB → CDC/ETL/ELT → Data Warehouse → BI/Analytics
+
+Trade-off
+Trying to run heavy analytical queries directly on an OLTP database can compete with production transactions for CPU, memory and I/O.
+Conversely, using an OLAP warehouse to handle thousands of tiny transactional updates isn't what it is optimized for.
+That's why modern data architectures usually separate the two workloads.
+
+Takeaway
+Think of it this way:
+
+OLTP = What is happening right now?
+OLAP = What has happened, and what can we learn from it?
+
+The real engineering challenge isn't choosing one over the other.
+It's designing the data flow between them.

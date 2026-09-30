@@ -1,5 +1,5 @@
 from typing import List, Literal
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 
 
 # ==========================================
@@ -23,10 +23,10 @@ class ContentStrategy(BaseModel):
     """Defines the narrative format and positioning strategy for LinkedIn."""
 
     post_format: Literal[
-        "Comparison Table",
-        "Production Post-Mortem",
-        "Architecture Deep-Dive",
-        "Debunking a Myth",
+        "Problem-Solution Flow",
+        "Key-Value Tradeoff Bullets",
+        "Architecture Breakdown",
+        "Post-Mortem Style Lesson",
         "Practical Checklist",
     ] = Field(description="The structural style best suited to present these specific insights.")
 
@@ -78,3 +78,10 @@ class VisualBrief(BaseModel):
     accessibility_alt_text: str = Field(
         description="One human-readable sentence describing the diagram for screen readers / LinkedIn alt text."
     )
+
+    @field_validator("image_prompt")
+    @classmethod
+    def image_prompt_max_110_words(cls, value: str) -> str:
+        if len(value.split()) > 110:
+            raise ValueError("image_prompt must contain no more than 110 words")
+        return value

@@ -21,7 +21,7 @@ def validate_linkedin_post(
 ) -> ValidationResult:
     llm = ChatGroq(
         groq_api_key=os.getenv("GROQ_API_KEY"),
-        model_name="openai/gpt-oss-20b",
+        model_name="openai/gpt-oss-120b",
         temperature=0.0,
     )
 
@@ -44,9 +44,10 @@ INPUT CONTEXT:
 EVALUATION CHECKLIST:
 ==================================================
 1. Useful Hook (`has_useful_hook`): Scroll-stopping line 1. FAIL if generic ("Hey network"), alarm emojis (🚨), or weak rhetorical questions ("Assuming OLTP can...?").
-2. Technical Accuracy (`is_technically_accurate`): Factually sound systems architecture principles.
+2. Technical Accuracy (`is_technically_accurate`): Factually sound systems architecture principles. Preserve the material details from the supplied analysis and post source; do not omit key items from source lists or add unsupported claims.
 3. Understandable & Scannable (`is_understandable_and_scannable`):
    - AUTOMATIC FAIL: Contains Markdown tables (`|---|`), multi-line ASCII diagrams (`+---+`, `|`, `--->`), or Markdown headers (`###`).
+   - Also assess mobile readability: short paragraphs (at most 2 sentences), blank lines between content blocks, and visible `•` bullets (nested `◦` bullets where useful) for comparisons or lists. Materially long lists should be split into one fact per bullet. Mark this criterion FALSE if the post is a dense wall of prose or packs many attributes into long bullets.
 4. Free of Fluff (`is_free_of_fluff`): Zero conversational filler ("Let's dive in").
 5. Teaches Something Concrete (`teaches_concrete_lesson`): Explains storage/system mechanics (row pages vs columnar groups, buffer pools, CDC).
 6. Clear Takeaway & Hashtags (`has_clear_takeaway`):
