@@ -1,0 +1,39 @@
+{
+  "source_file": "ETL_vs_ELT.txt",
+  "processed_at": "2026-10-02T00:10:42.031536",
+  "validation_score": 9.2,
+  "final_hook": "ETL vs ELT: the choice of where to do the heavy lifting is not a trend, it's a compliance and cost lever.",
+  "final_post_text": "ETL vs ELT: the choice of where to do the heavy lifting is not a trend, it's a compliance and cost lever.\n\nETL follows Extract  to  Transform  to  Load.\nELT follows Extract  to  Load  to  Transform.\n\nIn an e-commerce stack, PostgreSQL feeds Orders, Salesforce feeds Customers, APIs feed Payments, and JSON feeds Clickstream.\n\n- With ETL, we clean, join and apply business rules before loading the warehouse.\n- With ELT, we first land the raw data in a lakehouse and then use SQL, dbt or Spark to build staging, intermediate and business models.\n\n- Early transformation (ETL) keeps the warehouse lean and satisfies source-system constraints or security rules that must be enforced before data arrives.\n- Raw landing (ELT) enables audit trails, re-processing, and multiple downstream models without re-extracting data.\n- ELT can incur higher compute costs because the warehouse must run the transformation workload.\n- ETL may add latency because transformations happen outside the warehouse, but it can reduce the load on the target system.\n\nRule of thumb: choose ELT when you need to preserve the raw layer for audit, re-processing or multiple models; choose ETL when source constraints or compliance require transformation before load.\n\nWhich approach will keep your data fresh while meeting compliance and cost targets?\n\n#ETL #ELT #DataEngineering #DataWarehouse #DataPipeline",
+  "visual_concept": "Illustrate the ETL vs ELT pipeline flow and their trade\u2011offs in compliance and cost",
+  "image_prompt": "Flat 2D orthographic diagram, deep navy background (#050B14). Two parallel pipelines centered: left side ETL \u2013 thin cool-grey lines from four source cylinders (PostgreSQL, Salesforce, API, JSON) to a white transform box, then to a white warehouse cylinder. Right side ELT \u2013 same source lines to a white raw lakehouse block, then to a white transform box, then to warehouse. Use bright cyan arrows for active data flow, white for structural shapes, thin grey for infrastructure lines. High negative space, no text, no labels, no numbers, no glow, no 3D, no realistic textures.",
+  "source_evidence": "ETL vs ELT\n\nOne of the common discussions in data engineering is:\nETL or ELT?\nThe fundamental difference is simple:\n\nETL: Extract \u2192 Transform \u2192 Load\nTransformation happens before data reaches the target system.\n\nELT: Extract \u2192 Load \u2192 Transform\nRaw data is loaded first, and transformation happens inside the warehouse/lakehouse.\n\nA simple example:\n\nETL\nSources\n   \u2193\nExtract\n   \u2193\nTransform\n   \u2193\nWarehouse\n\nversus:\n\nELT\nSources\n   \u2193\nExtract\n   \u2193\nWarehouse / Lake\n   \u2193\nTransform\n   \u2193\nAnalytics Models\n\nConsider an e-commerce platform with:\n\u2022 PostgreSQL \u2192 Orders\n\u2022 Salesforce \u2192 Customers\n\u2022 APIs \u2192 Payments\n\u2022 JSON \u2192 Clickstream\n\nWith ETL, we might clean, join and apply business rules before loading the warehouse.\n\nWith ELT, we can first land the raw data and then use SQL/dbt/Spark to build staging, intermediate and business models.\n\nWhy does ELT become attractive?\n\nBecause keeping the raw layer can make it easier to:\n\u2192 Reprocess data\n\u2192 Change business logic\n\u2192 Build multiple downstream models\n\u2192 Audit where data came from\n\u2192 Scale transformations using warehouse/lakehouse compute\n\nBut ELT isn't automatically the right answer.\nETL can still make sense when transformations must happen before data reaches the target\u2014for example, because of security, compliance, source-system constraints, latency, or architectural requirements.\nSo the real question isn't:\n\"ETL or ELT?\"\n\nIt's:\n\"Where should transformation happen, and what trade-offs does that create?\"\nAs data engineers, that's the architectural decision that matters.\n#DataEngineering #ETL #ELT #DataWarehouse #DataArchitecture #BigData #dbt #CloudData\n",
+  "validation_criteria": {
+    "has_useful_hook": true,
+    "is_technically_accurate": true,
+    "is_understandable_and_scannable": true,
+    "is_free_of_fluff": true,
+    "teaches_concrete_lesson": true,
+    "has_clear_takeaway": true
+  },
+  "technical_analysis": {
+    "topic": "ETL vs ELT",
+    "core_lesson": "Transformation location determines data freshness, compliance, and compute cost; raw landing enables reprocessing but may add latency",
+    "common_misconception": "ELT is always better because it uses warehouse compute",
+    "practical_takeaway": "Choose ELT when raw data must be preserved for audit, reprocessing, or multiple models; choose ETL when security/compliance or source constraints require pre\u2011load transformation",
+    "architecture_pattern": "ETL: Extract \u2192 Transform \u2192 Load vs ELT: Extract \u2192 Load \u2192 Transform",
+    "useful_comparison": "ETL: early transformation, lower warehouse load, stricter compliance; ELT: raw landing, flexible reprocessing, higher compute cost, potential latency"
+  },
+  "content_strategy": {
+    "post_format": "Key-Value Tradeoff Bullets",
+    "angle": "Opinionated Lead Engineer",
+    "hook_angle": "Contrarian statement",
+    "visual_concept": "Extract \u2192 Transform \u2192 Load vs Extract \u2192 Load \u2192 Transform",
+    "tags": [
+      "#ETL",
+      "#ELT",
+      "#DataEngineering",
+      "#DataWarehouse",
+      "#DataPipeline"
+    ]
+  }
+}

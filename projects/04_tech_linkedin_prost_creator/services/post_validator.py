@@ -43,13 +43,13 @@ INPUT CONTEXT:
 ==================================================
 EVALUATION CHECKLIST:
 ==================================================
-1. Useful Hook (`has_useful_hook`): Scroll-stopping line 1. FAIL if generic ("Hey network"), alarm emojis (🚨), or weak rhetorical questions ("Assuming OLTP can...?").
+1. Useful Hook (`has_useful_hook`): Scroll-stopping line 1 that clearly names the topic or compared options immediately. FAIL if readers cannot tell the subject from the opening sentence, or if it uses generic greetings ("Hey network"), alarm emojis (🚨), or weak rhetorical questions.
 2. Technical Accuracy (`is_technically_accurate`): Factually sound systems architecture principles. Preserve the material details from the supplied analysis and post source; do not omit key items from source lists or add unsupported claims.
 3. Understandable & Scannable (`is_understandable_and_scannable`):
    - AUTOMATIC FAIL: Contains Markdown tables (`|---|`), multi-line ASCII diagrams (`+---+`, `|`, `--->`), or Markdown headers (`###`).
-   - Also assess mobile readability: short paragraphs (at most 2 sentences), blank lines between content blocks, and visible `•` bullets (nested `◦` bullets where useful) for comparisons or lists. Materially long lists should be split into one fact per bullet. Mark this criterion FALSE if the post is a dense wall of prose or packs many attributes into long bullets.
+   - Also assess mobile readability: short paragraphs (at most 2 sentences), blank lines between content blocks, and plain ASCII hyphen bullets (`- `) for comparisons or lists. Mark this criterion FALSE if the post is a dense wall of prose, uses nested bullet indentation, or packs many attributes into long paragraphs or bullets.
 4. Free of Fluff (`is_free_of_fluff`): Zero conversational filler ("Let's dive in").
-5. Teaches Something Concrete (`teaches_concrete_lesson`): Explains storage/system mechanics (row pages vs columnar groups, buffer pools, CDC).
+5. Teaches Something Concrete (`teaches_concrete_lesson`): Explains a relevant mechanism, decision, or practical detail for the supplied topic; do not require examples from unrelated topics.
 6. Clear Takeaway & Hashtags (`has_clear_takeaway`):
    - Includes practical rule of thumb + open engineering question.
    - MUST contain EXACTLY 3 to 5 technical hashtags at the bottom. Less than 3 or more than 5 hashtags is a FAIL.

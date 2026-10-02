@@ -1,0 +1,20 @@
+ETL vs ELT: the choice of where to do the heavy lifting is not a trend, it's a compliance and cost lever.
+
+ETL follows Extract  to  Transform  to  Load.
+ELT follows Extract  to  Load  to  Transform.
+
+In an e-commerce stack, PostgreSQL feeds Orders, Salesforce feeds Customers, APIs feed Payments, and JSON feeds Clickstream.
+
+- With ETL, we clean, join and apply business rules before loading the warehouse.
+- With ELT, we first land the raw data in a lakehouse and then use SQL, dbt or Spark to build staging, intermediate and business models.
+
+- Early transformation (ETL) keeps the warehouse lean and satisfies source-system constraints or security rules that must be enforced before data arrives.
+- Raw landing (ELT) enables audit trails, re-processing, and multiple downstream models without re-extracting data.
+- ELT can incur higher compute costs because the warehouse must run the transformation workload.
+- ETL may add latency because transformations happen outside the warehouse, but it can reduce the load on the target system.
+
+Rule of thumb: choose ELT when you need to preserve the raw layer for audit, re-processing or multiple models; choose ETL when source constraints or compliance require transformation before load.
+
+Which approach will keep your data fresh while meeting compliance and cost targets?
+
+#ETL #ELT #DataEngineering #DataWarehouse #DataPipeline

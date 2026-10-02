@@ -38,7 +38,7 @@ CONTRACT & FORMATTING RULES:
      - "Practical Checklist": Provide a short, actionable checklist grounded in the technical analysis.
 
 2. Select the format that best fits the supplied analysis. Do not invent incidents, metrics, systems, or technical details. 
-   The post itself must always follow this order: Hook -> Concept -> Real-world example -> Trade-off -> Takeaway. Choose `post_format` only to guide how the explanation or trade-off is presented within that flow; it must not remove or reorder these stages.
+   The post itself must always follow this order: Hook -> Concept -> Real-world example -> Trade-off -> Takeaway. The hook must name the topic or the compared options immediately and make the central decision or tension clear. Choose `post_format` only to guide how the explanation or trade-off is presented within that flow; it must not remove or reorder these stages.
 3. `visual_concept`: Describe a single-line horizontal sequence or a short bulleted workflow. 
      - Example: `Producer -> Kafka -> Flink -> Iceberg` 
      - Do not use multi-line ASCII diagrams, box drawings, or vertical arrows. 
