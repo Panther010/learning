@@ -1,0 +1,72 @@
+**Data Warehouse vs Data Lake — the difference is not just structured vs unstructured data.**
+
+A more useful question is:
+**Where should data live, and who needs to use it?**
+
+###Data Warehouse
+A warehouse is primarily designed for **curated analytical data**.
+
+Think:
+`Sources → Transform → Warehouse → BI / Analytics`
+
+Data is modeled, governed and optimized for analytical queries.
+
+Examples:
+`fact_orders`
+`dim_customer`
+`dim_product`
+
+### Data Lake
+A lake is primarily designed to **retain data at scale**, often in raw or lightly processed form.
+
+Think:
+`Sources → Raw Data → Processing → Analytics / ML`
+
+It can store:
+`CSV • JSON • Parquet • Logs • Events • Images`
+The schema can be applied later depending on the use case.
+
+### Real-world example
+
+Consider an e-commerce platform:
+PostgreSQL → Orders
+Salesforce → Customers
+Payment APIs → Transactions
+Kafka → Clickstream
+Application logs → JSON
+
+- A lake might preserve the original source data for reprocessing, ML and exploration.
+- A warehouse might turn that data into:
+
+`fact_orders → dim_customer → daily_sales → customer_LTV`
+
+for BI and business reporting.
+
+### The trade-off
+
+**Data Lake**
+→ More flexible
+→ Retains raw data
+→ Handles many data types
+→ Great for large-scale processing
+
+But requires strong governance, metadata and data-quality practices.
+
+**Data Warehouse**
+→ Curated and analytics-ready
+→ Strong SQL/BI experience
+→ Easier business consumption
+→ Strong modeling and governance
+
+But can require more upfront modeling and may not be ideal as the primary home for every type of raw data.
+And modern **lakehouse architectures blur the boundary**, combining lake-style storage with warehouse-style analytics capabilities.
+
+### Takeaway
+Don't ask:
+**"Lake or Warehouse?"**
+
+Ask:
+**"What data do we need to preserve, who will consume it, and what workloads do we need to support?"**
+Sometimes the answer is **both**.
+
+#DataEngineering #DataWarehouse #DataLake #Lakehouse #DataArchitecture #Analytics

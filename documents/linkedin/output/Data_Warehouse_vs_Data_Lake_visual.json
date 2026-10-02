@@ -1,0 +1,6 @@
+{
+  "visual_concept": "Illustrate the trade\u2011off between a raw data lake and a curated data warehouse in a single, clean diagram.",
+  "image_prompt": "Flat 2D orthographic diagram, deep navy background (#050B14). Centered: two cylinders side by side, left labeled lake, right labeled warehouse. Thin cool\u2011grey infrastructure lines (#8A99AD) connect: source streams (thin lines) to lake cylinder, lake to processing node (square), processing to warehouse cylinder, warehouse to analytics nodes (small squares). Cyan (#00E5FF) arrows show active data flow from sources to lake, lake to processing, processing to warehouse, warehouse to analytics. White (#FFFFFF) shapes for cylinders, nodes, and arrows. High negative space, clean developer aesthetic, no text, no glow, no 3D, no decorative elements.",
+  "negative_prompt": "text, labels, numbers, code snippets, UI screenshots, 3D renders, realistic textures, people, rainbow colors, floating icons, duplicate nodes, arbitrary arrows, decorative elements, cyberpunk, excessive glow",
+  "accessibility_alt_text": "A centered flat 2\u2011D diagram showing a data lake and a data warehouse side by side, with source streams feeding a raw data lake cylinder, then a processing node, then a warehouse cylinder, and finally analytics nodes, all connected by cyan arrows indicating data flow."
+}

@@ -152,9 +152,9 @@ Say these plainly if asked; don't try to fake depth.
 
 
 1. Data Engineering fundamentals — Days 1–15
-ETL vs ELT — when to use each
+ETL vs ELT — when to use each -> Done
 OLTP vs OLAP --> Done
-Data Warehouse vs Data Lake
+Data Warehouse vs Data Lake -> Done
 Data Lake vs Data Lakehouse
 Structured vs Semi-structured vs Unstructured data
 Batch vs Streaming processing

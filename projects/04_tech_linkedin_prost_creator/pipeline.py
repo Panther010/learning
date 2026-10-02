@@ -24,15 +24,27 @@ from shared.path_utils import get_project_root
 logger = get_logger(__name__)
 
 
+def _to_linkedin_bold(text: str) -> str:
+    """Convert ASCII letters and digits to Unicode sans-serif bold characters."""
+    bold_text = []
+    for character in text:
+        if "A" <= character <= "Z":
+            bold_text.append(chr(0x1D5D4 + ord(character) - ord("A")))
+        elif "a" <= character <= "z":
+            bold_text.append(chr(0x1D5EE + ord(character) - ord("a")))
+        elif "0" <= character <= "9":
+            bold_text.append(chr(0x1D7EC + ord(character) - ord("0")))
+        else:
+            bold_text.append(character)
+    return "".join(bold_text)
+
+
 def sanitize_post_content(post_text: str) -> str:
-    """Prepare LinkedIn copy as plain paragraphs with portable characters."""
-    normalized_text = unicodedata.normalize("NFKC", post_text)
+    """Normalize spacing while preserving LinkedIn-friendly Unicode formatting."""
+    normalized_text = unicodedata.normalize("NFC", post_text)
     replacements = str.maketrans({
-        "•": "-",
-        "◦": "-",
-        "→": " to ",
-        "‑": "-",
-        "‐": "-",
+        "→": "→",
+        "•": "•",
         "–": "-",
         "—": "-",
         "−": "-",
@@ -42,18 +54,27 @@ def sanitize_post_content(post_text: str) -> str:
         "’": "'",
         "\u00a0": " ",
     })
-    translated_text = normalized_text.translate(replacements).replace("**", "")
-    translated_text = translated_text.replace("->", " to ")
+    translated_text = normalized_text.translate(replacements)
+    translated_text = re.sub(
+        r"\*\*(.+?)\*\*",
+        lambda match: _to_linkedin_bold(match.group(1)),
+        translated_text,
+    ).replace("`", "")
+    translated_text = translated_text.replace("->", "→")
     cleaned_lines = []
     for line in translated_text.splitlines():
-        # Unicode spacing characters are not all normalized by NFKC.
+        # Convert Unicode space separators to ordinary spaces and collapse repeats.
         line = "".join(
             " " if unicodedata.category(character) == "Zs" else character
             for character in line
         )
-        line = line.strip()
-        # Drop remaining non-ASCII decoration, including emoji and invisible marks.
-        line = unicodedata.normalize("NFKD", line).encode("ascii", "ignore").decode("ascii")
+        line = re.sub(r"[ \t]{2,}", " ", line).strip()
+        # Drop control/format characters while keeping line breaks and emoji joiners.
+        line = "".join(
+            character
+            for character in line
+            if unicodedata.category(character) not in {"Cc", "Cf"} or character == "\u200d"
+        )
         cleaned_lines.append(line)
 
     plain_text = "\n".join(cleaned_lines)
@@ -137,7 +158,7 @@ def process_single_file(
 
         # 1. Save copy-paste ready post (.txt)
         output_post_path = output_dir / f"{base_name}_post.txt"
-        output_post_path.write_text(final_post, encoding="utf-8")
+        output_post_path.write_text(final_post, encoding="utf-8", newline="\n")
 
         # 2. Save Stage 5 visual brief (.json)
         output_visual_path = output_dir / f"{base_name}_visual.json"
@@ -186,7 +207,7 @@ def process_single_file(
         # 1. Save diagnostic fail report in review_required/
         review_report_path = review_dir / f"{base_name}_FAILED.json"
         review_draft_path = review_dir / f"{base_name}_FAILED_post.txt"
-        review_draft_path.write_text(final_post, encoding="utf-8")
+        review_draft_path.write_text(final_post, encoding="utf-8", newline="\n")
 
         failed_report = {
             "source_file": file_path.name,

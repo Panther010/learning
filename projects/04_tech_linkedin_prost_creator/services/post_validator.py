@@ -47,7 +47,9 @@ EVALUATION CHECKLIST:
 2. Technical Accuracy (`is_technically_accurate`): Factually sound systems architecture principles. Preserve the material details from the supplied analysis and post source; do not omit key items from source lists or add unsupported claims.
 3. Understandable & Scannable (`is_understandable_and_scannable`):
    - AUTOMATIC FAIL: Contains Markdown tables (`|---|`), multi-line ASCII diagrams (`+---+`, `|`, `--->`), or Markdown headers (`###`).
-   - Also assess mobile readability: short paragraphs (at most 2 sentences), blank lines between content blocks, and plain ASCII hyphen bullets (`- `) for comparisons or lists. Mark this criterion FALSE if the post is a dense wall of prose, uses nested bullet indentation, or packs many attributes into long paragraphs or bullets.
+   - Inline Unicode arrows (`→`), visible Unicode bullets (`•`, `◦`), limited Unicode bold, and appropriate emoji are allowed; do not lower the score solely for using them.
+   - Assess mobile readability against the writer's layout: 5 or more short blocks with blank lines; prose paragraphs of at most 2 sentences and about 35 words; visible bullet groups for comparisons, steps, or related facts; one idea per bullet, preferably under 20 words; no bullet indentation.
+   - Short plain-text labels (for example, `Trade-offs:`) are allowed. Mark this criterion FALSE if the post is a dense wall of prose, lacks bullets where a list/comparison is needed, combines distinct ideas into a long bullet, or repeats points to fill space.
 4. Free of Fluff (`is_free_of_fluff`): Zero conversational filler ("Let's dive in").
 5. Teaches Something Concrete (`teaches_concrete_lesson`): Explains a relevant mechanism, decision, or practical detail for the supplied topic; do not require examples from unrelated topics.
 6. Clear Takeaway & Hashtags (`has_clear_takeaway`):

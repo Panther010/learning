@@ -30,16 +30,17 @@ The pipeline requires `GROQ_API_KEY` in the environment (a local `.env` is loade
 - Use the source notes and technical analysis as the factual boundary. Include OLTP/OLAP concepts only when the supplied topic or notes support them; apply the same rule to every other subject.
 - Make the first sentence name the topic or compared options and state the central decision or tension. The reader should know the subject before continuing.
 - Carry a source-supported example through the explanation and trade-offs. Do not invent incidents, outcomes, metrics, systems, or vendors.
-- Keep the post easy to read and paste into LinkedIn: short paragraphs (at most two sentences), normal blank lines, and simple ASCII hyphen bullets (`- `) for lists and comparisons. Keep each bullet to one idea and preferably under 20 words; do not nest or indent bullets.
-- Use ordinary punctuation and short labels only when they help scanning. Avoid Unicode bullets, arrows, emoji, Markdown emphasis, tables, and decorative symbols. Retain final hashtags, which are part of the post.
+- Keep the post easy to read and paste into LinkedIn: organize it into at least five short blocks separated by blank lines; keep prose paragraphs to at most two sentences and about 35 words; use visible bullets for lists and comparisons. Each bullet should carry one idea and preferably stay under 20 words. Use `•` for main bullets and `◦` only for a necessary nested detail, without indentation.
+- Keep opening sentences clear about the topic. Short plain-text labels such as `Trade-offs:` or `Rule of thumb:` may be used where they help scanning.
+- LinkedIn-friendly Unicode such as `→`, `•`, `◦`, and appropriate emoji is allowed. Do not penalize it as a special-character or readability issue. Unicode bold is allowed sparingly for the hook or one or two key phrases; the sanitizer converts `**...**` markers. Avoid Markdown tables and decorative symbol clutter. Retain final hashtags, which are part of the post.
 - Preserve useful technical detail without turning every post into a glossary or checklist. Keep risks qualified unless the source confirms they happened.
 - The validator must assess the supplied topic, not require mechanics from unrelated subjects.
-- If a prompt is changed, update any related validation criteria so generation and validation ask for the same format and quality.
+- Keep `post_writer.py`, `post_validator.py`, and `ValidationCriteria` aligned on opening clarity, paragraph length, blank lines, labels, and bullet expectations. If one prompt changes, update the matching validator and schema descriptions.
 
 ## Code and data dos and don'ts
 
 - Use type hints and keep functions focused; follow the repository's Python and Ruff conventions.
-- Keep output formatting in `sanitize_post_content()` consistent with the writer's formatting contract. It should normalize decorative Unicode and arrows but preserve plain ASCII hyphen bullets and useful line breaks. It runs before validation and before saving both passing and review drafts.
+- Keep output formatting in `sanitize_post_content()` consistent with the writer's formatting contract. Normalize text with NFC, preserve useful Unicode (including bullets, arrows, and emoji), normalize `->` to `→`, collapse repeated spaces, and keep blank lines. Convert sparse `**bold**` markers to Unicode bold. Write post files as UTF-8 with LF newlines. The sanitizer runs before validation and before saving both passing and review drafts.
 - Keep pipeline paths resolved through the existing project path utilities rather than hardcoding machine-specific absolute paths.
 - Keep source examples small and factual. Do not commit credentials, generated output, large datasets, or environment files.
 - Avoid broad refactors of legacy learning material unless the task requires them.
