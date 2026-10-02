@@ -48,9 +48,19 @@ class ContentStrategy(BaseModel):
 class ValidationCriteria(BaseModel):
     has_useful_hook: bool = Field(description="True if hook is scroll-stopping and avoids generic clichés/alarm emojis.")
     is_technically_accurate: bool = Field(description="True if facts match TechnicalAnalysis without hallucinated or flawed advice.")
-    is_understandable_and_scannable: bool = Field(description="True if layout uses clean line breaks and avoids unrenderable Markdown tables or ASCII blocks.")
+    is_understandable_and_scannable: bool = Field(
+        description=(
+            "True if the post uses blank lines between blocks, short paragraphs (at most 2 sentences/about 35 words), "
+            "and visible bullet groups where comparisons or lists need them, with one idea per bullet. "
+            "Unicode bullets, arrows, emoji, and limited Unicode bold are allowed; "
+            "do not mark down solely for these characters. Plain-text labels are allowed. "
+            "Markdown tables and multi-line ASCII art are not allowed."
+        )
+    )
     is_free_of_fluff: bool = Field(description="True if introductory fluff and filler words are removed.")
-    teaches_concrete_lesson: bool = Field(description="True if it explains 'why' or 'how' (e.g., row pages vs column chunks) rather than surface definitions.")
+    teaches_concrete_lesson: bool = Field(
+        description="True if it explains a relevant mechanism, decision, or practical detail for the supplied topic."
+    )
     has_clear_takeaway: bool = Field(description="True if ending includes a crisp rule of thumb and engaging CTA.")
 
 

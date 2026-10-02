@@ -1,0 +1,34 @@
+𝗗𝗮𝘁𝗮 𝗟𝗮𝗸𝗲 𝘃𝘀. 𝗗𝗮𝘁𝗮 𝗪𝗮𝗿𝗲𝗵𝗼𝘂𝘀𝗲: 𝗧𝗵𝗲 𝗿𝗲𝗮𝗹 𝗱𝗲𝗰𝗶𝘀𝗶𝗼𝗻 𝗽𝗼𝗶𝗻𝘁
+
+A data lake is a scalable raw‑data repository; a data warehouse is a curated, analytics‑ready store. The choice hinges on preservation needs, consumer profiles, and workload types.
+
+𝗛𝗼𝘄 𝗶𝘁 𝘄𝗼𝗿𝗸𝘀 𝗶𝗻 𝗽𝗿𝗮𝗰𝘁𝗶𝗰𝗲
+
+Sources → Raw Data → Processing → Analytics / ML
+Sources → Transform → Warehouse → BI / Analytics
+
+An e‑commerce platform pulls PostgreSQL orders, Salesforce customers, payment API transactions, Kafka clickstream, and JSON logs.
+
+• The lake keeps all source files intact for future re‑processing or ML experiments.
+• The warehouse turns them into fact_orders, dim_customer, dim_product, and derived metrics like daily_sales and customer_LTV for business reporting.
+
+𝗞𝗲𝘆 𝘁𝗿𝗮𝗱𝗲‑𝗼𝗳𝗳𝘀
+
+• Lake
+
+◦ Flexible, supports CSV, JSON, Parquet, logs, images, and any schema applied later.
+◦ Handles large‑scale processing and ML pipelines.
+◦ Requires robust governance, metadata, and data‑quality controls to avoid becoming a "data swamp."
+
+• Warehouse
+
+◦ Curated, SQL‑centric, ready for BI tools and quick queries.
+◦ Strong modeling and governance reduce data‑consistency risks.
+◦ Needs upfront design; may not accommodate every raw data type as a primary home.
+
+𝗥𝘂𝗹𝗲 𝗼𝗳 𝘁𝗵𝘂𝗺𝗯
+
+Ask: "What data must we preserve, who will consume it, and what workloads must it support?"
+The answer often is 𝗯𝗼𝘁𝗵-a lake for raw, exploratory work and a warehouse for business‑ready insights, or a lakehouse that blends the two.
+
+#DataLake #DataWarehouse #Lakehouse #DataGovernance #DataEngineering
