@@ -25,13 +25,13 @@ def analyze_technical_notes(raw_post_content: str) -> TechnicalAnalysis:
         TechnicalAnalysis: Pydantic model containing core lesson, misconceptions,
           practical takeaways, and architectural flow.
     """
-    # 1. Initialize LLM (Using active Groq model with low temperature for analytical precision)
+    # Keep the structured analysis response within Groq's output-token budget.
     llm = ChatGroq(
         groq_api_key=os.getenv("GROQ_API_KEY"),
-        model_name="qwen/qwen3.8-27b",
+        model_name="openai/gpt-oss-20b",
         temperature=0.1,
+        max_tokens=800,
     )
-
 
     # 2. Attach Pydantic Schema directly for native structured output
     structured_llm = llm.with_structured_output(TechnicalAnalysis)

@@ -1,0 +1,6 @@
+{
+  "visual_concept": "Illustrate the ETL vs ELT pipeline flow and their trade\u2011offs in compliance and cost",
+  "image_prompt": "Flat 2D orthographic diagram, deep navy background (#050B14). Two parallel pipelines centered: left side ETL \u2013 thin cool-grey lines from four source cylinders (PostgreSQL, Salesforce, API, JSON) to a white transform box, then to a white warehouse cylinder. Right side ELT \u2013 same source lines to a white raw lakehouse block, then to a white transform box, then to warehouse. Use bright cyan arrows for active data flow, white for structural shapes, thin grey for infrastructure lines. High negative space, no text, no labels, no numbers, no glow, no 3D, no realistic textures.",
+  "negative_prompt": "text, labels, numbers, code, UI screenshots, 3D, realistic textures, people, cyberpunk, rainbow colors, floating icons, duplicate nodes, arbitrary arrows, decorative elements, excessive glow",
+  "accessibility_alt_text": "A centered diagram showing two parallel pipelines: one labeled ETL with arrows from source databases to a transform box then to a warehouse, and one labeled ELT with arrows from sources to a raw lakehouse then to a transform box before the warehouse, highlighting compliance and cost trade\u2011offs."
+}

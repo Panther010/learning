@@ -1,0 +1,64 @@
+ETL vs ELT
+
+One of the common discussions in data engineering is:
+ETL or ELT?
+The fundamental difference is simple:
+
+ETL: Extract → Transform → Load
+Transformation happens before data reaches the target system.
+
+ELT: Extract → Load → Transform
+Raw data is loaded first, and transformation happens inside the warehouse/lakehouse.
+
+A simple example:
+
+ETL
+Sources
+   ↓
+Extract
+   ↓
+Transform
+   ↓
+Warehouse
+
+versus:
+
+ELT
+Sources
+   ↓
+Extract
+   ↓
+Warehouse / Lake
+   ↓
+Transform
+   ↓
+Analytics Models
+
+Consider an e-commerce platform with:
+• PostgreSQL → Orders
+• Salesforce → Customers
+• APIs → Payments
+• JSON → Clickstream
+
+With ETL, we might clean, join and apply business rules before loading the warehouse.
+
+With ELT, we can first land the raw data and then use SQL/dbt/Spark to build staging, intermediate and business models.
+
+Why does ELT become attractive?
+
+Because keeping the raw layer can make it easier to:
+→ Reprocess data
+→ Change business logic
+→ Build multiple downstream models
+→ Audit where data came from
+→ Scale transformations using warehouse/lakehouse compute
+
+But ELT isn't automatically the right answer.
+ETL can still make sense when transformations must happen before data reaches the target—for example, because of security, compliance, source-system constraints, latency, or architectural requirements.
+So the real question isn't:
+"ETL or ELT?"
+
+It's:
+"Where should transformation happen, and what trade-offs does that create?"
+As data engineers, that's the architectural decision that matters.
+#DataEngineering #ETL #ELT #DataWarehouse #DataArchitecture #BigData #dbt #CloudData

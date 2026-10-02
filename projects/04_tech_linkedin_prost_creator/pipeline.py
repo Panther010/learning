@@ -1,8 +1,10 @@
 # pipeline.py
 import json
+import re
 import shutil
 import sys
 import time
+import unicodedata
 from datetime import datetime
 from pathlib import Path
 
@@ -23,11 +25,12 @@ logger = get_logger(__name__)
 
 
 def sanitize_post_content(post_text: str) -> str:
-    """Prepare plain-text copy for LinkedIn using portable punctuation."""
+    """Prepare LinkedIn copy as plain paragraphs with portable characters."""
+    normalized_text = unicodedata.normalize("NFKC", post_text)
     replacements = str.maketrans({
         "•": "-",
         "◦": "-",
-        "→": "->",
+        "→": " to ",
         "‑": "-",
         "‐": "-",
         "–": "-",
@@ -39,7 +42,23 @@ def sanitize_post_content(post_text: str) -> str:
         "’": "'",
         "\u00a0": " ",
     })
-    return post_text.translate(replacements).replace("**", "")
+    translated_text = normalized_text.translate(replacements).replace("**", "")
+    translated_text = translated_text.replace("->", " to ")
+    cleaned_lines = []
+    for line in translated_text.splitlines():
+        # Unicode spacing characters are not all normalized by NFKC.
+        line = "".join(
+            " " if unicodedata.category(character) == "Zs" else character
+            for character in line
+        )
+        line = line.strip()
+        # Drop remaining non-ASCII decoration, including emoji and invisible marks.
+        line = unicodedata.normalize("NFKD", line).encode("ascii", "ignore").decode("ascii")
+        cleaned_lines.append(line)
+
+    plain_text = "\n".join(cleaned_lines)
+    plain_text = re.sub(r"\n{3,}", "\n\n", plain_text)
+    return plain_text.strip()
 
 
 def extract_hook_line(post_text: str) -> str:
