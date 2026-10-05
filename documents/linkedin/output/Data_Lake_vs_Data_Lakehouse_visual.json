@@ -1,0 +1,6 @@
+{
+  "visual_concept": "Illustrate the lakehouse architecture layering a transactional table format over object storage, showing raw Bronze, validated Silver, and business\u2011ready Gold tiers with ACID guarantees and a catalog.",
+  "image_prompt": "Flat 2D orthographic diagram: deep navy background (#050B14). Centered: a large cylinder labeled object storage (white). On top, three stacked white cylinders labeled Bronze, Silver, Gold, connected by bright cyan arrows flowing upward. A white catalog box above the stack, linked by cyan arrows to each tier. Thin cool\u2011grey infrastructure lines connect a PostgreSQL cylinder, a Salesforce cylinder, a Kafka cylinder, and an API cylinder to the bottom of the object storage. All shapes are precise geometric, no text, no labels, no numbers. Clean developer\u2011tool aesthetic, quiet glow, high negative space.",
+  "negative_prompt": "text, labels, numbers, code snippets, UI screenshots, 3D renders, realistic textures, photorealistic people, rainbow colors, floating icons, duplicate nodes, arbitrary arrows, decorative elements, cyberpunk, excessive glow",
+  "accessibility_alt_text": "Diagram showing a lakehouse architecture with object storage at the base, three data tiers (Bronze, Silver, Gold) stacked above, and a catalog on top, all connected to source systems via arrows."
+}

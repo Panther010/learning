@@ -47,11 +47,16 @@ class ContentStrategy(BaseModel):
 # ==========================================
 class ValidationCriteria(BaseModel):
     has_useful_hook: bool = Field(description="True if hook is scroll-stopping and avoids generic clichés/alarm emojis.")
-    is_technically_accurate: bool = Field(description="True if facts match TechnicalAnalysis without hallucinated or flawed advice.")
+    is_technically_accurate: bool = Field(
+        description=(
+            "True if claims match the technical analysis and source notes, with no hallucinations "
+            "or flawed advice. Missing optional source details are feedback, not a failure."
+        )
+    )
     is_understandable_and_scannable: bool = Field(
         description=(
-            "True if the post uses blank lines between blocks, short paragraphs (at most 2 sentences/about 35 words), "
-            "and visible bullet groups where comparisons or lists need them, with one idea per bullet. "
+            "True if the post is visually easy to scan, with short paragraphs, useful bullets, and blank lines between blocks. "
+            "Prefer short lines and one idea per bullet, but line or bullet length alone is not a failure. "
             "Unicode bullets, arrows, emoji, and limited Unicode bold are allowed; "
             "do not mark down solely for these characters. Plain-text labels are allowed. "
             "Markdown tables and multi-line ASCII art are not allowed."
@@ -64,12 +69,56 @@ class ValidationCriteria(BaseModel):
     has_clear_takeaway: bool = Field(description="True if ending includes a crisp rule of thumb and engaging CTA.")
 
 
+class ValidationScoreBreakdown(BaseModel):
+    has_useful_hook: float = Field(ge=0, le=10, description="Numeric score for the opening hook, from 0 to 10.")
+    is_technically_accurate: float = Field(
+        ge=0, le=10, description="Numeric score for factual correctness, from 0 to 10."
+    )
+    is_understandable_and_scannable: float = Field(
+        ge=0, le=10, description="Numeric score for visual scannability and clarity, not line length alone."
+    )
+    is_free_of_fluff: float = Field(ge=0, le=10, description="Numeric score for concise, useful writing, from 0 to 10.")
+    teaches_concrete_lesson: float = Field(
+        ge=0, le=10, description="Numeric score for the relevant technical lesson, from 0 to 10."
+    )
+    has_clear_takeaway: float = Field(
+        ge=0, le=10, description="Numeric score for the takeaway and hashtag requirements, from 0 to 10."
+    )
+
+
+class SourceAudit(BaseModel):
+    omitted_source_details: List[str] = Field(
+        description=(
+            "Distinct useful source details not represented in the post's meaning; semantic paraphrases count as present. "
+            "These are non-blocking suggestions, not accuracy failures."
+        )
+    )
+    unsupported_post_claims: List[str] = Field(
+        description="Claims in the post not supported by the analysis or source notes; empty when none are found."
+    )
+
+
 class ValidationResult(BaseModel):
-    score: float = Field(description="Overall quality score between 0.0 and 10.0")
-    passed: bool = Field(description="True if score >= 7.0 and no critical formatting/technical issues exist")
+    score: float = Field(
+        ge=0,
+        le=10,
+        description="Overall score, calculated as the mean of score_breakdown by the application.",
+    )
+    score_breakdown: ValidationScoreBreakdown = Field(
+        description="Numeric 0-10 scores for each criterion; the overall score is their arithmetic mean."
+    )
+    passed: bool = Field(description="True if score >= 7.0 and no critical factual or quality issues exist")
     criteria: ValidationCriteria = Field(description="Itemized evaluation checklist")
-    issues: List[str] = Field(description="Actionable feedback bullet points explaining what to fix if score < 7.0")
+    source_audit: SourceAudit = Field(description="Explicit source omissions and unsupported-claim findings.")
+    issues: List[str] = Field(
+        description="Blocking factual or quality problems; do not include omissions or line length preferences."
+    )
     improvement_suggestions: List[str] = Field(description="Specific rewrite instructions to pass in the next attempt")
+    warnings: List[str] = Field(
+        description=(
+            "Non-blocking suggestions such as omitted source details or long lines; these must not make the post fail."
+        )
+    )
 
 
 # ==========================================
