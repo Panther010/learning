@@ -1,0 +1,42 @@
+Lake versus lakehouse: choose the right layer for the right workload.
+
+A data lake stores raw files in cheap object storage.
+A lakehouse adds a transactional, schema‑aware table layer on top of the same storage.
+
+Lakehouse relies on table formats such as Delta Lake, Apache Iceberg, or Apache Hudi to provide ACID transactions, schema enforcement, and time travel.
+The architectural formula is: 𝗢𝗯𝗷𝗲𝗰𝘁 𝗦𝘁𝗼𝗿𝗮𝗴𝗲 + 𝗧𝗮𝗯𝗹𝗲 𝗙𝗼𝗿𝗺𝗮𝘁 + 𝗧𝗿𝗮𝗻𝘀𝗮𝗰𝘁𝗶𝗼𝗻𝗮𝗹/𝗚𝗼𝘃𝗲𝗿𝗻𝗮𝗻𝗰𝗲 𝗖𝗮𝗽𝗮𝗯𝗶𝗹𝗶𝘁𝗶𝗲𝘀.
+
+𝗘𝘅𝗮𝗺𝗽𝗹𝗲 - 𝗲‑𝗰𝗼𝗺𝗺𝗲𝗿𝗰𝗲 𝗽𝗹𝗮𝘁𝗳𝗼𝗿𝗺
+Orders from PostgreSQL, customers from Salesforce, payments via APIs, clickstream from Kafka, logs as JSON.
+All raw files land in S3.
+A lakehouse can expose those files as ACID‑enabled tables for BI, engineering, science, and ML.
+
+𝗧𝗿𝗮𝗱𝗲‑𝗼𝗳𝗳𝘀
+
+• Cost and flexibility
+
+Lake: low‑cost, scalable, open formats.
+Lakehouse: same storage cost, extra compute for transaction logs.
+
+• Governance
+
+Lake: no built‑in schema enforcement; risk of a data swamp.
+Lakehouse: schema enforcement, evolution, and time travel.
+
+• Operational complexity
+
+Lake: simple ingestion pipelines.
+Lakehouse: requires managing table formats and transaction coordinators.
+
+• Workload fit
+
+Lake: exploratory analytics, ML training on raw data.
+Lakehouse: shared analytical workloads that need reliable semantics.
+
+𝗥𝘂𝗹𝗲 𝗼𝗳 𝘁𝗵𝘂𝗺𝗯
+If you only need flexible, low‑cost storage for exploration, a plain lake is enough.
+If you need shared BI, engineering, and ML workloads that depend on ACID guarantees, a lakehouse is the right choice.
+
+What guarantees and workloads do you need on top of your storage layer?
+
+#Lakehouse #DataLake #ACID #DataGovernance

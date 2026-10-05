@@ -123,14 +123,20 @@ def process_single_file(
 
     # Stage 4: Post Validation
     logger.info("Running Stage 4: Post Validation (LLM-as-a-Judge)...")
-    validation: ValidationResult = validate_linkedin_post(final_post, tech_analysis)
+    validation: ValidationResult = validate_linkedin_post(
+        final_post, tech_analysis, source_notes=raw_text
+    )
     time.sleep(1.5)
 
     # Make one targeted repair attempt using the validator's feedback.
     if not validation.passed:
         logger.info("Validation failed; revising the post once using validator feedback...")
         revision_feedback = "\n".join(
-            [*validation.issues, *validation.improvement_suggestions]
+            [
+                *validation.issues,
+                *validation.improvement_suggestions,
+                *[f"Non-blocking improvement: {warning}" for warning in validation.warnings],
+            ]
         )
         raw_post = generate_final_post(
             analysis=tech_analysis,
@@ -141,7 +147,9 @@ def process_single_file(
         )
         final_post = sanitize_post_content(raw_post)
         extracted_hook = extract_hook_line(final_post)
-        validation = validate_linkedin_post(final_post, tech_analysis)
+        validation = validate_linkedin_post(
+            final_post, tech_analysis, source_notes=raw_text
+        )
         time.sleep(1.5)
 
     base_name = file_path.stem
@@ -173,6 +181,10 @@ def process_single_file(
             "source_file": file_path.name,
             "processed_at": datetime.now().isoformat(),
             "validation_score": validation.score,
+            "validation_score_breakdown": validation.score_breakdown.model_dump(),
+            "source_audit": validation.source_audit.model_dump(),
+            "validation_issues": validation.issues,
+            "validation_warnings": validation.warnings,
             "final_hook": extracted_hook,
             "final_post_text": final_post,
             "visual_concept": visual_brief.visual_concept,
@@ -194,6 +206,8 @@ def process_single_file(
             "topic": tech_analysis.topic,
             "score": validation.score,
             "status": "PASSED",
+            "score_breakdown": validation.score_breakdown.model_dump(),
+            "warnings": validation.warnings,
         }
 
     # ==========================================
@@ -213,13 +227,16 @@ def process_single_file(
             "source_file": file_path.name,
             "evaluated_at": datetime.now().isoformat(),
             "score": validation.score,
+            "score_breakdown": validation.score_breakdown.model_dump(),
             "passed": validation.passed,
             "final_hook": extracted_hook,
             "generated_post_draft": final_post,
             "source_evidence": raw_text,
             "criteria_checks": validation.criteria.model_dump(),
+            "source_audit": validation.source_audit.model_dump(),
             "issues_identified": validation.issues,
             "improvement_suggestions": validation.improvement_suggestions,
+            "warnings": validation.warnings,
             "draft_text_file": review_draft_path.name,
         }
         review_report_path.write_text(json.dumps(failed_report, indent=2), encoding="utf-8")
@@ -234,7 +251,9 @@ def process_single_file(
             "topic": tech_analysis.topic,
             "score": validation.score,
             "status": "FAILED_VALIDATION",
+            "score_breakdown": validation.score_breakdown.model_dump(),
             "issues": validation.issues,
+            "warnings": validation.warnings,
         }
 
 
@@ -286,10 +305,18 @@ def run_pipeline():
         if item["status"] == "PASSED":
             print(f"✅ PASSED | File: {item['file_name']} | Score: {item['score']}/10.0")
             print(f"   Topic: {item['topic']}")
+            print(f"   Score breakdown: {item['score_breakdown']}")
+            for warning in item.get("warnings", []):
+                print(f"   Suggestion: {warning}")
             print(f"   Artifacts saved to: documents/linkedin/output/\n")
         elif item["status"] == "FAILED_VALIDATION":
             print(f"❌ REJECTED | File: {item['file_name']} | Score: {item['score']}/10.0")
             print(f"   Topic: {item['topic']}")
+            print(f"   Score breakdown: {item['score_breakdown']}")
+            for issue in item.get("issues", []):
+                print(f"   - {issue}")
+            for warning in item.get("warnings", []):
+                print(f"   Suggestion: {warning}")
             print(f"   Moved raw file to: documents/linkedin/failed/")
             print(f"   Diagnostic report: documents/linkedin/review_required/\n")
         else:

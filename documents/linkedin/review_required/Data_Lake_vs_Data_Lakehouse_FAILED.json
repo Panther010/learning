@@ -1,0 +1,50 @@
+{
+  "source_file": "Data_Lake_vs_Data_Lakehouse.txt",
+  "evaluated_at": "2026-10-04T17:03:55.832388",
+  "score": 7.7,
+  "score_breakdown": {
+    "has_useful_hook": 9.0,
+    "is_technically_accurate": 5.0,
+    "is_understandable_and_scannable": 4.0,
+    "is_free_of_fluff": 10.0,
+    "teaches_concrete_lesson": 9.0,
+    "has_clear_takeaway": 9.0
+  },
+  "passed": false,
+  "final_hook": "Lake versus lakehouse: choose the right layer for the right workload.",
+  "generated_post_draft": "Lake versus lakehouse: choose the right layer for the right workload.\n\nA data lake stores raw files in cheap object storage.\nA lakehouse adds a transactional, schema\u2011aware table layer on top of the same storage.\n\nLakehouse relies on table formats such as Delta Lake, Apache Iceberg, or Apache Hudi to provide ACID transactions, schema enforcement, and time travel.\nThe architectural formula is: \ud835\udde2\ud835\uddef\ud835\uddf7\ud835\uddf2\ud835\uddf0\ud835\ude01 \ud835\udde6\ud835\ude01\ud835\uddfc\ud835\uddff\ud835\uddee\ud835\uddf4\ud835\uddf2 + \ud835\udde7\ud835\uddee\ud835\uddef\ud835\uddf9\ud835\uddf2 \ud835\uddd9\ud835\uddfc\ud835\uddff\ud835\uddfa\ud835\uddee\ud835\ude01 + \ud835\udde7\ud835\uddff\ud835\uddee\ud835\uddfb\ud835\ude00\ud835\uddee\ud835\uddf0\ud835\ude01\ud835\uddf6\ud835\uddfc\ud835\uddfb\ud835\uddee\ud835\uddf9/\ud835\uddda\ud835\uddfc\ud835\ude03\ud835\uddf2\ud835\uddff\ud835\uddfb\ud835\uddee\ud835\uddfb\ud835\uddf0\ud835\uddf2 \ud835\uddd6\ud835\uddee\ud835\uddfd\ud835\uddee\ud835\uddef\ud835\uddf6\ud835\uddf9\ud835\uddf6\ud835\ude01\ud835\uddf6\ud835\uddf2\ud835\ude00.\n\n\ud835\uddd8\ud835\ude05\ud835\uddee\ud835\uddfa\ud835\uddfd\ud835\uddf9\ud835\uddf2 - \ud835\uddf2\u2011\ud835\uddf0\ud835\uddfc\ud835\uddfa\ud835\uddfa\ud835\uddf2\ud835\uddff\ud835\uddf0\ud835\uddf2 \ud835\uddfd\ud835\uddf9\ud835\uddee\ud835\ude01\ud835\uddf3\ud835\uddfc\ud835\uddff\ud835\uddfa\nOrders from PostgreSQL, customers from Salesforce, payments via APIs, clickstream from Kafka, logs as JSON.\nAll raw files land in S3.\nA lakehouse can expose those files as ACID\u2011enabled tables for BI, engineering, science, and ML.\n\n\ud835\udde7\ud835\uddff\ud835\uddee\ud835\uddf1\ud835\uddf2\u2011\ud835\uddfc\ud835\uddf3\ud835\uddf3\ud835\ude00\n\n\u2022 Cost and flexibility\n\nLake: low\u2011cost, scalable, open formats.\nLakehouse: same storage cost, extra compute for transaction logs.\n\n\u2022 Governance\n\nLake: no built\u2011in schema enforcement; risk of a data swamp.\nLakehouse: schema enforcement, evolution, and time travel.\n\n\u2022 Operational complexity\n\nLake: simple ingestion pipelines.\nLakehouse: requires managing table formats and transaction coordinators.\n\n\u2022 Workload fit\n\nLake: exploratory analytics, ML training on raw data.\nLakehouse: shared analytical workloads that need reliable semantics.\n\n\ud835\udde5\ud835\ude02\ud835\uddf9\ud835\uddf2 \ud835\uddfc\ud835\uddf3 \ud835\ude01\ud835\uddf5\ud835\ude02\ud835\uddfa\ud835\uddef\nIf you only need flexible, low\u2011cost storage for exploration, a plain lake is enough.\nIf you need shared BI, engineering, and ML workloads that depend on ACID guarantees, a lakehouse is the right choice.\n\nWhat guarantees and workloads do you need on top of your storage layer?\n\n#Lakehouse #DataLake #ACID #DataGovernance",
+  "source_evidence": "**Data Lake vs Data Lakehouse\n\nThe difference isn't just where you store data.**\n\n### Data Lake\nA Data Lake is\n    - primarily a low-cost,\n    - flexible storage layer for large amounts of data,\n    - commonly built on object storage such as S3, ADLS, or GCS.\n    - It gives you flexibility.\n**Sources \u2192 Object Storage \u2192 Processing \u2192 Analytics / ML**\n\nYou can land raw JSON, Parquet, logs, clickstream, files and structured data without forcing everything into a predefined model.\n\nGreat for:\n\u2192 Low-cost scalable storage\n\u2192 Raw data retention\n\u2192 Exploration and ML\n\u2192 Multiple data formats\n\nBut without strong governance, a Data Lake can become a **Data Swamp**.\n\n### Data Lakehouse\nA Lakehouse keeps\n    - the object-storage foundation of a Data Lake\n    - adds capabilities traditionally associated with data warehouses.\n    - It tries to add **reliability, transactions, governance and analytical capabilities** on top of that flexible storage.\nThe idea is:\n\n**Object Storage + Table Format + Transactional / Governance Capabilities**\n\nTechnologies such as **Delta Lake, Apache Iceberg and Apache Hudi** add capabilities such as:\n\n\u2192 ACID transactions\n\u2192 Schema enforcement/evolution\n\u2192 Time travel\n\u2192 Better table management\n\u2192 More reliable analytical workloads\n\nImagine an e-commerce platform:\n\nPostgreSQL \u2192 Orders\nSalesforce \u2192 Customers\nAPIs \u2192 Payments\nKafka \u2192 Clickstream\nJSON \u2192 Application logs\n\nA Data Lake can store all of it.\n\nA Lakehouse can store it while providing stronger table semantics and making the same data easier to serve to:\n\n**BI + Data Engineering + Data Science + ML**\n\n### But is Lakehouse always better?\n\nNot necessarily.\n\n**Data Lake**\n\n\u2713 Flexible\n\u2713 Cheap storage\n\u2713 Open formats\n\u2713 Excellent for raw/exploratory data\n\n**Lakehouse**\n\n\u2713 Better table reliability\n\u2713 ACID transactions\n\u2713 Schema management\n\u2713 Time travel\n\u2713 Better fit for shared analytical workloads\n\nBut it also introduces **more platform complexity and operational decisions**.\n\nThe real architectural question isn't:\n\n**\"Lake or Lakehouse?\"**\n\nIt's:\n\n**\"What guarantees and workloads do we need on top of our storage layer?\"**\n\nIf you primarily need flexible, low-cost storage \u2192 a Data Lake may be enough.\n\nIf you need object-storage economics **plus reliable analytical tables and shared BI/ML workloads** \u2192 a Lakehouse can be a strong fit.\n\n**A Lakehouse doesn't replace good data architecture.\nIt gives you better primitives to build one.**\n\n#DataEngineering #DataLake #Lakehouse #DataArchitecture #BigData #DataPlatform #AnalyticsEngineering\n",
+  "criteria_checks": {
+    "has_useful_hook": true,
+    "is_technically_accurate": false,
+    "is_understandable_and_scannable": false,
+    "is_free_of_fluff": true,
+    "teaches_concrete_lesson": true,
+    "has_clear_takeaway": true
+  },
+  "source_audit": {
+    "omitted_source_details": [
+      "The risk of a Data Swamp when a lake lacks strong governance",
+      "Explicit mention of raw data retention as a benefit of a Data Lake",
+      "Support for multiple data formats in a Data Lake"
+    ],
+    "unsupported_post_claims": []
+  },
+  "issues_identified": [
+    "One prose line exceeds the 18\u2011word limit, breaking the scannable requirement.",
+    "The post omits several source details (Data Swamp risk, raw data retention, multiple data formats).",
+    "Line 6, sentence 1: has 23 words (maximum 18): Lakehouse relies on table formats such as Delta Lake, Apache Iceberg, or Apache Hudi to provide ACID transactions, schema enforcement, and time travel.",
+    "Line 38, sentence 1: has 20 words (maximum 18): If you need shared BI, engineering, and ML workloads that depend on ACID guarantees, a lakehouse is the right choice.",
+    "Material source details omitted: The risk of a Data Swamp when a lake lacks strong governance; Explicit mention of raw data retention as a benefit of a Data Lake; Support for multiple data formats in a Data Lake",
+    "Validation criterion failed: technical accuracy and source coverage.",
+    "Validation criterion failed: readability and formatting."
+  ],
+  "improvement_suggestions": [
+    "Break the long sentence about table formats into two shorter sentences (\u226418 words each).",
+    "Add a brief note about the Data Swamp risk to reflect the source warning about governance.",
+    "Mention that a Data Lake supports raw data retention and multiple data formats, as highlighted in the source.",
+    "Rewrite each flagged prose line to at most 18 words and each flagged bullet to at most 15 words.",
+    "Restore or accurately summarize these source details: The risk of a Data Swamp when a lake lacks strong governance; Explicit mention of raw data retention as a benefit of a Data Lake; Support for multiple data formats in a Data Lake"
+  ],
+  "draft_text_file": "Data_Lake_vs_Data_Lakehouse_FAILED_post.txt"
+}
