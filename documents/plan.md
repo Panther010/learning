@@ -156,7 +156,7 @@ ETL vs ELT — when to use each -> Done
 OLTP vs OLAP --> Done
 Data Warehouse vs Data Lake -> Done
 Data Lake vs Data Lakehouse -> Done
-Structured vs Semi-structured vs Unstructured data
+Structured vs Semi-structured vs Unstructured data -> Done
 Batch vs Streaming processing
 Full Load vs Incremental Load
 CDC — Change Data Capture
