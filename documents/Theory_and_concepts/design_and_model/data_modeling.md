@@ -1,5 +1,4 @@
 # Data Modeling — Revision Notes
-*(Organized basic → advanced: what modeling is → building blocks → normalization → OLTP/OLAP & dimensional modeling → modern approaches)*
 
 ---
 

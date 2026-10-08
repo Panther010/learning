@@ -1,0 +1,50 @@
+Batch vs Streaming vs Micro-batch
+𝗟𝗮𝘁𝗲𝗻𝗰𝘆‑𝗗𝗿𝗶𝘃𝗲𝗻 𝗣𝗿𝗼𝗰𝗲𝘀𝘀𝗶𝗻𝗴 𝗠𝗼𝗱𝗲𝗹𝘀 𝗮𝗿𝗲 𝗻𝗼𝘁 𝗮 𝘁𝗲𝗰𝗵𝗻𝗼𝗹𝗼𝗴𝘆 𝗰𝗵𝗼𝗶𝗰𝗲, 𝘁𝗵𝗲𝘆'𝗿𝗲 𝗮 𝗯𝘂𝘀𝗶𝗻𝗲𝘀𝘀 𝗱𝗲𝗰𝗶𝘀𝗶𝗼𝗻.
+When you ask, "Should we batch, micro‑batch or stream?" the answer comes from the cost of delay, not from the stack's capabilities.
+
+The three models form a ladder:
+
+• 𝗕𝗮𝘁𝗰𝗵 - Collect → Process → Publish
+• Typical windows: hourly or daily
+• Use cases: daily revenue reports, large historical ETL, backfills
+• Strengths: high throughput, low operational cost, predictable timing
+• Weaknesses: high latency, no real‑time insight
+
+• 𝗠𝗶𝗰𝗿𝗼‑𝗯𝗮𝘁𝗰𝗵 - Collect a small window → Process → Publish
+• Typical windows: 10-30 seconds
+• Use cases: dashboards that refresh every 30 s, incremental loads, click‑stream aggregation
+• Strengths: near‑real‑time, moderate complexity, easier to scale than full streaming
+• Weaknesses: still a batch cycle, ordering and state are less strict than streaming
+
+• 𝗦𝘁𝗿𝗲𝗮𝗺𝗶𝗻𝗴 - Event arrives → Process → Output
+• Typical windows: milliseconds to seconds
+• Use cases: fraud detection, real‑time alerts, IoT telemetry, recommendation engines
+• Strengths: true real‑time, immediate action possible
+• Weaknesses: ordering guarantees, late‑arrival handling, duplicate suppression, state management, checkpointing, higher operational overhead
+
+𝗥𝗲𝗮𝗹‑𝘄𝗼𝗿𝗹𝗱 𝗲𝘅𝗮𝗺𝗽𝗹𝗲
+An e‑commerce platform can layer all three:
+
+• Batch: daily revenue reporting to finance
+• Micro‑batch: sales dashboard that updates every 30 s for marketing
+• Streaming: fraud detection on every payment event
+
+The same business can decide to keep the fraud engine in streaming because a 30‑minute delay would render the decision useless, while the sales dashboard can tolerate a few seconds of lag.
+
+𝗧𝗿𝗮𝗱𝗲‑𝗼𝗳𝗳𝘀
+
+• Latency vs. complexity - the lower the latency you need, the more complex the pipeline becomes.
+• Cost of delay - a 30‑minute lag on a monthly report is acceptable; the same lag on a fraud decision is not.
+• Operational overhead - streaming requires robust checkpointing, state recovery, and strict delivery semantics.
+
+𝗥𝘂𝗹𝗲 𝗼𝗳 𝘁𝗵𝘂𝗺𝗯
+
+• Hours/days → Batch
+• Seconds/minutes → Micro‑batch
+• Milliseconds/seconds + immediate action → Streaming
+
+Choose the tier that matches the business's tolerance for delay. Don't add real‑time complexity just because the technology allows it.
+
+What latency tier is most critical for your next data product?
+
+#LatencyEngineering #DataProcessing #BatchVsStreaming #RealTimeData #DataArchitecture
