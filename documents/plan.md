@@ -323,3 +323,76 @@ The real skill is understanding how data moves across the cluster.
 That kind of post demonstrates considerably more expertise than:
 
 "Data skew is when data is unevenly distributed."
+
+
+
+1. Architecture and fundamentals (comparison-style)
+Batch vs Streaming vs Micro-batch
+Data Warehouse vs Data Lake vs Lakehouse vs Data Mesh
+Lambda vs Kappa architecture
+OLTP vs OLAP
+Row-based vs Columnar storage (CSV vs Parquet)
+Delta vs Iceberg vs Hudi
+Star schema vs Snowflake schema vs One Big Table
+Medallion architecture (Bronze/Silver/Gold)
+Data Mesh vs Centralized platform
+Push vs Pull ingestion
+2. Data modelling
+Facts vs Dimensions, explained with one e-commerce example
+SCD Type 1 vs 2 vs 3
+Normalization vs Denormalization: when each wins
+Surrogate keys vs Natural keys
+Grain: the most common modelling mistake
+Data Vault vs Kimball vs Inmon
+3. Pipelines and orchestration
+Idempotency: why your pipeline must be safe to re-run
+Full load vs Incremental load vs CDC
+Backfills: how to do them without breaking prod
+Orchestration vs Transformation vs Ingestion tools
+Airflow DAG design anti-patterns
+Retries, dead-letter queues and failure handling
+Event-driven vs Schedule-driven pipelines
+4. Data quality and reliability
+Data contracts: what they are and why they matter
+The 6 dimensions of data quality
+Schema drift: causes and defences
+Data observability vs Data monitoring
+Where to put validation in a pipeline
+Silent data loss: the scariest failure mode
+SLAs, SLOs and freshness
+5. Performance and cost
+Partitioning vs Clustering vs Indexing
+The small-files problem
+Data skew in Spark: how to spot and fix it
+Shuffle: the hidden cost in distributed jobs
+Cost optimization checklist for cloud warehouses
+Caching, materialized views and incremental models
+6. Streaming and real-time
+Kafka basics: topics, partitions, consumer groups
+Exactly-once vs At-least-once vs At-most-once
+Late-arriving data and watermarks
+Do you actually need real-time?
+Stateful vs Stateless stream processing
+7. Governance, security and platform
+Data catalog vs Data lineage vs Metadata
+PII handling: masking, tokenization, encryption
+RBAC vs ABAC in data platforms
+Data retention and GDPR “right to be forgotten” in a lakehouse
+Semantic layer and metrics layer
+Data product thinking
+8. Modern and emerging topics
+Data engineering for AI/ML: feature stores and training data pipelines
+Vector databases vs traditional databases
+RAG pipelines from a data engineer’s view
+Where LLMs help data engineers and where they don’t
+Open table formats and the rise of interoperability
+Reverse ETL
+9. Career and leadership (usually your highest engagement)
+What I look for when hiring a data engineer
+Junior vs Senior vs Lead data engineer: what actually changes
+Mistakes I made in my first year as a data engineer
+How to review a data pipeline PR
+Explaining data engineering to business stakeholders
+Build vs Buy for data tools
+Post-mortem of a real pipeline failure (anonymized)
+Skills roadmap: SQL, Python, then what?
