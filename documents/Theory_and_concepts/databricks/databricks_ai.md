@@ -3,8 +3,8 @@ Large Language Models (LLMs) are powerful, but they have hard limits. No amount 
 - Hallucination
 - Missing private context
 
-Retrieval Augmented Generation (RAG) 
-- addresses these limits by injecting relevant external data into the model's context at query time.
+Retrieval Augmented Generation (RAG):
+- Addresses these limits by injecting relevant external data into the model's context at query time.
 - Instead of relying on frozen training data, a RAG system 
   - retrieves relevant documents
   - augments the prompt with them
@@ -47,22 +47,32 @@ Effective context engineering for agents involves:
 
 
 ## Agent bricks Knowledge Assistant
-Databricks Knowledge Assistant (part of Databricks Agent Bricks) is a tool designed to help you create smart AI chatbots using your company’s own documents.   
-Think of it like building a custom ChatGPT that only answers questions using your company's files.
+Databricks Knowledge Assistant (part of Databricks Agent Bricks) 
+- is a tool designed to help you create smart AI chatbots using your company’s own documents.   
+- Think of it like building a custom ChatGPT that only answers questions using your company's files.
 
 Key Concepts
 - Agent Bricks: A collection of pre-built AI templates offered by Databricks. 
-- Instead of building an AI chatbot from scratch using complex code, Agent Bricks gives you ready-made tools to launch AI agents quickly.   
+- Instead of building an AI chatbot from scratch using complex code, 
+- Agent Bricks gives you ready-made tools to launch AI agents quickly.   
  
-- Knowledge Assistant: A specific agent template within Agent Bricks designed to read documents (such as PDFs, guides, policy manuals, or product documentation) and answer user questions based directly on those files.
+- Knowledge Assistant: 
+  - A specific agent template within Agent Bricks designed 
+  - It reads documents (such as PDFs, guides, policy manuals, or product documentation) 
+  - And answer user questions based directly on those files.
 - How It Works
-  - Upload Documents: You point the assistant to a folder containing your company's documents (like PDFs, policy guides, or support documentation).   
+  - Upload Documents: You point the assistant to a folder containing your company's documents
   - Ask Questions: Users type natural language questions into a chat window.
-  - Get Accurate Answers: The Knowledge Assistant reads through the files, generates an accurate answer, and includes citations so you can click and view the exact source document.   
-  - Continuous Improvement: Subject-matter experts can leave feedback on responses, helping the assistant learn and improve its answers over time.   
+  - Get Accurate Answers: 
+    - The Knowledge Assistant reads through the files, 
+    - generates an accurate answer, 
+    - includes citations so you can click and view the exact source document.   
+  - Continuous Improvement: 
+    - Subject-matter experts can leave feedback on responses, 
+    - helping the assistant learn and improve its answers over time.   
 
-
-Before a retrieval agent can answer questions about your documents, those documents must be transformed from raw files into searchable, structured data. 
+Before a retrieval agent can answer questions about your documents, 
+- those documents must be transformed from raw files into searchable, structured data. 
 - ai_parse_document: 
   - invokes state-of-the-art generative AI models to extract structured content from PDFs and images. 
   - It returns a structured JSON object (VARIANT type) with layout-aware text extraction.
@@ -82,7 +92,10 @@ Before a retrieval agent can answer questions about your documents, those docume
   - extracts specific fields from unstructured text. You define what to extract, and the AI model finds the values.
   - Analogy: Using a highlighter to pick out the total price, date, and vendor name from an invoice.
 
-- ai_prep_search: Cuts long document text into smaller, smart pieces (chunks) and adds useful titles/metadata to each chunk so an AI can search them fast.
+- ai_prep_search: 
+  - Cuts long document text into smaller, 
+  - smart pieces (chunks) 
+  - and adds useful titles/metadata to each chunk so an AI can search them fast.
   - Databricks AI Function that chunks text for AI Search. 
   - Instead of manually splitting text by character count or using custom chunking logic, ai_prep_search uses AI models to split text into semantically meaningful chunks.
 
@@ -110,3 +123,29 @@ Before a retrieval agent can answer questions about your documents, those docume
 Embeddings:
 - An embedding is a list of numbers (a vector) that captures the meaning of a piece of text.
 - Texts with similar meanings produce vectors that are close together in mathematical space.
+
+ 
+Managed RAG (Knowledge Assistants):
+
+- You provide documents (in a UC Volume or AI Search Index)
+- The system handles parsing, chunking, embedding, indexing, and serving
+- Optimized automatically via feedback loops
+- Best for: standard RAG use cases where speed to production matters
+
+Custom RAG (Agent Framework + AI Search):
+- You build the pipeline yourself with full ownership of each step
+- Full control over parsing strategy, chunking approach, embedding model, and retrieval logic
+- Use AI Search indexes as retrieval tools in your custom agent
+- Best for: unique requirements, complex multi-step reasoning, novel architectures
+
+- An Embedding:
+  - Is a numerical representation of text generated by an AI model 
+  - It captures its semantic meaning as a vector in high-dimensional space. 
+   
+- Cosine Similarity is the metric used to measure the angle between two embedding vectors 
+- to determine how closely related their meanings are.
+
+- In Databricks Vector Search, we generate embeddings for document chunks during ingestion. 
+- When a user asks a question, 
+  - we convert their prompt into an embedding
+  - And use Cosine Similarity to instantaneously retrieve the most contextually relevant chunks to pass to the LLM.
