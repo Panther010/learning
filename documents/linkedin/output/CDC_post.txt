@@ -1,0 +1,61 @@
+Log‑based CDC is not a silver bullet for "always‑fresh" data; it is a tool that requires careful coordination between snapshots, ordering, and idempotence to avoid duplicates and data loss.
+
+---
+
+𝗪𝗵𝘆 𝘁𝗵𝗲 𝗺𝗶𝘀𝘁𝗮𝗸𝗲?
+Many teams assume that once Debezium streams changes to Kafka, downstream warehouses will receive each row exactly once, in order, and without gaps. In practice, that promise is only achieved when the entire pipeline is engineered for it.
+
+---
+
+𝗥𝗲𝗮𝗹‑𝘄𝗼𝗿𝗹𝗱 𝗲𝘅𝗮𝗺𝗽𝗹𝗲
+An e‑commerce platform runs PostgreSQL for orders.
+
+• 𝗢𝗿𝗱𝗲𝗿 𝗰𝗿𝗲𝗮𝘁𝗲𝗱 → Debezium captures INSERT → Kafka → Warehouse applies INSERT.
+• 𝗦𝘁𝗮𝘁𝘂𝘀 𝘂𝗽𝗱𝗮𝘁𝗲𝗱 → Debezium captures UPDATE → Kafka → Warehouse updates row.
+• 𝗢𝗿𝗱𝗲𝗿 𝗱𝗲𝗹𝗲𝘁𝗲𝗱 → Debezium captures DELETE → Kafka → Warehouse deletes row.
+
+If the snapshot that seeds the warehouse falls behind the log position, or if a retry produces a duplicate event, the warehouse can end up with stale or duplicated data.
+
+---
+
+𝗞𝗲𝘆 𝗰𝗼𝗺𝗽𝗼𝗻𝗲𝗻𝘁𝘀 𝘁𝗵𝗮𝘁 𝗺𝗮𝗸𝗲 𝗼𝗿 𝗯𝗿𝗲𝗮𝗸 𝗿𝗲𝗹𝗶𝗮𝗯𝗶𝗹𝗶𝘁𝘆
+
+• Initial snapshot and log‑position coordination
+◦ The snapshot must finish before the first log event is consumed.
+◦ The broker must record the exact offset for the last snapshot row.
+
+• Duplicate events and retries
+◦ Idempotent writes are mandatory; the target must be able to ignore a second identical event.
+
+• Ordering and transaction boundaries
+◦ Debezium emits events per transaction; downstream must preserve that order to maintain consistency.
+
+• Deletes and tombstones
+◦ A DELETE in the source must translate to a tombstone in Kafka or a delete in the warehouse.
+
+• Schema evolution
+◦ Changes to table columns must be reflected in the target schema; otherwise, writes fail.
+
+• Replication lag and recovery
+◦ If the broker falls behind, the pipeline must catch up without dropping events.
+
+---
+
+𝗧𝗿𝗮𝗱𝗲‑𝗼𝗳𝗳𝘀
+
+• 𝗙𝘂𝗹𝗹 𝘁𝗮𝗯𝗹𝗲 𝗿𝗲𝗹𝗼𝗮𝗱
+
+• High latency, high I/O, but simple consistency model.
+
+• 𝗟𝗼𝗴‑𝗯𝗮𝘀𝗲𝗱 𝗖𝗗𝗖
+
+• Low latency, low I/O, but requires complex ordering, idempotence, and snapshot coordination.
+
+---
+
+𝗥𝘂𝗹𝗲 𝗼𝗳 𝘁𝗵𝘂𝗺𝗯
+Use CDC only when downstream systems need frequent updates and the cost of a full reload outweighs the complexity of a well‑designed pipeline.
+
+How are you ensuring idempotent writes and transaction‑aware ordering in your CDC workflows?
+
+#CDC #Debezium #Kafka #DataEngineering #DataPipeline

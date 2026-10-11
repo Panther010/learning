@@ -1,0 +1,6 @@
+{
+  "visual_concept": "Illustrate the critical coordination between an initial snapshot, Debezium log capture, Kafka ordering, and idempotent writes to a warehouse, highlighting the risk of duplicates and gaps.",
+  "image_prompt": "Flat 2D orthographic diagram: a deep navy background. Centered: a white database cylinder labeled Source DB, thin cool-grey line to a white Debezium icon, thin line to a white Kafka cluster, then to a white warehouse block. Arrows in bright cyan show data flow. A cyan arrow from Debezium to Kafka splits into two: one to warehouse (normal flow) and one to a tombstone block. A cyan arrow from warehouse loops back to source to indicate idempotent write. All shapes are precise geometry, no text, no glow, high negative space.",
+  "negative_prompt": "text, labels, numbers, code, UI screenshots, 3D, realistic textures, people, rainbow colors, floating icons, duplicate nodes, arbitrary arrows, decorative elements, cyberpunk, excessive glow",
+  "accessibility_alt_text": "Diagram showing a source database feeding Debezium, Kafka, and a warehouse with bright cyan arrows indicating data flow, a tombstone path for deletes, and a loop arrow representing idempotent writes."
+}

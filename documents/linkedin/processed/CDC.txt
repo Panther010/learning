@@ -1,0 +1,68 @@
+**Why reload 1 million rows when only 1,000 have changed?**
+
+This is where Change Data Capture (CDC) becomes useful.
+
+Traditional batch pipelines often extract an entire table on every run, even when only a small percentage of records have changed.
+
+**CDC captures inserts, updates and deletes so downstream systems can process changes instead of repeatedly reloading everything.**
+
+Here's how it works.
+
+**1️⃣ Log-based CDC**
+
+The pipeline reads the database's transaction logs, such as PostgreSQL WAL or MySQL binlogs.
+
+Instead of repeatedly querying the entire table, it captures changes recorded by the database.
+
+**2️⃣ A real-world example**
+
+Imagine an e-commerce platform:
+
+PostgreSQL → Orders
+Debezium → Captures changes
+Kafka → Transports events
+Warehouse / Lakehouse → Applies changes
+
+An order is created.
+
+Its status changes from `Pending` to `Paid`.
+
+Later, the record is deleted.
+
+CDC can capture each change and propagate it downstream, enabling fresher analytics and operational use cases.
+
+**3️⃣ But capturing changes is only half the problem.**
+
+A production-ready CDC pipeline must handle:
+
+• Initial snapshot and log-position coordination
+• Duplicate events and retries
+• Ordering and transaction boundaries
+• Deletes and tombstones
+• Schema evolution
+• Replication lag and recovery
+• Idempotent target writes
+
+CDC does not automatically guarantee real-time delivery or exactly-once processing end to end.
+
+Those guarantees depend on how the complete pipeline is designed.
+
+**4️⃣ When should you use it?**
+
+Use CDC when downstream systems need frequent updates, tables are large, or repeated full extracts are expensive.
+
+A scheduled batch load may still be the better choice when daily freshness is sufficient and operational simplicity matters more.
+
+**My takeaway:**
+
+CDC isn't just about moving less data.
+
+It's about propagating changes reliably while managing ordering, recovery, and consistency across systems.
+
+The real question isn't *“Can we implement CDC?”*
+
+It's **“Does the business need change-level freshness, and can we operate it reliably?”**
+
+How are you implementing CDC in your data platform: log-based replication, timestamp polling, or another approach?
+
+#DataEngineering #CDC #DataPipelines #DataArchitecture #Kafka #Debezium #DataWarehouse
