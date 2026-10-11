@@ -152,7 +152,7 @@ Say these plainly if asked; don't try to fake depth.
 Batch vs Streaming vs Micro-batch   -> Done
 Data Warehouse vs Data Lake vs Lakehouse vs Data Mesh
 Lambda vs Kappa architecture
-OLTP vs OLAP
+OLTP vs OLAP --> Done
 Row-based vs Columnar storage (CSV vs Parquet)
 Delta vs Iceberg vs Hudi
 Star schema vs Snowflake schema vs One Big Table

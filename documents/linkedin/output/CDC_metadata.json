@@ -1,0 +1,63 @@
+{
+  "source_file": "CDC.txt",
+  "processed_at": "2026-10-11T21:20:04.364921",
+  "validation_score": 9.5,
+  "validation_score_breakdown": {
+    "has_useful_hook": 10.0,
+    "is_technically_accurate": 10.0,
+    "is_understandable_and_scannable": 9.0,
+    "is_free_of_fluff": 10.0,
+    "teaches_concrete_lesson": 9.0,
+    "has_clear_takeaway": 9.0
+  },
+  "source_audit": {
+    "omitted_source_details": [
+      "Explicit mention of the business\u2011level question: \u201cDoes the business need change\u2011level freshness, and can we operate it reliably?\u201d"
+    ],
+    "unsupported_post_claims": []
+  },
+  "validation_issues": [],
+  "validation_warnings": [
+    "Line 1, sentence 1: has 29 words (suggested maximum 18): Log\u2011based CDC is not a silver bullet for \"always\u2011fresh\" data; it is a tool that requires careful coordination between snapshots, ordering, and idempotence to avoid duplicates and data loss.",
+    "Line 6: contains 2 sentences; put each sentence on its own line: Many teams assume that once Debezium streams changes to Kafka, downstream warehouses will receive each row exactly once, in order, and without gaps. In practice, that promise is only achieved when the entire pipeline is engineered for it.",
+    "Line 6, sentence 1: has 23 words (suggested maximum 18): Many teams assume that once Debezium streams changes to Kafka, downstream warehouses will receive each row exactly once, in order, and without gaps.",
+    "Line 17, sentence 1: has 30 words (suggested maximum 18): If the snapshot that seeds the warehouse falls behind the log position, or if a retry produces a duplicate event, the warehouse can end up with stale or duplicated data.",
+    "Line 34: bullet has 18 words (suggested maximum 15): \u25e6 A DELETE in the source must translate to a tombstone in Kafka or a delete in the warehouse.",
+    "Line 57, sentence 1: has 23 words (suggested maximum 18): Use CDC only when downstream systems need frequent updates and the cost of a full reload outweighs the complexity of a well\u2011designed pipeline.",
+    "Source details to consider including: Explicit mention of the business\u2011level question: \u201cDoes the business need change\u2011level freshness, and can we operate it reliably?\u201d"
+  ],
+  "final_hook": "Log\u2011based CDC is not a silver bullet for \"always\u2011fresh\" data; it is a tool that requires careful coordination between snapshots, ordering, and idempotence to avoid duplicates and data loss.",
+  "final_post_text": "Log\u2011based CDC is not a silver bullet for \"always\u2011fresh\" data; it is a tool that requires careful coordination between snapshots, ordering, and idempotence to avoid duplicates and data loss.\n\n---\n\n\ud835\uddea\ud835\uddf5\ud835\ude06 \ud835\ude01\ud835\uddf5\ud835\uddf2 \ud835\uddfa\ud835\uddf6\ud835\ude00\ud835\ude01\ud835\uddee\ud835\uddf8\ud835\uddf2?\nMany teams assume that once Debezium streams changes to Kafka, downstream warehouses will receive each row exactly once, in order, and without gaps. In practice, that promise is only achieved when the entire pipeline is engineered for it.\n\n---\n\n\ud835\udde5\ud835\uddf2\ud835\uddee\ud835\uddf9\u2011\ud835\ude04\ud835\uddfc\ud835\uddff\ud835\uddf9\ud835\uddf1 \ud835\uddf2\ud835\ude05\ud835\uddee\ud835\uddfa\ud835\uddfd\ud835\uddf9\ud835\uddf2\nAn e\u2011commerce platform runs PostgreSQL for orders.\n\n\u2022 \ud835\udde2\ud835\uddff\ud835\uddf1\ud835\uddf2\ud835\uddff \ud835\uddf0\ud835\uddff\ud835\uddf2\ud835\uddee\ud835\ude01\ud835\uddf2\ud835\uddf1 \u2192 Debezium captures INSERT \u2192 Kafka \u2192 Warehouse applies INSERT.\n\u2022 \ud835\udde6\ud835\ude01\ud835\uddee\ud835\ude01\ud835\ude02\ud835\ude00 \ud835\ude02\ud835\uddfd\ud835\uddf1\ud835\uddee\ud835\ude01\ud835\uddf2\ud835\uddf1 \u2192 Debezium captures UPDATE \u2192 Kafka \u2192 Warehouse updates row.\n\u2022 \ud835\udde2\ud835\uddff\ud835\uddf1\ud835\uddf2\ud835\uddff \ud835\uddf1\ud835\uddf2\ud835\uddf9\ud835\uddf2\ud835\ude01\ud835\uddf2\ud835\uddf1 \u2192 Debezium captures DELETE \u2192 Kafka \u2192 Warehouse deletes row.\n\nIf the snapshot that seeds the warehouse falls behind the log position, or if a retry produces a duplicate event, the warehouse can end up with stale or duplicated data.\n\n---\n\n\ud835\uddde\ud835\uddf2\ud835\ude06 \ud835\uddf0\ud835\uddfc\ud835\uddfa\ud835\uddfd\ud835\uddfc\ud835\uddfb\ud835\uddf2\ud835\uddfb\ud835\ude01\ud835\ude00 \ud835\ude01\ud835\uddf5\ud835\uddee\ud835\ude01 \ud835\uddfa\ud835\uddee\ud835\uddf8\ud835\uddf2 \ud835\uddfc\ud835\uddff \ud835\uddef\ud835\uddff\ud835\uddf2\ud835\uddee\ud835\uddf8 \ud835\uddff\ud835\uddf2\ud835\uddf9\ud835\uddf6\ud835\uddee\ud835\uddef\ud835\uddf6\ud835\uddf9\ud835\uddf6\ud835\ude01\ud835\ude06\n\n\u2022 Initial snapshot and log\u2011position coordination\n\u25e6 The snapshot must finish before the first log event is consumed.\n\u25e6 The broker must record the exact offset for the last snapshot row.\n\n\u2022 Duplicate events and retries\n\u25e6 Idempotent writes are mandatory; the target must be able to ignore a second identical event.\n\n\u2022 Ordering and transaction boundaries\n\u25e6 Debezium emits events per transaction; downstream must preserve that order to maintain consistency.\n\n\u2022 Deletes and tombstones\n\u25e6 A DELETE in the source must translate to a tombstone in Kafka or a delete in the warehouse.\n\n\u2022 Schema evolution\n\u25e6 Changes to table columns must be reflected in the target schema; otherwise, writes fail.\n\n\u2022 Replication lag and recovery\n\u25e6 If the broker falls behind, the pipeline must catch up without dropping events.\n\n---\n\n\ud835\udde7\ud835\uddff\ud835\uddee\ud835\uddf1\ud835\uddf2\u2011\ud835\uddfc\ud835\uddf3\ud835\uddf3\ud835\ude00\n\n\u2022 \ud835\uddd9\ud835\ude02\ud835\uddf9\ud835\uddf9 \ud835\ude01\ud835\uddee\ud835\uddef\ud835\uddf9\ud835\uddf2 \ud835\uddff\ud835\uddf2\ud835\uddf9\ud835\uddfc\ud835\uddee\ud835\uddf1\n\n\u2022 High latency, high I/O, but simple consistency model.\n\n\u2022 \ud835\udddf\ud835\uddfc\ud835\uddf4\u2011\ud835\uddef\ud835\uddee\ud835\ude00\ud835\uddf2\ud835\uddf1 \ud835\uddd6\ud835\uddd7\ud835\uddd6\n\n\u2022 Low latency, low I/O, but requires complex ordering, idempotence, and snapshot coordination.\n\n---\n\n\ud835\udde5\ud835\ude02\ud835\uddf9\ud835\uddf2 \ud835\uddfc\ud835\uddf3 \ud835\ude01\ud835\uddf5\ud835\ude02\ud835\uddfa\ud835\uddef\nUse CDC only when downstream systems need frequent updates and the cost of a full reload outweighs the complexity of a well\u2011designed pipeline.\n\nHow are you ensuring idempotent writes and transaction\u2011aware ordering in your CDC workflows?\n\n#CDC #Debezium #Kafka #DataEngineering #DataPipeline",
+  "visual_concept": "Illustrate the critical coordination between an initial snapshot, Debezium log capture, Kafka ordering, and idempotent writes to a warehouse, highlighting the risk of duplicates and gaps.",
+  "image_prompt": "Flat 2D orthographic diagram: a deep navy background. Centered: a white database cylinder labeled Source DB, thin cool-grey line to a white Debezium icon, thin line to a white Kafka cluster, then to a white warehouse block. Arrows in bright cyan show data flow. A cyan arrow from Debezium to Kafka splits into two: one to warehouse (normal flow) and one to a tombstone block. A cyan arrow from warehouse loops back to source to indicate idempotent write. All shapes are precise geometry, no text, no glow, high negative space.",
+  "source_evidence": "**Why reload 1 million rows when only 1,000 have changed?**\n\nThis is where Change Data Capture (CDC) becomes useful.\n\nTraditional batch pipelines often extract an entire table on every run, even when only a small percentage of records have changed.\n\n**CDC captures inserts, updates and deletes so downstream systems can process changes instead of repeatedly reloading everything.**\n\nHere's how it works.\n\n**1\ufe0f\u20e3 Log-based CDC**\n\nThe pipeline reads the database's transaction logs, such as PostgreSQL WAL or MySQL binlogs.\n\nInstead of repeatedly querying the entire table, it captures changes recorded by the database.\n\n**2\ufe0f\u20e3 A real-world example**\n\nImagine an e-commerce platform:\n\nPostgreSQL \u2192 Orders\nDebezium \u2192 Captures changes\nKafka \u2192 Transports events\nWarehouse / Lakehouse \u2192 Applies changes\n\nAn order is created.\n\nIts status changes from `Pending` to `Paid`.\n\nLater, the record is deleted.\n\nCDC can capture each change and propagate it downstream, enabling fresher analytics and operational use cases.\n\n**3\ufe0f\u20e3 But capturing changes is only half the problem.**\n\nA production-ready CDC pipeline must handle:\n\n\u2022 Initial snapshot and log-position coordination\n\u2022 Duplicate events and retries\n\u2022 Ordering and transaction boundaries\n\u2022 Deletes and tombstones\n\u2022 Schema evolution\n\u2022 Replication lag and recovery\n\u2022 Idempotent target writes\n\nCDC does not automatically guarantee real-time delivery or exactly-once processing end to end.\n\nThose guarantees depend on how the complete pipeline is designed.\n\n**4\ufe0f\u20e3 When should you use it?**\n\nUse CDC when downstream systems need frequent updates, tables are large, or repeated full extracts are expensive.\n\nA scheduled batch load may still be the better choice when daily freshness is sufficient and operational simplicity matters more.\n\n**My takeaway:**\n\nCDC isn't just about moving less data.\n\nIt's about propagating changes reliably while managing ordering, recovery, and consistency across systems.\n\nThe real question isn't *\u201cCan we implement CDC?\u201d*\n\nIt's **\u201cDoes the business need change-level freshness, and can we operate it reliably?\u201d**\n\nHow are you implementing CDC in your data platform: log-based replication, timestamp polling, or another approach?\n\n#DataEngineering #CDC #DataPipelines #DataArchitecture #Kafka #Debezium #DataWarehouse\n",
+  "validation_criteria": {
+    "has_useful_hook": true,
+    "is_technically_accurate": true,
+    "is_understandable_and_scannable": true,
+    "is_free_of_fluff": true,
+    "teaches_concrete_lesson": true,
+    "has_clear_takeaway": true
+  },
+  "technical_analysis": {
+    "topic": "Log\u2011Based CDC",
+    "core_lesson": "CDC captures only changed rows, but reliability hinges on snapshot coordination, idempotence, ordering, and schema handling",
+    "common_misconception": "Assuming CDC guarantees exactly\u2011once, real\u2011time delivery without additional design",
+    "practical_takeaway": "Design CDC end\u2011to\u2011end with idempotent writes, transaction\u2011aware ordering, and robust snapshot\u2011to\u2011log handoff to avoid duplicates and data loss",
+    "architecture_pattern": "Log-based CDC pipeline: source DB \u2192 CDC engine (Debezium) \u2192 message broker (Kafka) \u2192 downstream (Warehouse/Lakehouse)",
+    "useful_comparison": "Full table reload (high latency, high I/O) vs. Log\u2011based CDC (low latency, low I/O but requires complex ordering & idempotence)"
+  },
+  "content_strategy": {
+    "post_format": "Problem-Solution Flow",
+    "angle": "Production Lesson Learned",
+    "hook_angle": "Common architectural mistake",
+    "visual_concept": "Source DB \u2192 Debezium \u2192 Kafka \u2192 Warehouse",
+    "tags": [
+      "#CDC",
+      "#Debezium",
+      "#Kafka",
+      "#DataEngineering",
+      "#DataPipeline"
+    ]
+  }
+}
