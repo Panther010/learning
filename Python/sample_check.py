@@ -1,13 +1,10 @@
-name = "aaaabbbc"
-result = {}
-for char in name:
-    result[char] = result.get(char, 0) + 1
+a = {"apple": 2, "banana": 3}
+b = {"apple": 4, "orange": 5}
 
-print(result)
-max_o_char = ''
-max_o = 0
-for key in result:
-    if result[key] > max_o:
-        max_o = result[key]
-        max_o_char = key
-print(max_o_char)
+def merge_count(a: dict, b: dict) -> dict:
+    result = a
+    for key, value in b.items():
+        result[key] = result.get(key, 0) + value
+    return result
+
+print(merge_count(a, b))
