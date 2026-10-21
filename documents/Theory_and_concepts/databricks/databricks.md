@@ -566,7 +566,10 @@ AS SELECT * FROM STREAM(LIVE.raw_orders);
 | Lifecycle         | Runs until manually paused/auto-terminated | Terminates immediately on job completion |
 | Relative DBU cost | ~3x higher                                 | ~1x (baseline)                           |
 
-**Practical rule:** scheduled production pipelines → **Job Compute** (cheaper, auto-terminates); interactive notebook work during the day → **All-Purpose**. Leaving All-Purpose clusters idle is one of the most common silent cost leaks in Databricks billing.
+**Practical rule:** 
+- scheduled production pipelines → **Job Compute** (cheaper, auto-terminates); 
+- interactive notebook work during the day → **All-Purpose**. 
+- Leaving All-Purpose clusters idle is one of the most common silent cost leaks in Databricks billing.
 
 ### 11.5 DBUs
 Billing is based on **DBUs (Databricks Units)** — processing capability consumed per hour, varying by compute type/size. Job Compute's lower DBU rate vs. All-Purpose is exactly why production workloads shouldn't run on shared interactive clusters.
