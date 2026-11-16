@@ -1,0 +1,74 @@
+pipeline:
+  name: instrument_daily_metrics
+  version: "1.0"
+
+source:
+  type: csv
+  path: /Users/bakulseth/PycharmProjects/learning/data/raw/instruments.csv
+
+transformations:
+  - name: filter_valid_records
+    type: filter
+    condition:
+      column: price
+      operator: gt
+      value: 0
+
+  - name: calculate_notional
+    type: expression
+    output_column: notional
+    expression:
+      function: multiply
+      inputs:
+        - column: price
+        - column: volume
+
+  - name: daily_aggregates
+    type: aggregate
+    group_by:
+      - instrument_id
+      - trade_date
+      - currency
+    aggregations:
+      - column: notional
+        function: sum
+        alias: total_notional
+      - column: price
+        function: avg
+        alias: avg_price
+      - column: volume
+        function: sum
+        alias: total_volume
+
+  - name: calculate_vwap
+    type: expression
+    output_column: vwap
+    expression:
+      function: divide
+      inputs:
+        - column: total_notional
+        - column: total_volume
+
+  - name: add_processing_metadata
+    type: expression
+    output_column: processed_at
+    expression:
+      function: current_timestamp
+
+output:
+  columns:
+    - instrument_id
+    - trade_date
+    - currency
+    - total_notional
+    - avg_price
+    - total_volume
+    - vwap
+    - processed_at
+
+validation:
+  rules:
+    - column: vwap
+      check: not_null
+    - column: total_volume
+      check: positive
