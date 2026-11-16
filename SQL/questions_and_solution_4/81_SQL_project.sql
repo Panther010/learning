@@ -7,6 +7,7 @@
     --     their first-ever order) since launch.
     -- Q3: Count of all the users who were acquired in Jan 2025 and
     --      only placed one order in Jan and did not place any other order after that
+    -- Q4: no order in last 7 days, acquired >1 month ago, first order on promo
 
 -- create table statement
 CREATE TABLE orders1(
@@ -255,3 +256,148 @@ other_month_orders as (
 )
 select count(*) from jan_cust_single_order a left join other_month_orders b on a.customer_code = b.customer_code
 where b.customer_code is null
+
+
+-- ============================================================
+-- Q4: no order in last 7 days, acquired >1 month ago, first order on promo
+-- ============================================================
+-- question statement
+--   List customers with no order in the last 7 days, acquired more than
+--   one month ago, whose first order was on a promo.
+--   As-of date assumed = 2025-03-25 (as in your query).
+
+-- Required Output (verified by execution) -- 24 rows
+-- customer_code,acquired_date,last_order_date
+-- ABC1234567890XYZ,2025-01-01,2025-01-05
+-- ABC9876543210MNO,2025-01-27,2025-03-15
+-- BCD7890123456ABC,2025-01-10,2025-01-10
+-- DEF9876543210XYZ,2025-01-02,2025-03-02
+-- ... (full data as provided; 24 rows incl. NO_ORDER_RECENT, PROMO_FIRST_ONLY, THIRD_ORDER_CUST1/2)
+
+--Solution steps
+-- 1. Rank each customer's orders (rn=1 = first order); take max(placed_at)
+--    over the whole customer, not just promo orders.
+-- 2. Keep rn=1 rows where promo_code_name is not null.
+-- 3. Filter: last order < as_of - 7 days, first order < as_of - 1 month.
+
+--SQL solution1
+with ranked as (
+    select
+        customer_code,
+        placed_at,
+        promo_code_name,
+        row_number() over (partition by customer_code order by placed_at) as rn,
+        max(placed_at) over (partition by customer_code)                  as last_at
+    from orders1
+)
+select
+    customer_code,
+    placed_at::date as acquired_date,
+    last_at::date   as last_order_date
+from ranked
+where rn = 1
+  and promo_code_name is not null
+  and last_at::date   < date '2025-03-25' - interval '7 days'
+  and placed_at::date < date '2025-03-25' - interval '1 month'
+order by customer_code;
+
+-- ============================================================
+-- Q5: target customers after every third order
+-- ============================================================
+-- question statement
+--   Target customers after every third order (3rd, 6th, 9th ...).
+
+-- Required Output (verified by execution) -- 10 rows
+-- customer_code,placed_at,order_number
+-- ABC9876543210MNO,2025-03-15,3
+-- LAST_ORDER_7DAYS,2025-03-31,3
+-- MULTI_CUISINE_CUST,2025-01-15,3
+-- MULTI_CUISINE_CUST,2025-03-31,6
+-- ... (full data as provided: PROMO_FIRST_ONLY, THIRD_ORDER_CUST1/2, UFDDN x2, UVW7890123456JKL)
+
+--Solution steps
+-- 1. row_number() per customer ordered by placed_at.
+-- 2. Keep rows where order_number % 3 = 0.
+
+--SQL solution1
+with cte as (
+    select
+        *,
+        row_number() over (partition by customer_code order by placed_at, order_id) as order_number
+    from orders1
+)
+select * from cte where order_number % 3 = 0;
+
+
+-- ============================================================
+-- Q6: customers with >1 order, all on a promo
+-- ============================================================
+-- question statement
+--   List customers who placed more than one order, all of them with a promo.
+
+-- Required Output (verified by execution; both methods identical)
+-- customer_code,total_orders,orders_with_promocode
+-- DEF9876543210XYZ,2,2
+-- UVW7890123456JKL,3,3
+
+--Solution steps
+-- 1. Method 1: customers with >1 order, anti-join to any non-promo order.
+-- 2. Method 2: count(*) = count(promo_code_name) (count skips NULLs).
+
+--SQL solution1 -- anti-join
+with multi as (
+    select customer_code, count(*) as order_count
+    from orders1
+    group by customer_code
+    having count(*) > 1
+)
+select a.*
+from multi a
+left join orders1 b
+       on a.customer_code = b.customer_code and b.promo_code_name is null
+where b.customer_code is null;
+
+--SQL solution2 -- conditional count (preferred: one scan)
+select
+    customer_code,
+    count(*)                 as total_orders,
+    count(promo_code_name)   as orders_with_promocode
+from orders1
+group by customer_code
+having count(*) > 1
+   and count(*) = count(promo_code_name);
+
+
+-- ============================================================
+-- Q7: % of customers organically acquired in Jan 2025
+-- ============================================================
+-- question statement
+--   What percentage of customers were organically acquired in Jan 2025
+--   (first order in Jan 2025 placed without a promo code)?
+
+-- Required Output (verified by execution)
+-- jan_acquired,organic,organic_pct
+-- 41,18,43.90
+
+--Solution steps
+-- 1. Take each customer's first order (row_number = 1).
+-- 2. Keep first orders placed in Jan 2025 (= Jan-acquired customers).
+-- 3. organic = first order with NULL promo; pct = organic / total * 100.
+
+--SQL solution1
+with cte as (
+    select
+        customer_code,
+        placed_at,
+        promo_code_name,
+        row_number() over (partition by customer_code order by placed_at) as rn
+    from orders1
+)
+select
+    count(*)                                                        as jan_acquired,
+    count(case when promo_code_name is null then 1 end)             as organic,
+    round(100.0 * count(case when promo_code_name is null then 1 end)
+          / count(*), 2)                                            as organic_pct
+from cte
+where rn = 1
+  and placed_at >= '2025-01-01' and placed_at < '2025-02-01';
